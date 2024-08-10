@@ -1,46 +1,6 @@
 // Prototype for room sensor controller
 // Seeed Studio XIAO SAMD21 version
 
-#ifndef __cplusplus
-#error NOT C++
-#endif
-
-// for the XIAO SAMD board, the builting LED illuminates when pulled LOW, unlike Arduino Uno
-#define LED_ON LOW
-#define LED_OFF HIGH
-
-
-struct SwitchState {
-  uint32_t loopCount;
-  bool state;
-};
-
-uint32_t loopCount = 0;
-SwitchState switch1_a;
-SwitchState switch1_b;
-
-SwitchState* switch1_current = &switch1_a;
-SwitchState* switch1_last = &switch1_b;
-
-
-void setup() {
-  Serial.begin(9600);
-  pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(PIN_A0, INPUT_PULLDOWN);
-  pinMode(PIN_A1, INPUT_PULLDOWN);
-  pinMode(PIN_A2, INPUT_PULLDOWN);
-  pinMode(PIN_A3, INPUT_PULLDOWN);
-}
-
-void loop() {
-  loopCount++;
-  readSwitch(&switch1_current, &switch1_last, PIN_A0);
-  dumpSwitchState("last", switch1_last);
-  dumpSwitchState("curr", switch1_current);
-  Serial.println();
-
-  delay(1000);
-}
 
 // passive sensors
 // read motion sensor
@@ -61,55 +21,114 @@ void loop() {
 
 
 
+#ifndef __cplusplus
+#error NOT C++
+#endif
 
+// for the XIAO SAMD board, the builting LED illuminates when pulled LOW, unlike Arduino Uno
+#define LED_ON LOW
+#define LED_OFF HIGH
 
+struct SwitchState {
+  uint32_t loopCount;
+  bool state;
+};
 
+uint32_t loopCount = 0;
 
-void readSwitch(SwitchState** pp_current, SwitchState** pp_last, int pin)
+#define SWITCH_QTY 3
+uint switchPinMap[SWITCH_QTY] = { PIN_A0, PIN_A1, PIN_A2};
+SwitchState switches_a[SWITCH_QTY];
+SwitchState switches_b[SWITCH_QTY];
+
+SwitchState* switches_curr[SWITCH_QTY];
+SwitchState* switches_last[SWITCH_QTY];
+
+void initSwitchStateAndPins()
 {
+  for (int i = 0; i < SWITCH_QTY; ++i)
+  {
+    switches_curr[i] = &switches_a[i];
+    switches_last[i] = &switches_b[i];   
+    pinMode(switchPinMap[i], INPUT_PULLDOWN);
+  }
+}
+
+
+// read a single switch on the given pin; swapping the current and last state ptrs beforehand
+// Thus, calling this func repeatedly results in current pointing to the just-read state and 
+// last pointing to the previously read state.
+void readSwitch(uint switchnum)
+{
+  SwitchState** pp_current = &switches_curr[switchnum];
+  SwitchState** pp_last = &switches_last[switchnum];
   SwitchState* temp = *pp_last;
   *pp_last = *pp_current;
   *pp_current = temp;
 
   (*pp_current)->loopCount = loopCount;
-  (*pp_current)->state = digitalRead(pin);
-  return;
+  (*pp_current)->state = digitalRead(switchPinMap[switchnum]);
 }
 
 
-
-
-
-void dumpSwitchState(const char* label, SwitchState* state)
+void readSwitches()
 {
-  Serial.print(label);
-  Serial.print((uint32_t) state);
-  Serial.print(" lc: ");
-  Serial.print(state->loopCount);
-  Serial.print(" st: ");
-  Serial.print(state->state);
-  Serial.println();
+  for (int i = 0; i < SWITCH_QTY; ++i)
+  {
+    readSwitch(i);
+  }
 }
 
 
-// int delay_counter = 1000;
+void setup() {
+  Serial.begin(9600);
+  pinMode(LED_BUILTIN, OUTPUT);
+  
+  initSwitchStateAndPins();
+}
 
-// // the loop function runs over and over again forever
-// void loop() {
 
-//   Serial.print(" pin 0 = "); Serial.print(p0);
-//   Serial.print(" pin 1 = "); Serial.print(p1);
-//   Serial.print(" pin 2 = "); Serial.print(p2);
-//   Serial.print(" pin 3 = "); Serial.print(p3);
-//   Serial.println();
-//   digitalWrite(LED_BUILTIN, LED_ON);
-//   delay(50);
-//   digitalWrite(LED_BUILTIN, LED_OFF);
-//   delay(100);
-//   // delay(delay_counter);
-//   // delay_counter -= 100;
-//   // if (delay_counter < 0)
-//   // {
-//   //   delay_counter = 1000;
-//   // }
-// }
+
+void loop() {
+  loopCount++;
+  Serial.println(loopCount);
+  // readSwitches();
+  // dumpSwitches();
+  delay(1000);
+}
+
+
+const char* statLine = "1 c: v=x lc=yyyy 0xZZZZ l: v=x lc=yyyy 0xZZZZ | 2 c: v=x lc=yyyy 0xZZZZ l: v=x lc=yyyy 0xZZZZ | 3 c: v=x lc=yyyy 0xZZZZ l: v=x lc=yyyy 0xZZZZ ";
+const uint valIdx[SWITCH_QTY] = {7, 55, 103};
+
+void dumpSwitches()
+{
+  for (int i = 0; i < SWITCH_QTY; ++i)
+  {
+    fmtSwitchDump(i);
+  }
+  Serial.println(statLine);
+}
+
+
+
+void fmtSwitchDump(uint i)
+{
+  SwitchState* ss = switches_curr[i];
+  char* bufStart = (char*)statLine + valIdx[i];
+  itoa(ss->state, bufStart, 2);
+  bufStart += 4;
+  itoa(ss->loopCount, bufStart, 16);
+  bufStart += 7;
+  itoa(((uint32_t)ss & 0xFFFF), bufStart, 16);
+
+  ss = switches_last[i];
+  bufStart += 6;
+  itoa(ss->state, bufStart, 2);
+  bufStart += 4;
+  itoa(ss->loopCount, bufStart, 16);
+  bufStart += 7;
+  itoa(((uint32_t)ss & 0xFFFF), bufStart, 16);
+}
+
+
