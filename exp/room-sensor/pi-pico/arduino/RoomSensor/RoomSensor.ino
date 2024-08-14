@@ -1,28 +1,58 @@
+
 // Prototype for room sensor controller
 // edition: Raspberry Pi Pico (v1) using Arduino SDK
 
-#include "PinSampler.hpp"
+
 #include "KeyState.hpp"
+#include "DHT11Async.hpp"
 
 
-static char dumpBuf[132];
-
-static uint32_t loopCount = 0;
+// The rate at which we emit serial data depends on the wire and the board, so parameterize it. 
+const unsigned DEBUG_BIT_RATE = 115200;
 const uint8_t CONTROL_KEYS_QTY = 3;
-static PinSampler keySampler[CONTROL_KEYS_QTY];
-static int keyToPinMap[CONTROL_KEYS_QTY] = { 18, 19, 20};
 
+
+
+static char debugLineBuf[132];
+static uint32_t loopCount = 0;
+
+// The pins used by each key switch 
+static int keyToPinMap[CONTROL_KEYS_QTY] = { 2, 3, 4 };
 static KeyState keyStates[CONTROL_KEYS_QTY];
 
 
+
+
+DHTAsync dhtSensor(20);
+
+
+/*
+ * Poll for a measurement, keeping the state machine alive.  Returns
+ * true if a measurement is available.
+ */
+static bool measureTemperatureAndHumidity(float *temperature, float *humidity) {
+    static unsigned long measurement_timestamp = millis();
+
+    /* Measure once every four seconds. */
+    if (millis() - measurement_timestamp > 4000ul) {
+        if (dhtSensor.measure(temperature, humidity)) {
+            measurement_timestamp = millis();
+            return (true);
+        }
+    }
+
+    return (false);
+}
+
+
+
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(DEBUG_BIT_RATE);
   pinMode(LED_BUILTIN, OUTPUT);
 
   for (int i = 0; i < CONTROL_KEYS_QTY; ++i) 
   {
     pinMode(keyToPinMap[i], INPUT_PULLDOWN);
-    keyStates[i].SetPressedPinStatus(PinStatus::HIGH);
   }
 }
 
@@ -32,80 +62,42 @@ void sampleKeyPins()
 {
   for (int i = 0; i < CONTROL_KEYS_QTY; ++i)
   {
-    keySampler[i].TakeSample(loopCount, digitalRead(keyToPinMap[i]));
-  }
-}
-
-
-
-void dumpKeyPinSamples()
-{
-  strcpy(dumpBuf, "key pins: ");
-  for (int i = 0; i < CONTROL_KEYS_QTY; ++i)  
-  {
-    strcat(dumpBuf, keySampler[i].ToString());
-    strcat(dumpBuf, " || ");
-  }  
-  Serial.println(dumpBuf);
-}
-
-
-
-void updateKeyStates()
-{
-  for (int i = 0; i < CONTROL_KEYS_QTY; ++i)
-  {
-    KeyState::KeyPressKind kpk = keyStates[i].Update(keySampler[i]);
-    switch (kpk)
+    KeyState::KeyPressKind k = keyStates[i].Update(digitalRead(keyToPinMap[i]));
+    if (k != KeyState::KeyPressKind::None)
     {
-      case KeyState::KeyPressKind::ShortPress:
-      {
-        Serial.println("SHORT PRESS");
-        break;
-      }
-      case KeyState::KeyPressKind::LongPress:
-      {
-        Serial.println("LONG PRESS");
-        break;
-      }
-      default:
-      {
-        break;
-      }
+      Serial.println(k);
     }
   }
 }
 
 
 
-void
-dumpKeyStates()
-{
-  strcpy(dumpBuf, "key states: ");
-  for (int i = 0; i < CONTROL_KEYS_QTY; ++i)  
-  {
-    strcat(dumpBuf, keyStates[i].ToString());
-    strcat(dumpBuf, " || ");
-  }  
-  Serial.println(dumpBuf);
-}
-
+static float temperature;
+static float humidity;
 
 void loop() 
 {
   loopCount++;
-  Serial.print("loopCount "); Serial.print(loopCount); Serial.print(" ");
-  int p0 = digitalRead(keyToPinMap[0]);
-  int p1 = digitalRead(keyToPinMap[1]);
-  int p2 = digitalRead(keyToPinMap[2]);
-
-  //Serial.print(p0); Serial.print(" "); Serial.print(p1); Serial.print(" "); Serial.println(p2);
+  // Serial.print("loopCount "); Serial.print(loopCount); Serial.print(" ");
 
   sampleKeyPins();
-  dumpKeyPinSamples();
-  //updateKeyStates();
+ 
 
-  delay(100);
+  /* Measure temperature and humidity.  If the functions returns
+      true, then a measurement is available. */
+
+  if (measureTemperatureAndHumidity(&temperature, &humidity)) {
+      Serial.print("T = ");
+      Serial.print(dhtSensor.convertCtoF(temperature), 1);
+      Serial.print(" F  H = ");
+      Serial.print(humidity, 1);
+      Serial.println("%");
+  }
+
+
+
+
+  delay(10);
 }
 
 

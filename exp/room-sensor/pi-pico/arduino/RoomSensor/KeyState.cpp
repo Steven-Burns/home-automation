@@ -1,122 +1,134 @@
-#include "KeyState.hpp"
+#include <Arduino.h>
 #include <stdio.h>
 #include <cassert>
+#include "KeyState.hpp"
 
-void
-KeyState::SetPressedPinStatus(PinStatus status)
-{
-  pressedPinStatus = status;
-}
-
-
-constexpr const char* 
-StateToString(KeyState::States state) {
-    switch (state) {
-        case KeyState::States::Debouncing:      return "Debouncing";
-        case KeyState::States::Pressed:         return "Pressed";
-        case KeyState::States::PressedPreLong:  return "PressedPreLong";
-        case KeyState::States::Unpressed:       return "Unpressed";
-        default: return "Unknown";
-    }
-}
-
-
-const char *
-KeyState::ToString() const
-{
-    snprintf(
-        (char *)toStringBuf,
-        toStringBufChars,
-        "s %s k %s",
-        StateToString(state), "(kind)");
-    return toStringBuf;
-}
 
 
 KeyState::KeyPressKind 
-KeyState::Update(const PinSampler &sampler)
+KeyState::Update(PinStatus pinStatus)
 {
-    KeyPressKind result = KeyPressKind::None;
+  KeyPressKind result = KeyPressKind::None;
+  ulong elapsed = 0;
 
-    switch (state)
+  switch (state)
+  {
+    case States::WaitingForHigh:
     {
-    case States::Unpressed:
-    {
-        // todo not sure we need to check value changed.
-        if (sampler.IsSamplePinValChanged() && sampler.Current()->pinVal == pressedPinStatus)
-        {
-            state = Pressed;
-            duration = 0;
-        }
+      if (pinStatus != HIGH)
+      {
+        // Stay waiting
         break;
+      }
+      state = States::WaitingForLow;
+      longPressTimerStart = dblPressTimerStart = millis();
+      break;
     }
-    case States::Pressed:
+    case States::WaitingForLow:
     {
-        // todo not sure we need to check value changed.
-        if (!sampler.IsSamplePinValChanged() && sampler.Current()->pinVal == pressedPinStatus)
-        {
-            // still pressed.
-
-            duration += (sampler.Current()->clock - sampler.Previous()->clock);
-            if (duration > ShortPressThreshold)
-            {
-                duration = 0;
-                state = PressedPreLong;
-            }
-            // otherwise, we remain Pressed waiting for the threshold
-        }
-        else
-        {
-            // the pin has dropped, and we've not met the short press threshold. So
-            // revert back to Unpressed ==> the pin transition is ignored.
-            state = States::Unpressed;
-        }
+      if (pinStatus != LOW)
+      {
+        // stay waiting for a LOW.
         break;
+      }
+      elapsed = millis() - longPressTimerStart;
+      if (elapsed > LONG_PRESS_THRESHOLD_MS)
+      {
+        state = States::LongPressDetected;
+        break;
+      }
+      elapsed = millis() - dblPressTimerStart;
+      if (elapsed > DOUBLE_PRESS_THRESHOLD_MS)
+      {
+        state = States::SinglePressDetected;
+        break;
+      }
+      // this is the tricky case: low pin within the double-press threshold.
+      state = States::WaitingForDoubleHigh;
+      break;
     }
-    case States::PressedPreLong:
+    case States::WaitingForDoubleHigh:
     {
-        if (sampler.Current()->pinVal != pressedPinStatus)
+      elapsed = millis() - dblPressTimerStart;
+      if (elapsed > DOUBLE_PRESS_THRESHOLD_MS)
+      {
+        if (pinStatus == LOW) 
         {
-            // the pin has dropped, so proceed to debounce a short press
-            kind = KeyPressKind::ShortPress;
-            duration = 0;
-            state = States::Debouncing;
+          state = States::SinglePressDetected;
+          break;
         }
-        else
-        {
-            // still pressed.
-
-            duration += (sampler.Current()->clock - sampler.Previous()->clock);
-            if (duration > LongPressThreshold)
-            {
-                duration = 0;
-                kind = KeyPressKind::LongPress;
-                duration = 0;
-                state = States::Debouncing;
-            }
-        }
+        // it might be preferable to just eat this keypress as a "failed" double click. Doing so fires no events and so 
+        // is benign -- at worst, the user has to try again.
+        state = States::WaitingForExpiredDoubleLow;
         break;
+      }
+      if (pinStatus == HIGH)
+      {
+        state = States::WaitingForDoubleLow;
+        break;
+      }
+      // else, we're within the double threshold and the pin is low, so 
+      // keep waiting.
+      break;
+    }
+    case States::WaitingForExpiredDoubleLow:
+    {
+      if (pinStatus != LOW)
+      {
+        // keep waiting for a low 
+        break;
+      }
+      state = States::SinglePressDetected;
+      break;
+    }
+    case States::WaitingForDoubleLow:
+    {
+      if (pinStatus != LOW)
+      {
+        // keep waiting
+        break;
+      }
+      state = States::DoublePressDetected;
+      break;
+    }
+    case States::LongPressDetected:
+    {
+      result = KeyPressKind::LongPress;
+      debounceTimerStart = millis();
+      state = States::Debouncing;
+      break;
+    }
+    case States::SinglePressDetected:
+    {
+      result = KeyPressKind::SinglePress;
+      debounceTimerStart = millis();
+      state = States::Debouncing;
+      break;
+    }
+    case States::DoublePressDetected:
+    {
+      result = KeyPressKind::DoublePress;
+      debounceTimerStart = millis();
+      state = States::Debouncing;
+      break;
     }
     case States::Debouncing:
     {
-        // we don't care about the pin state here, we're just waiting for time to pass and eating
-        // any pin transition.
-        duration += (sampler.Current()->clock - sampler.Previous()->clock);
-        if (duration > PostPressThreshold)
-        {
-            // here we want to "enqueue" a keypress event somehow.
-            result = kind;
-            // Serial.print("BOOM! "); Serial.println(kind);
-
-            // and then the next state is Unpressed
-            state = States::Unpressed;
-        }
-        break;
+      elapsed = millis() - debounceTimerStart;
+      if (elapsed > DEBOUNCE_THRESHOLD_MS)
+      {
+        state = States::WaitingForHigh;
+      }
+      break;
     }
     default:
     {
-        assert(false /* unhandled KeyState::States case */);
+      assert(false);
     }
-    }
-    return result;
+  }
+  return result;
 }
+
+
+
+
