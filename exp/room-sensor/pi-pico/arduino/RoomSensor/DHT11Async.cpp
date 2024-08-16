@@ -1,11 +1,17 @@
+// This code refurbished and made to work with Raspberry Pi Pico from 
+// https://github.com/toannv17/DHT-Sensors-Non-Blocking 
+//
+// what didn't work with the original:
+// - disabling interupts.  Crashes the mbedOS on the Pico
+// - requires F_CPU to be defined, which appears to have been removed
+// from the Arduino SDK of late.
+
+
 #include "DHT11Async.hpp"
 
 
-#define F_CPU 130000000L  // Raspberry Pi Pico v1 
-
-
+#define F_CPU 130000000L  // Raspberry Pi Pico v1, according to internet
 #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
-//#define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
 #define microsecondsToClockCycles(a) ( (a) * clockCyclesPerMicrosecond() )
 
 
@@ -144,22 +150,22 @@ uint32_t DHTAsync::expectPulse(bool level) const {
 #endif
     // On AVR platforms use direct GPIO port access as it's much faster and better
     // for catching pulses that are 10's of microseconds in length:
-// #ifdef __AVR
-//     uint8_t portState = level ? _bit : 0;
-//     while ((*portInputRegister(_port) & _bit) == portState) {
-//         if (count++ >= _maxCycles) {
-//             return 0; // Exceeded timeout, fail.
-//         }
-//     }
-//     // Otherwise fall back to using digitalRead (this seems to be necessary on ESP8266
-//     // right now, perhaps bugs in direct port access functions?).
-// #else
+#ifdef __AVR
+    uint8_t portState = level ? _bit : 0;
+    while ((*portInputRegister(_port) & _bit) == portState) {
+        if (count++ >= _maxCycles) {
+            return 0; // Exceeded timeout, fail.
+        }
+    }
+    // Otherwise fall back to using digitalRead (this seems to be necessary on ESP8266
+    // right now, perhaps bugs in direct port access functions?).
+#else
     while (digitalRead(_pin) == level) {
         if (count++ >= _maxCycles) {
             return 0; // Exceeded timeout, fail.
         }
     }
-// #endif
+#endif
 
     return count;
 }
