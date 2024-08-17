@@ -21,10 +21,10 @@ Sampler<T>::HasSampleChanged() const
     bool result = current->value != previous->value;
 
     // check to see that the timestamps have increased when there is a delta. If not, then why is the pin changed?
-    if (result) 
-    {
-      Serial.print(current->clock); Serial.print(' '); Serial.println(previous->clock);
-    }
+    // if (result) 
+    // {
+    //   Serial.print(current->clock); Serial.print(' '); Serial.println(previous->clock);
+    // }
     return result;
 }
 
