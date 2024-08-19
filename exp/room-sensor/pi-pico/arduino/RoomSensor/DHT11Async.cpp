@@ -212,7 +212,7 @@ bool DHTAsync::readAsync() {
                 status = readData();
                 if( status != true )
                 {
-                  Serial.println( "Reading failed" );
+                  // Serial.println( "Reading failed" );
                 }
             }
             break;

@@ -147,7 +147,8 @@ void loop()
   }
 
   // TODO
-  // comms
+  // read pico internal temperature
+  // comms over rs485 and Cat6A cables 100'
   // heartbeat: every M units of time, send a full passive sensor update with current states
 
 
