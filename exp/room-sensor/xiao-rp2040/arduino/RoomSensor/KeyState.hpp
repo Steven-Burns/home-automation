@@ -55,5 +55,4 @@ private:
 
 public:
     KeyPressKind Update(PinStatus status);
-    const char *ToString() const;
 };

@@ -7,11 +7,20 @@
 #include "GroveLightSensor12.hpp"
 #include "GroveMiniPIRMotionSensor.hpp"
 #include "Sampler.hpp"
+#include "SensorEvent.hpp"
+
 
 
 // The rate at which we emit serial data depends on the wire and the board, so parameterize it. 
 const unsigned DEBUG_BIT_RATE = 115200;
 static char debugLineBuf[132];
+
+void clearBuiltinLED()
+{
+  digitalWrite(LED_BUILTIN, HIGH);
+  digitalWrite(PIN_LED_B, HIGH);
+  digitalWrite(PIN_LED_G, HIGH);
+}
 
 // non-blocking heartbeat
 void toggleBuiltinLED()
@@ -22,16 +31,25 @@ void toggleBuiltinLED()
   if (now - millisSinceLastCall > 1000) 
   {
     lastLEDLevel =(lastLEDLevel == HIGH) ? LOW : HIGH;
-    digitalWrite(LED_BUILTIN, lastLEDLevel);
+    //digitalWrite(LED_BUILTIN, lastLEDLevel);
     digitalWrite(PIN_LED_B, lastLEDLevel);
-    digitalWrite(PIN_LED_G, lastLEDLevel);
+    //digitalWrite(PIN_LED_G, lastLEDLevel);
     millisSinceLastCall = now;
   }
 }
 
 
 
+/*
+QUESTION to self
 
+does the sensor interpret the meaning of the keys, or just the actions taken with them?  e.g.
+LIGHT_ON / LIGHT_OFF or "BUTTON 1 SINGLE CLICK"?
+
+probably the latter, as interpretation may need to consider information not available to the sensor, like
+time of day, sunset, day of year, etc.
+
+*/
 
 
 const uint8_t CONTROL_KEYS_QTY = 3;
@@ -96,6 +114,8 @@ void setup() {
   pinMode(PIN_LED_B, OUTPUT);
   pinMode(PIN_LED_G, OUTPUT);
 
+  clearBuiltinLED();
+
   doKeyStatesSetup();
   doTemperatureAndHumiditySetup();
   doMotionSensorSetup();
@@ -111,7 +131,8 @@ void sampleKeyPins()
     KeyState::KeyPressKind k = keyStates[i].Update(digitalRead(keyToPinMap[i]));
     if (k != KeyState::KeyPressKind::None)
     {
-      Serial.print("key "); Serial.print(i); Serial.print(" "); Serial.println(k);
+      KeyPressEvent kpe(i, k);
+      Serial.println(kpe.ToString());
     }
   }
 }
@@ -152,12 +173,12 @@ void loop()
 
   sampleKeyPins();
  
-  if (measureTemperatureAndHumidity() && dhtSampler.HasSampleChanged()) {
-      Serial.print("T = ");
-      Serial.print(dhtSensor.convertCtoF(dhtSampler.Current()->value.temperature), 1);
-      Serial.print(" F  H = ");
-      Serial.print(dhtSampler.Current()->value.humidity, 1);
-      Serial.println("%");
+  if (measureTemperatureAndHumidity() && dhtSampler.HasSampleChanged()) 
+  {
+    TemperatureEvent te(
+        dhtSensor.convertCtoF(dhtSampler.Current()->value.temperature),
+        dhtSampler.Current()->value.humidity);
+    Serial.println(te.ToString());
   }
 
   lightSampler.TakeSample(millis(), lightSensor.ReadLevel());
@@ -169,7 +190,8 @@ void loop()
   motionSampler.TakeSample(millis(), motionSensor.IsMotionDetected());
   if (motionSampler.HasSampleChanged())
   {
-    Serial.print("motion "); Serial.println(motionSampler.Current()->value);
+    MotionEvent me(motionSampler.Current()->value);
+    Serial.println(me.ToString());
   }
 
   // TODO
