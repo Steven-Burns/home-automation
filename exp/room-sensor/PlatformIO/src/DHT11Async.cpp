@@ -10,9 +10,10 @@
 #include "DHT11Async.hpp"
 
 
-#define F_CPU 130000000L  // Raspberry Pi Pico v1, according to internet
-#define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
-#define microsecondsToClockCycles(a) ( (a) * clockCyclesPerMicrosecond() )
+// Don't need to define these when compiling under PlatformIO. Yay!
+// #define F_CPU 130000000L  // Raspberry Pi Pico v1, according to internet
+// #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
+// #define microsecondsToClockCycles(a) ( (a) * clockCyclesPerMicrosecond() )
 
 
 
