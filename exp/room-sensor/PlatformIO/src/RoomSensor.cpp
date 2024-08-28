@@ -1,7 +1,6 @@
 // Prototype for room sensor device
 // edition: Raspberry Pi Pico (v1) using Arduino SDK
 
-
 #include <Arduino.h>
 #include "KeyState.hpp"
 #include "DHT11Async.hpp"
@@ -9,10 +8,10 @@
 #include "GroveMiniPIRMotionSensor.hpp"
 #include "Sampler.hpp"
 #include "SensorEvent.hpp"
+#include "Display.hpp"
+#include "Reboot.hpp"
 
-
-
-// The rate at which we emit serial data depends on the wire and the board, so parameterize it. 
+// The rate at which we emit serial data depends on the wire and the board, so parameterize it.
 const unsigned DEBUG_BIT_RATE = 115200;
 static char debugLineBuf[132];
 
@@ -29,41 +28,27 @@ void toggleBuiltinLED()
   static int lastLEDLevel = LOW;
   static uint32_t millisSinceLastCall = 0;
   uint32_t now = millis();
-  if (now - millisSinceLastCall > 1000) 
+  if (now - millisSinceLastCall > 1000)
   {
-    lastLEDLevel =(lastLEDLevel == HIGH) ? LOW : HIGH;
-    //digitalWrite(LED_BUILTIN, lastLEDLevel);
+    lastLEDLevel = (lastLEDLevel == HIGH) ? LOW : HIGH;
+    // digitalWrite(LED_BUILTIN, lastLEDLevel);
     digitalWrite(PIN_LED_B, lastLEDLevel);
-    //digitalWrite(PIN_LED_G, lastLEDLevel);
+    // digitalWrite(PIN_LED_G, lastLEDLevel);
     millisSinceLastCall = now;
   }
 }
 
-
-
-/*
-QUESTION to self
-
-does the sensor interpret the meaning of the keys, or just the actions taken with them?  e.g.
-LIGHT_ON / LIGHT_OFF or "BUTTON 1 SINGLE CLICK"?
-
-probably the latter, as interpretation may need to consider information not available to the sensor, like
-time of day, sunset, day of year, etc.
-
-*/
-
-
 const uint8_t CONTROL_KEYS_QTY = 3;
-// The pins used by each key switch 
-static uint8_t keyToPinMap[CONTROL_KEYS_QTY] = { D8, D9, D10};
+// The pins used by each key switch
+static uint8_t keyToPinMap[CONTROL_KEYS_QTY] = {D8, D9, D10};
 static KeyState keyStates[CONTROL_KEYS_QTY];
 
-// The frequency to take a sensor reading
+// The frequency to take a temp sensor reading
 static ulong TEMPERATURE_MEASUREMENT_INTERVAL_MS = 5000ul;
-static uint8_t DHT_SENSOR_PIN = D2; 
+static uint8_t DHT_SENSOR_PIN = D2;
 DHTAsync dhtSensor(DHT_SENSOR_PIN);
 
-struct DHTSample 
+struct DHTSample
 {
   float temperature;
   float humidity;
@@ -81,11 +66,9 @@ static uint8_t MOTION_SENSOR_PIN = D1;
 GroveMotionSensor motionSensor(MOTION_SENSOR_PIN);
 Sampler<bool> motionSampler;
 
-
-
 void doKeyStatesSetup()
 {
-  for (int i = 0; i < CONTROL_KEYS_QTY; ++i) 
+  for (int i = 0; i < CONTROL_KEYS_QTY; ++i)
   {
     pinMode(keyToPinMap[i], INPUT_PULLDOWN);
   }
@@ -99,7 +82,6 @@ void doTemperatureAndHumiditySetup()
 void doLightSensorSetup()
 {
   pinMode(LIGHT_SENSOR_PIN, INPUT);
-
 }
 
 void doMotionSensorSetup()
@@ -107,9 +89,13 @@ void doMotionSensorSetup()
   pinMode(MOTION_SENSOR_PIN, INPUT);
 }
 
+void doDisplaySetup()
+{
+  Display::Setup();
+}
 
-
-void setup() {
+void setup()
+{
   delay(1000);
   Serial.begin(DEBUG_BIT_RATE);
   pinMode(LED_BUILTIN, OUTPUT);
@@ -117,6 +103,8 @@ void setup() {
   pinMode(PIN_LED_G, OUTPUT);
 
   clearBuiltinLED();
+  toggleBuiltinLED();
+  doDisplaySetup();
 
   doKeyStatesSetup();
   doTemperatureAndHumiditySetup();
@@ -124,7 +112,38 @@ void setup() {
   doLightSensorSetup();
 }
 
+// Push the temp and humidity state machine forward. If the function returns
+// true, then a measurement is available.
+static bool measureTemperatureAndHumidity()
+{
+  static ulong measurement_timestamp = millis();
+  static float t = NAN;
+  static float h = NAN;
 
+  if (millis() - measurement_timestamp > TEMPERATURE_MEASUREMENT_INTERVAL_MS)
+  {
+    if (dhtSensor.measure(&t, &h))
+    {
+      measurement_timestamp = millis();
+      DHTSample s = {.temperature = t, .humidity = h};
+      dhtSampler.TakeSample(millis(), s);
+      return true;
+    }
+  }
+
+  return false;
+}
+
+static uint32_t loopCount = 0;
+static struct
+{
+  uint keypresses = 0;
+  uint temperatureChanges = 0;
+  uint motionChanges = 0;
+  uint lightChanges = 0;
+  uint pingCount = 0;
+  uint heartbeatCount = 0;
+} stats;
 
 void sampleKeyPins()
 {
@@ -134,59 +153,67 @@ void sampleKeyPins()
     if (k != KeyState::KeyPressKind::None)
     {
       KeyPressEvent kpe(i, k);
+      stats.keypresses++;
       Serial.println(kpe.ToString());
     }
   }
 }
 
-
-
-// Push the temp and humidity state machine forward. If the function returns
-// true, then a measurement is available.
-static bool measureTemperatureAndHumidity() 
+void updateDisplay()
 {
-    static ulong measurement_timestamp = millis();
-    static float t = NAN;
-    static float h = NAN;
+  static uint32_t lastUpdateTime = millis();
+  uint32_t now = millis();
+  if (now - lastUpdateTime > 250)
+  {
+    Display::StartUpdate();
+    sprintf(
+        debugLineBuf,
+        "Arcadia House        255.255.255.255",
+        // put ip address here
+        NULL);
+    Display::WriteString(0, 0, debugLineBuf);
 
-    if (millis() - measurement_timestamp > TEMPERATURE_MEASUREMENT_INTERVAL_MS) 
-    {
-      if (dhtSensor.measure(&t, &h)) 
-      {
-        measurement_timestamp = millis();
-        DHTSample s = { .temperature = t, .humidity = h };
-        dhtSampler.TakeSample(millis(), s);
-        return true;
-      }
-    }
+    sprintf(
+        debugLineBuf,
+        "K %02d M %02d L %02d T %03d P %04d H %03d",
+        stats.keypresses, stats.motionChanges, stats.lightChanges, stats.temperatureChanges,
+        stats.pingCount, stats.heartbeatCount);
+    Display::WriteString(0, 1, debugLineBuf);
 
-    return false;
+    Display::WriteString(0, 2, "More fun than a box of rocks on a");
+    Display::WriteString(0, 3, "cloudy day.");
+
+    Display::EndUpdate();
+
+    // TODO: replace this with actual IP ping counter
+    stats.pingCount = loopCount;
+
+    lastUpdateTime = now;
+  }
 }
 
-
-
-static uint32_t loopCount = 0;
-
-void loop() 
+void loop()
 {
   loopCount++;
   toggleBuiltinLED();
   // Serial.print("loopCount "); Serial.print(loopCount); Serial.print(" ");
 
   sampleKeyPins();
- 
-  if (measureTemperatureAndHumidity() && dhtSampler.HasSampleChanged()) 
+
+  if (measureTemperatureAndHumidity() && dhtSampler.HasSampleChanged())
   {
     TemperatureEvent te(
         dhtSensor.convertCtoF(dhtSampler.Current()->value.temperature),
         dhtSampler.Current()->value.humidity);
+    stats.temperatureChanges++;
     Serial.println(te.ToString());
   }
 
   lightSampler.TakeSample(millis(), lightSensor.ReadLevel());
-  if (lightSampler.HasSampleChanged())  
+  if (lightSampler.HasSampleChanged())
   {
     LightLevelEvent le(lightSampler.Current()->value);
+    stats.lightChanges++;
     Serial.println(le.ToString());
   }
 
@@ -194,6 +221,7 @@ void loop()
   if (motionSampler.HasSampleChanged())
   {
     MotionEvent me(motionSampler.Current()->value);
+    stats.motionChanges++;
     Serial.println(me.ToString());
   }
 
@@ -202,6 +230,11 @@ void loop()
   // comms over rs485 and Cat6A cables 100'
   // heartbeat: every M units of time, send a full passive sensor update with current states
 
-
+  updateDisplay();
   delay(15);
+
+  if (loopCount > 9999)
+  {
+    reboot();
+  }
 }

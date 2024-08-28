@@ -180,7 +180,7 @@ void serviceCommandLoop()
 
   Serial.print("Command received: ");
   Serial.println(receivedChars);
-  Serial.println(strlen(receivedChars));
+  // Serial.println(strlen(receivedChars));
   newData = false;
 
   if (strncmp(receivedChars, "on ", 3) == 0)

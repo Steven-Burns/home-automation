@@ -16,6 +16,18 @@
 typedef unsigned long ulong;
 
 
+/*
+QUESTION to self
+
+does the sensor interpret the meaning of the keys, or just the actions taken with them?  e.g.
+LIGHT_ON / LIGHT_OFF or "BUTTON 1 SINGLE CLICK"?
+
+probably the latter, as interpretation may need to consider information not available to the sensor, like
+time of day, sunset, day of year, etc.
+
+*/
+
+
 
 class KeyState
 {
