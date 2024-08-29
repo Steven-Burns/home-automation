@@ -1,5 +1,5 @@
 // Prototype for room sensor device
-// edition: Raspberry Pi Pico (v1) using Arduino SDK
+// edition: XAIO RP2040 using Arduino SDK
 
 #include <Arduino.h>
 #include <Wire.h>
@@ -28,47 +28,6 @@ static struct
   uint pingCount = 0;
   uint heartbeatCount = 0;
 } stats;
-
-
-void clearBuiltinLEDs()
-{
-  // on the XAIO RP2040, you turn the builtin LEDs off by setting them high, weird.
-  digitalWrite(LED_BUILTIN, HIGH);
-  digitalWrite(PIN_LED_B, HIGH);
-  digitalWrite(PIN_LED_G, HIGH);
-}
-
-// non-blocking heartbeat
-void heartbeatCPU0()
-{
-  static int lastLEDLevel = LOW;
-  static uint32_t millisSinceLastCall = 0;
-  uint32_t now = millis();
-  if (now - millisSinceLastCall > 1500)
-  {
-    lastLEDLevel = (lastLEDLevel == HIGH) ? LOW : HIGH;
-    // digitalWrite(LED_BUILTIN, lastLEDLevel);
-    digitalWrite(PIN_LED_B, lastLEDLevel);
-    // digitalWrite(PIN_LED_G, lastLEDLevel);
-    millisSinceLastCall = now;
-  }
-}
-
-// non-blocking heartbeat for the second CPU
-void hearbeatCPU1()
-{
-  static int lastLEDLevel = LOW;
-  static uint32_t millisSinceLastCall = 0;
-  uint32_t now = millis();
-  if (now - millisSinceLastCall > 500)
-  {
-    lastLEDLevel = (lastLEDLevel == HIGH) ? LOW : HIGH;
-    // digitalWrite(LED_BUILTIN, lastLEDLevel);
-    // digitalWrite(PIN_LED_B, lastLEDLevel);
-    digitalWrite(PIN_LED_G, lastLEDLevel);
-    millisSinceLastCall = now;
-  }
-}
 
 const uint8_t CONTROL_KEYS_QTY = 3;
 // The pins used by each key switch
@@ -127,6 +86,42 @@ void doDisplaySetup()
   Display::Setup();
 }
 
+void clearBuiltinLEDs()
+{
+  // on the XAIO RP2040, you turn the builtin LEDs off by setting them high, weird.
+  digitalWrite(LED_BUILTIN, HIGH);
+  digitalWrite(PIN_LED_B, HIGH);
+  digitalWrite(PIN_LED_G, HIGH);
+}
+
+// non-blocking heartbeat
+void heartbeatCPU0()
+{
+  static int lastLEDLevel = LOW;
+  static uint32_t millisSinceLastCall = 0;
+  uint32_t now = millis();
+  if (now - millisSinceLastCall > 1500)
+  {
+    lastLEDLevel = (lastLEDLevel == HIGH) ? LOW : HIGH;
+    digitalWrite(PIN_LED_B, lastLEDLevel);
+    millisSinceLastCall = now;
+  }
+}
+
+// non-blocking heartbeat for the second CPU
+void hearbeatCPU1()
+{
+  static int lastLEDLevel = LOW;
+  static uint32_t millisSinceLastCall = 0;
+  uint32_t now = millis();
+  if (now - millisSinceLastCall > 500)
+  {
+    lastLEDLevel = (lastLEDLevel == HIGH) ? LOW : HIGH;
+    digitalWrite(PIN_LED_G, lastLEDLevel);
+    millisSinceLastCall = now;
+  }
+}
+
 void setup()
 {
   delay(1000);
@@ -136,9 +131,7 @@ void setup()
   pinMode(PIN_LED_G, OUTPUT);
 
   clearBuiltinLEDs();
-
   doDisplaySetup();
-
   doKeyStatesSetup();
   doTemperatureAndHumiditySetup();
   doMotionSensorSetup();
@@ -165,20 +158,6 @@ static bool measureTemperatureAndHumidity()
   }
 
   return false;
-}
-
-void sampleKeyPins()
-{
-  for (int i = 0; i < CONTROL_KEYS_QTY; ++i)
-  {
-    KeyState::KeyPressKind k = keyStates[i].Update(digitalRead(keyToPinMap[i]));
-    if (k != KeyState::KeyPressKind::None)
-    {
-      KeyPressEvent kpe(i, k);
-      stats.keypresses++;
-      Serial.println(kpe.ToString());
-    }
-  }
 }
 
 void updateDisplay()
@@ -259,6 +238,20 @@ void loop()
   // {
   //   reboot();
   // }
+}
+
+void sampleKeyPins()
+{
+  for (int i = 0; i < CONTROL_KEYS_QTY; ++i)
+  {
+    KeyState::KeyPressKind k = keyStates[i].Update(digitalRead(keyToPinMap[i]));
+    if (k != KeyState::KeyPressKind::None)
+    {
+      KeyPressEvent kpe(i, k);
+      stats.keypresses++;
+      Serial.println(kpe.ToString());
+    }
+  }
 }
 
 void loop1()
