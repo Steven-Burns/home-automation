@@ -31,8 +31,8 @@ class Display
     // This is the display for the Seeed "Yellow and Blue" module.
     // See: https://github.com/Seeed-Studio/Seeed_Learning_Space/tree/master/Grove%20-%20OLED%20Display%200.96''(SSD1315)V1.0
     // https://wiki.seeedstudio.com/Grove-OLED-Display-0.96-SSD1315/
-
-    static U8G2_SSD1306_128X64_NONAME_F_SW_I2C u8g2;  
+    static U8G2_SSD1306_128X64_NONAME_F_SW_I2C u8g2;
+      
     static uint charHeightPx;
     static uint charWidthPx;
     static uint displayWidthPx;

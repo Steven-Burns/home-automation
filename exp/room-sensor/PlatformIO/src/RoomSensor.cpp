@@ -2,6 +2,7 @@
 // edition: Raspberry Pi Pico (v1) using Arduino SDK
 
 #include <Arduino.h>
+#include <Wire.h>
 #include "KeyState.hpp"
 #include "DHT11Async.hpp"
 #include "GroveLightSensor12.hpp"
@@ -28,12 +29,28 @@ void toggleBuiltinLED()
   static int lastLEDLevel = LOW;
   static uint32_t millisSinceLastCall = 0;
   uint32_t now = millis();
-  if (now - millisSinceLastCall > 1000)
+  if (now - millisSinceLastCall > 1500)
   {
     lastLEDLevel = (lastLEDLevel == HIGH) ? LOW : HIGH;
     // digitalWrite(LED_BUILTIN, lastLEDLevel);
     digitalWrite(PIN_LED_B, lastLEDLevel);
     // digitalWrite(PIN_LED_G, lastLEDLevel);
+    millisSinceLastCall = now;
+  }
+}
+
+// non-blocking heartbeat for the second CPU
+void toggleBuiltinLED2()
+{
+  static int lastLEDLevel = LOW;
+  static uint32_t millisSinceLastCall = 0;
+  uint32_t now = millis();
+  if (now - millisSinceLastCall > 1500)
+  {
+    lastLEDLevel = (lastLEDLevel == HIGH) ? LOW : HIGH;
+    // digitalWrite(LED_BUILTIN, lastLEDLevel);
+    // digitalWrite(PIN_LED_B, lastLEDLevel);
+    digitalWrite(PIN_LED_G, lastLEDLevel);
     millisSinceLastCall = now;
   }
 }
@@ -91,6 +108,7 @@ void doMotionSensorSetup()
 
 void doDisplaySetup()
 {
+  Wire.begin(); // Needed to get I2C working well
   Display::Setup();
 }
 
@@ -104,6 +122,7 @@ void setup()
 
   clearBuiltinLED();
   toggleBuiltinLED();
+
   doDisplaySetup();
 
   doKeyStatesSetup();
@@ -168,9 +187,9 @@ void updateDisplay()
     Display::StartUpdate();
     sprintf(
         debugLineBuf,
-        "Arcadia House        255.255.255.255",
-        // put ip address here
-        NULL);
+        "Arcadia House       %d.%d.%d.%d",
+        // TODO put ip address here
+        255, 255, 255, 255);
     Display::WriteString(0, 0, debugLineBuf);
 
     sprintf(
@@ -197,8 +216,6 @@ void loop()
   loopCount++;
   toggleBuiltinLED();
   // Serial.print("loopCount "); Serial.print(loopCount); Serial.print(" ");
-
-  sampleKeyPins();
 
   if (measureTemperatureAndHumidity() && dhtSampler.HasSampleChanged())
   {
@@ -237,4 +254,13 @@ void loop()
   {
     reboot();
   }
+}
+
+static uint32_t loop1Count = 0;
+
+void loop1()
+{
+  loop1Count++;
+  toggleBuiltinLED2();
+  sampleKeyPins();
 }
