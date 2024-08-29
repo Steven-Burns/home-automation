@@ -1,11 +1,17 @@
 #include "Display.hpp"
 
-// U8G2_SSD1306_128X64_NONAME_F_HW_I2C
+// U8G2_SSD1306_128X64_NONAME_F_HW_I2C is the "I2C in hardware" version. It doesn't
+// work on the XAIO RP2040.
 U8G2_SSD1306_128X64_NONAME_F_SW_I2C Display::u8g2(U8G2_R0, 7, 6, U8X8_PIN_NONE);
 uint Display::charHeightPx = 0;
 uint Display::charWidthPx = 0;
 uint Display::displayWidthPx = 0;
 uint Display::displayHeightPx = 0;
+
+// the number of pixel rows that are yellow on the display. 
+inline static const uint TOP_REGION_HEIGHT = 16;
+
+
 
 void Display::Setup()
 {
@@ -33,10 +39,10 @@ void Display::StartUpdate()
 
 void Display::EndUpdate()
 {
-   u8g2.drawFrame(0, 0, displayWidthPx - 1, TOP_REGION_HEIGHT);
-   u8g2.drawFrame(
-       0, TOP_REGION_HEIGHT + 1,
-       displayWidthPx - 1, displayHeightPx - TOP_REGION_HEIGHT - 1);
+    u8g2.drawFrame(0, 0, displayWidthPx - 1, TOP_REGION_HEIGHT);
+    u8g2.drawFrame(
+        0, TOP_REGION_HEIGHT + 1,
+        displayWidthPx - 1, displayHeightPx - TOP_REGION_HEIGHT - 1);
 
-   u8g2.sendBuffer();
+    u8g2.sendBuffer();
 }

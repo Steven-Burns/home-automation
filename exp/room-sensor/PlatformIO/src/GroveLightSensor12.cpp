@@ -1,13 +1,9 @@
 #include "GroveLightSensor12.hpp"
 
-
-
 GroveLightSensor::GroveLightSensor(uint8_t analogPin)
 {
     pin = analogPin;
 }
-
-
 
 GroveLightSensor::LightLevel
 GroveLightSensor::ReadLevel() const
@@ -26,10 +22,7 @@ GroveLightSensor::ReadLevel() const
     return result;
 }
 
-
-
-uint
-GroveLightSensor::ReadRawLevel() const
+uint GroveLightSensor::ReadRawLevel() const
 {
     return analogRead(pin);
 }

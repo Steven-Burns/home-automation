@@ -1,6 +1,6 @@
 #pragma once
 
-#if defined AVR
+#if defined __AVR
 
 // per https://forum.arduino.cc/t/soft-reset-and-arduino/367284/5
 
@@ -15,7 +15,7 @@ inline void reboot()
     }
 }
 
-#elif defined(TARGET_RP2040) 
+#elif defined(TARGET_RP2040)
 
 #include <hardware/regs/m0plus.h>
 #include <hardware/regs/addressmap.h>

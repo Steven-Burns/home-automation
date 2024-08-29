@@ -16,15 +16,30 @@
 const unsigned DEBUG_BIT_RATE = 115200;
 static char debugLineBuf[132];
 
-void clearBuiltinLED()
+static uint32_t loopCount = 0;
+static uint32_t loop1Count = 0;
+
+static struct
 {
+  uint keypresses = 0;
+  uint temperatureChanges = 0;
+  uint motionChanges = 0;
+  uint lightChanges = 0;
+  uint pingCount = 0;
+  uint heartbeatCount = 0;
+} stats;
+
+
+void clearBuiltinLEDs()
+{
+  // on the XAIO RP2040, you turn the builtin LEDs off by setting them high, weird.
   digitalWrite(LED_BUILTIN, HIGH);
   digitalWrite(PIN_LED_B, HIGH);
   digitalWrite(PIN_LED_G, HIGH);
 }
 
 // non-blocking heartbeat
-void toggleBuiltinLED()
+void heartbeatCPU0()
 {
   static int lastLEDLevel = LOW;
   static uint32_t millisSinceLastCall = 0;
@@ -40,12 +55,12 @@ void toggleBuiltinLED()
 }
 
 // non-blocking heartbeat for the second CPU
-void toggleBuiltinLED2()
+void hearbeatCPU1()
 {
   static int lastLEDLevel = LOW;
   static uint32_t millisSinceLastCall = 0;
   uint32_t now = millis();
-  if (now - millisSinceLastCall > 1500)
+  if (now - millisSinceLastCall > 500)
   {
     lastLEDLevel = (lastLEDLevel == HIGH) ? LOW : HIGH;
     // digitalWrite(LED_BUILTIN, lastLEDLevel);
@@ -120,8 +135,7 @@ void setup()
   pinMode(PIN_LED_B, OUTPUT);
   pinMode(PIN_LED_G, OUTPUT);
 
-  clearBuiltinLED();
-  toggleBuiltinLED();
+  clearBuiltinLEDs();
 
   doDisplaySetup();
 
@@ -152,17 +166,6 @@ static bool measureTemperatureAndHumidity()
 
   return false;
 }
-
-static uint32_t loopCount = 0;
-static struct
-{
-  uint keypresses = 0;
-  uint temperatureChanges = 0;
-  uint motionChanges = 0;
-  uint lightChanges = 0;
-  uint pingCount = 0;
-  uint heartbeatCount = 0;
-} stats;
 
 void sampleKeyPins()
 {
@@ -214,7 +217,7 @@ void updateDisplay()
 void loop()
 {
   loopCount++;
-  toggleBuiltinLED();
+  heartbeatCPU0();
   // Serial.print("loopCount "); Serial.print(loopCount); Serial.print(" ");
 
   if (measureTemperatureAndHumidity() && dhtSampler.HasSampleChanged())
@@ -250,17 +253,19 @@ void loop()
   updateDisplay();
   delay(15);
 
-  if (loopCount > 9999)
-  {
-    reboot();
-  }
+  // TODO: this wasn't working reliably. And 10K iterations is too soon.  Might be more reliable
+  // to wire a pin to the reset pin, if there is one.
+  // if (loopCount > 9999)
+  // {
+  //   reboot();
+  // }
 }
-
-static uint32_t loop1Count = 0;
 
 void loop1()
 {
   loop1Count++;
-  toggleBuiltinLED2();
+  hearbeatCPU1();
+
+  // sampling the keyboard pins as fast as possible on CPU1 works well. Fewer missed keystrokes.
   sampleKeyPins();
 }

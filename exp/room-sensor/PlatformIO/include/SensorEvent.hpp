@@ -4,45 +4,39 @@
 #include "GroveLightSensor12.hpp"
 #include "KeyState.hpp"
 
-
-
 // something is discouraging me from using polymorphism here, from some vague ick about virtual functions
-// and how that does not seem "embedded kosher."  This is probably a silly notion that I will get over 
+// and how that does not seem "embedded kosher."  This is probably a silly notion that I will get over
 // soon.
 
-struct SensorEvent 
+struct SensorEvent
 {
-    // TODO this is a misdesign: the tag should really be a static property of the event type, not
-    // per-instance state, as it does not change per instance.
-    static const size_t TAG_BYTES = 7;
-    char tag[TAG_BYTES + 1];
+  // TODO this is a misdesign: the tag should really be a static property of the event type, not
+  // per-instance state, as it does not change per instance.
+  static const size_t TAG_BYTES = 7;
+  char tag[TAG_BYTES + 1];
 
-    public:
+public:
+  SensorEvent(const char *tag)
+  {
+    strncpy(this->tag, tag, TAG_BYTES);
+  }
 
-    SensorEvent(const char* tag)
-    {
-        strncpy(this->tag, tag, TAG_BYTES);
-    }
-
-    virtual const char* ToString() const = 0;
+  virtual const char *ToString() const = 0;
 };
-
-
 
 struct TemperatureEvent : public SensorEvent
 {
   float temperature = 0.0;
   float humidity = 0.0;
 
-  public:
-
+public:
   TemperatureEvent(float t, float h) : SensorEvent("TEMP")
   {
     temperature = t;
     humidity = h;
   }
 
-  virtual const char* ToString() const
+  virtual const char *ToString() const
   {
     static const size_t bufChars = 32;
     static char toStringBuffer[bufChars];
@@ -55,12 +49,11 @@ struct TemperatureEvent : public SensorEvent
     // p = (char*) memccpy(p - 1, ftoa(temperature), '\0', dsize);
     // dsize -= (p - toStringBuffer - 1);
     // memccpy(p - 1, ftoa(humidity), '\0', dsize);
+    // ... ok, forget it.  Until I run out of memory, I'm just using sprintf.
 
     return toStringBuffer;
   }
 };
-
-
 
 struct MotionEvent : public SensorEvent
 {
@@ -71,7 +64,7 @@ struct MotionEvent : public SensorEvent
     this->isMovementDetected = isMovementDetected;
   }
 
-  virtual const char* ToString() const 
+  virtual const char *ToString() const
   {
     static const size_t bufChars = 32;
     static char toStringBuffer[bufChars];
@@ -80,8 +73,6 @@ struct MotionEvent : public SensorEvent
     return toStringBuffer;
   }
 };
-
-
 
 struct KeyPressEvent : public SensorEvent
 {
@@ -94,7 +85,7 @@ struct KeyPressEvent : public SensorEvent
     kind = k;
   }
 
-  virtual const char* ToString() const 
+  virtual const char *ToString() const
   {
     static const size_t bufChars = 32;
     static char toStringBuffer[bufChars];
@@ -103,8 +94,6 @@ struct KeyPressEvent : public SensorEvent
     return toStringBuffer;
   }
 };
-
-
 
 struct LightLevelEvent : public SensorEvent
 {
@@ -115,12 +104,12 @@ struct LightLevelEvent : public SensorEvent
     lightLevel = level;
   }
 
-  virtual const char* ToString() const
+  virtual const char *ToString() const
   {
     static const size_t bufChars = 32;
     static char toStringBuffer[bufChars];
 
     sprintf(toStringBuffer, "%s %s", tag, GroveLightSensor::LightLevelToString(lightLevel));
-    return toStringBuffer;  
+    return toStringBuffer;
   }
 };

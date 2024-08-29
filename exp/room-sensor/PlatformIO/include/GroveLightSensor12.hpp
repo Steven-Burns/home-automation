@@ -1,16 +1,12 @@
-// Wraps the device here: https://wiki.seeedstudio.com/Grove-Light_Sensor/
-
 #pragma once
 
+#include <Arduino.h>
 
-#include "Arduino.h"
-
-
+// Wraps the device here: https://wiki.seeedstudio.com/Grove-Light_Sensor/
 
 class GroveLightSensor
 {
-    public:
-
+public:
     enum LightLevel
     {
         Dark,
@@ -18,21 +14,17 @@ class GroveLightSensor
         Bright
     };
 
-    static const char* LightLevelToString(LightLevel l) 
+    static const char *LightLevelToString(LightLevel l)
     {
-        return 
-            LightLevel::Dark == l ? "Dark" :
-                LightLevel::Dim == l ? "Dim" : 
-                    LightLevel::Bright == l ? "Bright" :
-                        "Unknown";
+        return LightLevel::Dark == l ? "Dark" : LightLevel::Dim == l  ? "Dim"
+                                            : LightLevel::Bright == l ? "Bright"
+                                                                      : "Unknown";
     }
-    
+
     GroveLightSensor(uint8_t analogPin);
-    LightLevel ReadLevel() const ;
+    LightLevel ReadLevel() const;
     uint ReadRawLevel() const;
 
-    private:
-
+private:
     uint8_t pin;
 };
-
