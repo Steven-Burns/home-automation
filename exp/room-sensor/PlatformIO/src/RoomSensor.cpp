@@ -13,7 +13,7 @@
 #include "Reboot.hpp"
 
 // The rate at which we emit serial data depends on the wire and the board, so parameterize it.
-const unsigned DEBUG_BIT_RATE = 115200;
+static const unsigned DEBUG_BIT_RATE = 115200;
 static char debugLineBuf[132];
 
 static uint32_t loopCount = 0;
@@ -29,14 +29,14 @@ static struct
   uint heartbeatCount = 0;
 } stats;
 
-const uint8_t CONTROL_KEYS_QTY = 3;
+static const uint8_t CONTROL_KEYS_QTY = 3;
 // The pins used by each key switch
 static uint8_t keyToPinMap[CONTROL_KEYS_QTY] = {D8, D9, D10};
 static KeyState keyStates[CONTROL_KEYS_QTY];
 
 // The frequency to take a temp sensor reading
-static ulong TEMPERATURE_MEASUREMENT_INTERVAL_MS = 5000ul;
-static uint8_t DHT_SENSOR_PIN = D2;
+static const ulong TEMPERATURE_MEASUREMENT_INTERVAL_MS = 5000ul;
+static const uint8_t DHT_SENSOR_PIN = D2;
 DHTAsync dhtSensor(DHT_SENSOR_PIN);
 
 struct DHTSample
@@ -49,13 +49,17 @@ struct DHTSample
 
 Sampler<DHTSample> dhtSampler;
 
-static uint8_t LIGHT_SENSOR_PIN = A0;
+static const uint8_t LIGHT_SENSOR_PIN = A0;
 GroveLightSensor lightSensor(LIGHT_SENSOR_PIN);
 Sampler<GroveLightSensor::LightLevel> lightSampler;
 
-static uint8_t MOTION_SENSOR_PIN = D1;
+static const uint8_t MOTION_SENSOR_PIN = D1;
 GroveMotionSensor motionSensor(MOTION_SENSOR_PIN);
 Sampler<bool> motionSampler;
+
+static const uint32_t displaySleepTimeoutMs = 10000;
+static uint32_t displayLastWakeTimeMs = 0;
+static bool shouldDisplayBeOn = false;
 
 void doKeyStatesSetup()
 {
@@ -167,6 +171,14 @@ void updateDisplay()
   if (now - lastUpdateTime > 250)
   {
     Display::StartUpdate();
+    if (shouldDisplayBeOn)
+    {
+      Display::Wake();
+    }
+    else 
+    {
+      Display::Sleep();
+    }
     sprintf(
         debugLineBuf,
         "Arcadia House       %d.%d.%d.%d",
@@ -176,7 +188,7 @@ void updateDisplay()
 
     sprintf(
         debugLineBuf,
-        "K %02d M %02d L %02d T %03d P %04d H %03d",
+        "K %02X M %02X L %02X T %03X P %04X H %03X",
         stats.keypresses, stats.motionChanges, stats.lightChanges, stats.temperatureChanges,
         stats.pingCount, stats.heartbeatCount);
     Display::WriteString(0, 1, debugLineBuf);
@@ -250,8 +262,15 @@ void sampleKeyPins()
       KeyPressEvent kpe(i, k);
       stats.keypresses++;
       Serial.println(kpe.ToString());
+      shouldDisplayBeOn = true;
+      displayLastWakeTimeMs = millis();
     }
   }
+}
+
+void setup1()
+{
+  shouldDisplayBeOn = true;
 }
 
 void loop1()
@@ -261,4 +280,11 @@ void loop1()
 
   // sampling the keyboard pins as fast as possible on CPU1 works well. Fewer missed keystrokes.
   sampleKeyPins();
+
+  uint32_t now = millis();
+  if (now - displayLastWakeTimeMs > displaySleepTimeoutMs)
+  {
+    // Turn off the display to stop burn-in.
+    shouldDisplayBeOn = false;
+  }
 }
