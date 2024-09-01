@@ -3,6 +3,8 @@
 
 #include <Arduino.h>
 #include <Wire.h>
+#include <SPI.h>
+#include <Ethernet.h>
 #include "KeyState.hpp"
 #include "DHT11Async.hpp"
 #include "GroveLightSensor12.hpp"
@@ -11,6 +13,7 @@
 #include "SensorEvent.hpp"
 #include "Display.hpp"
 #include "Reboot.hpp"
+#include "StatusLEDs.hpp"
 
 // The rate at which we emit serial data depends on the wire and the board, so parameterize it.
 static const unsigned DEBUG_BIT_RATE = 115200;
@@ -31,12 +34,12 @@ static struct
 
 static const uint8_t CONTROL_KEYS_QTY = 3;
 // The pins used by each key switch
-static uint8_t keyToPinMap[CONTROL_KEYS_QTY] = {D8, D9, D10};
+static uint8_t keyToPinMap[CONTROL_KEYS_QTY] = { 8, 9, 5 } ; // {D8, D9, D10};
 static KeyState keyStates[CONTROL_KEYS_QTY];
 
 // The frequency to take a temp sensor reading
 static const ulong TEMPERATURE_MEASUREMENT_INTERVAL_MS = 5000ul;
-static const uint8_t DHT_SENSOR_PIN = D2;
+static const uint8_t DHT_SENSOR_PIN = 28; // D2;
 DHTAsync dhtSensor(DHT_SENSOR_PIN);
 
 struct DHTSample
@@ -49,11 +52,11 @@ struct DHTSample
 
 Sampler<DHTSample> dhtSampler;
 
-static const uint8_t LIGHT_SENSOR_PIN = A0;
+static const uint8_t LIGHT_SENSOR_PIN = 26; // A0 
 GroveLightSensor lightSensor(LIGHT_SENSOR_PIN);
 Sampler<GroveLightSensor::LightLevel> lightSampler;
 
-static const uint8_t MOTION_SENSOR_PIN = D1;
+static const uint8_t MOTION_SENSOR_PIN = 27; // D1
 GroveMotionSensor motionSensor(MOTION_SENSOR_PIN);
 Sampler<bool> motionSampler;
 
@@ -90,24 +93,14 @@ void doDisplaySetup()
   Display::Setup();
 }
 
-void clearBuiltinLEDs()
-{
-  // on the XAIO RP2040, you turn the builtin LEDs off by setting them high, weird.
-  digitalWrite(LED_BUILTIN, HIGH);
-  digitalWrite(PIN_LED_B, HIGH);
-  digitalWrite(PIN_LED_G, HIGH);
-}
-
 // non-blocking heartbeat
 void heartbeatCPU0()
 {
-  static int lastLEDLevel = LOW;
   static uint32_t millisSinceLastCall = 0;
   uint32_t now = millis();
   if (now - millisSinceLastCall > 1500)
   {
-    lastLEDLevel = (lastLEDLevel == HIGH) ? LOW : HIGH;
-    digitalWrite(PIN_LED_B, lastLEDLevel);
+    StatusLEDs::TogglePrimary();
     millisSinceLastCall = now;
   }
 }
@@ -115,13 +108,11 @@ void heartbeatCPU0()
 // non-blocking heartbeat for the second CPU
 void hearbeatCPU1()
 {
-  static int lastLEDLevel = LOW;
   static uint32_t millisSinceLastCall = 0;
   uint32_t now = millis();
   if (now - millisSinceLastCall > 500)
   {
-    lastLEDLevel = (lastLEDLevel == HIGH) ? LOW : HIGH;
-    digitalWrite(PIN_LED_G, lastLEDLevel);
+    StatusLEDs::ToggleSecondary();
     millisSinceLastCall = now;
   }
 }
@@ -130,11 +121,13 @@ void setup()
 {
   delay(1000);
   Serial.begin(DEBUG_BIT_RATE);
-  pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(PIN_LED_B, OUTPUT);
-  pinMode(PIN_LED_G, OUTPUT);
+  
+  // This cute technique will block (spin) until the monitor is connected.
+  // ordinarily, we won't have a monitor connected except when debugging.
+  // while(!Serial);
 
-  clearBuiltinLEDs();
+  StatusLEDs::Setup();
+  StatusLEDs::Clear();
   doDisplaySetup();
   doKeyStatesSetup();
   doTemperatureAndHumiditySetup();
