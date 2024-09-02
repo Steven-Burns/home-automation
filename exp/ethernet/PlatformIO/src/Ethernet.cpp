@@ -1,46 +1,47 @@
 #include <Arduino.h>
+#include "WiznetW5100PicoHat.hpp"
 
 // The rate at which we emit serial data depends on the wire and the board, so parameterize it.
 const unsigned DEBUG_BIT_RATE = 115200;
 
-#include <W5100lwIP.h>
-Wiznet5100lwIP eth(17, SPI, 21); // use the interupt mode of the wiz chip.
+
+
+void crash()
+{
+  Serial.println("CRASH!");
+  for (;;)
+  {
+    delay(1000);
+  }
+}
 
 void setup()
 {
-  // These are the pins for the wiznet 5100 pico hat, and also the w5100-evb-pico
-  // https://arduino-pico.readthedocs.io/en/latest/ethernet.html#using-the-wiznet-w5100s-evb-pico
-  SPI.setMISO(16);
-  SPI.setCS(17);
-  SPI.setSCK(18);
-  SPI.setMOSI(19);
-
   Serial.begin(DEBUG_BIT_RATE);
   pinMode(LED_BUILTIN, OUTPUT);
 
   delay(2000);
 
+  Wiznet5100PicoHat::Setup();
+
   // Start the Ethernet port
-  if (!eth.begin())
+  if (!Wiznet5100PicoHat::Begin())
   {
     Serial.println("No wired Ethernet hardware detected. Check pinouts, wiring.");
-    while (1)
-    {
-      delay(1000);
-    }
+    crash();
   }
 
-  while (!eth.connected())
+  while (!Wiznet5100PicoHat::Connected())
   {
     Serial.print(".");
     delay(500);
   }
-  Serial.println();
+  Serial.println("Connected.");
 
-  Serial.print("IP address: "); Serial.println(eth.localIP());
-  Serial.print("Gateway   : "); Serial.println(eth.gatewayIP());
-  Serial.print("DNS       : "); Serial.println(eth.dnsIP());
-  Serial.print("Subnet    : "); Serial.println(eth.subnetMask());
+  Serial.print("IP address: "); Serial.println(Wiznet5100PicoHat::LocalIP());
+  Serial.print("Gateway   : "); Serial.println(Wiznet5100PicoHat::GatewayIP());
+  Serial.print("DNS       : "); Serial.println(Wiznet5100PicoHat::DNSIP());
+  Serial.print("Subnet    : "); Serial.println(Wiznet5100PicoHat::SubnetMask());
 }
 
 const char *host = "djxmmx.net";
@@ -98,8 +99,8 @@ void loop()
   }
   Serial.println();
 
-  Serial.print("packets recd: "); Serial.println(eth.packetsReceived());
-  Serial.print("packets sent: "); Serial.println(eth.packetsSent());
+  Serial.print("packets recd: "); Serial.println(Wiznet5100PicoHat::PacketsRecevied());
+  Serial.print("packets sent: "); Serial.println(Wiznet5100PicoHat::PacketsSent());
 
   // Close the connection
   Serial.println();
