@@ -24,24 +24,11 @@ void setup()
 
   Wiznet5100PicoHat::Setup();
 
-  // Start the Ethernet port
-  if (!Wiznet5100PicoHat::Begin())
+  // Start the Ethernet port -- this will retry forever as long as the physical link is up.
+  if (!Wiznet5100PicoHat::BeginAndConnect())
   {
-    Serial.println("No wired Ethernet hardware detected. Check pinouts, wiring.");
     crash();
   }
-
-  while (!Wiznet5100PicoHat::Connected())
-  {
-    Serial.print(".");
-    delay(500);
-  }
-  Serial.println("Connected.");
-
-  Serial.print("IP address: "); Serial.println(Wiznet5100PicoHat::LocalIP());
-  Serial.print("Gateway   : "); Serial.println(Wiznet5100PicoHat::GatewayIP());
-  Serial.print("DNS       : "); Serial.println(Wiznet5100PicoHat::DNSIP());
-  Serial.print("Subnet    : "); Serial.println(Wiznet5100PicoHat::SubnetMask());
 }
 
 const char *host = "djxmmx.net";

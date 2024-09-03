@@ -22,6 +22,28 @@ public:
         SPI.setMOSI(19);
     }
 
+    static bool BeginAndConnect()
+    {
+        if (!Wiznet5100PicoHat::Begin())
+        {
+            Serial.println("No wired Ethernet hardware detected. Check pinouts, wiring.");
+            return false;
+        }
+
+        while (!Wiznet5100PicoHat::Connected())
+        {
+            Serial.print(".");
+            delay(500);
+        }
+        Serial.println("Wired Ethernet w/IP Connected.");
+
+        Serial.print("IP address: "); Serial.println(Wiznet5100PicoHat::LocalIP());
+        Serial.print("Gateway   : "); Serial.println(Wiznet5100PicoHat::GatewayIP());
+        Serial.print("DNS       : "); Serial.println(Wiznet5100PicoHat::DNSIP());
+        Serial.print("Subnet    : "); Serial.println(Wiznet5100PicoHat::SubnetMask());
+        return true;
+    }
+
     static bool Begin()
     {
         return eth.begin();
