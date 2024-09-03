@@ -46,6 +46,15 @@ public:
 
     static bool Begin()
     {
+        if (!eth.hostname("arkadia-pico-01"))
+        {
+            Serial.println("Could not set hostname");
+        }
+        
+        // TODO: someday, play with this
+        // https://arduino-pico.readthedocs.io/en/latest/ethernet.html#adjusting-spi-speed
+        // eth.setSPISpeed(????);
+
         return eth.begin();
     }
 

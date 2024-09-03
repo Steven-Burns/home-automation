@@ -24,7 +24,7 @@ void setup()
 
   Wiznet5100PicoHat::Setup();
 
-  // Start the Ethernet port -- this will retry forever as long as the physical link is up.
+  // Start the Ethernet port -- this will retry connecting forever.
   if (!Wiznet5100PicoHat::BeginAndConnect())
   {
     crash();

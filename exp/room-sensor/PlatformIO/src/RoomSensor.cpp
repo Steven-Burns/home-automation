@@ -3,8 +3,6 @@
 
 #include <Arduino.h>
 #include <Wire.h>
-#include <SPI.h>
-#include <Ethernet.h>
 #include "KeyState.hpp"
 #include "DHT11Async.hpp"
 #include "GroveLightSensor12.hpp"
@@ -34,7 +32,7 @@ static struct
 
 static const uint8_t CONTROL_KEYS_QTY = 3;
 // The pins used by each key switch
-static uint8_t keyToPinMap[CONTROL_KEYS_QTY] = { 8, 9, 5 } ; // {D8, D9, D10};
+static uint8_t keyToPinMap[CONTROL_KEYS_QTY] = { 12, 13, 14 } ; 
 static KeyState keyStates[CONTROL_KEYS_QTY];
 
 // The frequency to take a temp sensor reading
@@ -63,6 +61,8 @@ Sampler<bool> motionSampler;
 static const uint32_t displaySleepTimeoutMs = 10000;
 static uint32_t displayLastWakeTimeMs = 0;
 static bool shouldDisplayBeOn = false;
+
+Sampler<float> internalTempSampler;
 
 void doKeyStatesSetup()
 {
@@ -119,6 +119,8 @@ void hearbeatCPU1()
 
 void setup()
 {
+  doKeyStatesSetup();
+
   delay(1000);
   Serial.begin(DEBUG_BIT_RATE);
   
@@ -126,17 +128,17 @@ void setup()
   // ordinarily, we won't have a monitor connected except when debugging.
   // while(!Serial);
 
+  Serial.println("RoomSensor startup.");
   StatusLEDs::Setup();
   StatusLEDs::Clear();
   doDisplaySetup();
-  doKeyStatesSetup();
   doTemperatureAndHumiditySetup();
   doMotionSensorSetup();
   doLightSensorSetup();
 }
 
 // Push the temp and humidity state machine forward. If the function returns
-// true, then a measurement is available.
+// true, then a measurement is available. 
 static bool measureTemperatureAndHumidity()
 {
   static ulong measurement_timestamp = millis();
@@ -149,7 +151,9 @@ static bool measureTemperatureAndHumidity()
     {
       measurement_timestamp = millis();
       DHTSample s = {.temperature = t, .humidity = h};
-      dhtSampler.TakeSample(millis(), s);
+      dhtSampler.TakeSample(measurement_timestamp, s);
+      internalTempSampler.TakeSample(measurement_timestamp, analogReadTemp());
+      // Serial.println(internalTempSampler.Current()->value);
       return true;
     }
   }
@@ -174,7 +178,7 @@ void updateDisplay()
     }
     sprintf(
         debugLineBuf,
-        "Arcadia House       %d.%d.%d.%d",
+        "Arkadia House       %d.%d.%d.%d",
         // TODO put ip address here
         255, 255, 255, 255);
     Display::WriteString(0, 0, debugLineBuf);
@@ -188,6 +192,14 @@ void updateDisplay()
 
     Display::WriteString(0, 2, "More fun than a box of rocks on a");
     Display::WriteString(0, 3, "cloudy day.");
+    Display::WriteString(0, 4, "line 4");
+    Display::WriteString(0, 5, "line 5");
+    Display::WriteString(0, 6, "line 6");
+
+    sprintf(
+      debugLineBuf, 
+      "IntT %2.2f", internalTempSampler.Current()->value);
+    Display::WriteString(0, 7, debugLineBuf);
 
     Display::EndUpdate();
 
@@ -230,20 +242,13 @@ void loop()
   }
 
   // TODO
-  // read pico internal temperature
-  // comms over rs485 and Cat6A cables 100'
+  // ethernet
   // heartbeat: every M units of time, send a full passive sensor update with current states
-
+ 
   updateDisplay();
   delay(15);
-
-  // TODO: this wasn't working reliably. And 10K iterations is too soon.  Might be more reliable
-  // to wire a pin to the reset pin, if there is one.
-  // if (loopCount > 9999)
-  // {
-  //   reboot();
-  // }
 }
+  
 
 void sampleKeyPins()
 {
