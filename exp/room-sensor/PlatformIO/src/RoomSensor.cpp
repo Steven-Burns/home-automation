@@ -247,6 +247,7 @@ void loop()
  
   updateDisplay();
   delay(15);
+  Reboot::RebootIfTime();
 }
   
 
