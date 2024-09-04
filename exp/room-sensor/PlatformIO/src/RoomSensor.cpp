@@ -12,6 +12,7 @@
 #include "Display.hpp"
 #include "Reboot.hpp"
 #include "StatusLEDs.hpp"
+#include "W6100_EVB_Pico.hpp"
 
 // The rate at which we emit serial data depends on the wire and the board, so parameterize it.
 static const unsigned DEBUG_BIT_RATE = 115200;
@@ -117,6 +118,15 @@ void hearbeatCPU1()
   }
 }
 
+void crash()
+{
+  Serial.println("CRASH, er, HANG!");
+  for (;;)
+  {
+    delay(1000);
+  }
+}
+
 void setup()
 {
   doKeyStatesSetup();
@@ -135,6 +145,14 @@ void setup()
   doTemperatureAndHumiditySetup();
   doMotionSensorSetup();
   doLightSensorSetup();
+
+  W6100_EVB_Pico::Setup();
+
+  // Start the Ethernet port -- this will retry connecting forever.
+  if (!W6100_EVB_Pico::BeginAndConnect())
+  {
+    crash();
+  }
 }
 
 // Push the temp and humidity state machine forward. If the function returns

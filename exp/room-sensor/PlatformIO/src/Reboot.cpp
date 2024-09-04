@@ -4,10 +4,10 @@
 // default is 4 hours
 
 ulong rebootThreshold =
-    1000 // ms per sec
-    * 60 // sec per min
-    * 1  // min per hr
-         //   *  4  // hrs
+    1000    // ms per sec
+    * 60    // sec per min
+    *  1    // min per hr
+    *  4    // hrs
     ;
 
 void Reboot::SetRebootTimeout(ulong millis)
