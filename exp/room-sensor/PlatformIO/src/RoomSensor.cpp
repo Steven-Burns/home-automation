@@ -194,11 +194,12 @@ void updateDisplay()
     {
       Display::Sleep();
     }
+    uint32_t ip = W6100_EVB_Pico::LocalIP();
+    uint8_t* rawIP = (uint8_t*) &ip;
     sprintf(
         debugLineBuf,
         "Arkadia House       %d.%d.%d.%d",
-        // TODO put ip address here
-        255, 255, 255, 255);
+        rawIP[0], rawIP[1], rawIP[2], rawIP[3]);
     Display::WriteString(0, 0, debugLineBuf);
 
     sprintf(
