@@ -6,14 +6,6 @@
 // I can't get FastLED to work on the MBED-less arduino board setup.
 // Requires FastLED library
 
-
-#include <Arduino.h>
-
-// For FastLED 3.7.x, without this define, the compile will fail as described here: https://github.com/FastLED/FastLED/issues/1629#issuecomment-2275336557
-// Downgrading to FastLED 3.6.0 did not work for me.
-#define FASTLED_RP2040_CLOCKLESS_M0_FALLBACK 0
-#include <FastLED.h>
-
 // The job here is to take "lighting commands" and ... make the lights connected to the device illuminate accordingly.
 
 // What would a command vocabulary look like?
@@ -29,46 +21,69 @@ glow in out repeat
 glow up repeat
 flash
 
-The upstream automator that is authoring the effect command is responsible for 
+The upstream automator that is authoring the effect command is responsible for
 - determining the scene
 - determining the addressed pixels
 - scaling the intensity based on factors such as time-of-day
 
-Defer this until you have a better understanding of what FastLED has to offer, which 
+Defer this until you have a better understanding of what FastLED has to offer, which
 includes concepts like pallettes, global brightness and such.
 
 */
 
-// The rate at which we emit serial data depends on the wire and the board, so parameterize it. 
+#include <Arduino.h>
+#include "WiznetW5100PicoHat.hpp"
+
+// For FastLED 3.7.x, without this define, the compile will fail as described here:
+// https://github.com/FastLED/FastLED/issues/1629#issuecomment-2275336557
+// Downgrading to FastLED 3.6.0 did not work for me.
+#define FASTLED_RP2040_CLOCKLESS_M0_FALLBACK 0
+#include <FastLED.h>
+
+// The rate at which we emit serial data depends on the wire and the board, so parameterize it.
 const unsigned DEBUG_BIT_RATE = 115200;
 static char debugLineBuf[132];
 
-
-
 #define NUM_LEDS 10
-#define DATA_PIN 16
+#define LED_CONTROL_DATA_PIN 22
 
 static CRGB leds[NUM_LEDS];
 
+void crash()
+{
+  for (;;)
+  {
+    Serial.println("CRASHed!");
+    delay(1000);
+  }
+}
 
-void setup() {
+void setup()
+{
   Serial.begin(DEBUG_BIT_RATE);
   pinMode(LED_BUILTIN, OUTPUT);
 
-  pinMode(DATA_PIN, OUTPUT);
-  FastLED.addLeds<WS2813, DATA_PIN, GRB>(leds, NUM_LEDS);  
+  delay(2000);
+
+  pinMode(LED_CONTROL_DATA_PIN, OUTPUT);
+  FastLED.addLeds<WS2813, LED_CONTROL_DATA_PIN, GRB>(leds, NUM_LEDS);
+
+  Wiznet5100PicoHat::Setup();
+
+  // Start the Ethernet port -- this will retry connecting forever.
+  if (!Wiznet5100PicoHat::BeginAndConnect())
+  {
+    crash();
+  }
 }
-
-
-
 
 void incrementalOn()
 {
   for (int i = 0; i < NUM_LEDS; ++i)
   {
-    leds[i] = CRGB::White;
+    leds[i] = CRGB::BlueViolet;
     FastLED.show();
-    delay(100);
+    delay(50);
   }
 }
 
@@ -79,7 +94,7 @@ void incrementalOff()
     // Now turn the LED off, then pause
     leds[i] = CRGB::Black;
     FastLED.show();
-    delay(100);
+    delay(50);
   }
 }
 
@@ -87,44 +102,48 @@ void incrementalOff()
 
 // null if nothing available, else the contents of the serial buffer.
 
-
 const byte numChars = 65;
-char receivedChars[numChars];   // an array to store the received data
+char receivedChars[numChars]; // an array to store the received data
 
 static boolean newData = false;
 
+void recvWithEndMarker()
+{
+  static byte ndx = 0;
+  static char endMarker = '\n';
+  char rc;
 
-void recvWithEndMarker() {
-    static byte ndx = 0;
-    static char endMarker = '\n';
-    char rc;
-    
-    while (Serial.available() > 0 && newData == false) {
-        rc = Serial.read();
+  while (Serial.available() > 0 && newData == false)
+  {
+    rc = Serial.read();
 
-        if (rc != endMarker) {
-            receivedChars[ndx] = rc;
-            ndx++;
-            if (ndx >= numChars) {
-                ndx = numChars - 1;
-            }
-        }
-        else {
-            receivedChars[ndx] = '\0'; // terminate the string
-            ndx = 0;
-            newData = true;
-        }
+    if (rc != endMarker)
+    {
+      receivedChars[ndx] = rc;
+      ndx++;
+      if (ndx >= numChars)
+      {
+        ndx = numChars - 1;
+      }
     }
+    else
+    {
+      receivedChars[ndx] = '\0'; // terminate the string
+      ndx = 0;
+      newData = true;
+    }
+  }
 }
 
-void showNewData() {
-    if (newData == true) {
-        Serial.print("This just in ... ");
-        Serial.println(receivedChars);
-        newData = false;
-    }
+void showNewData()
+{
+  if (newData == true)
+  {
+    Serial.print("This just in ... ");
+    Serial.println(receivedChars);
+    newData = false;
+  }
 }
-
 
 // non-blocking heartbeat
 void toggleBuiltinLED()
@@ -132,22 +151,21 @@ void toggleBuiltinLED()
   static int lastLEDLevel = LOW;
   static uint32_t millisSinceLastCall = 0;
   uint32_t now = millis();
-  if (now - millisSinceLastCall > 1000) 
+  if (now - millisSinceLastCall > 1000)
   {
-    lastLEDLevel =(lastLEDLevel == HIGH) ? LOW : HIGH;
+    lastLEDLevel = (lastLEDLevel == HIGH) ? LOW : HIGH;
     digitalWrite(LED_BUILTIN, lastLEDLevel);
     millisSinceLastCall = now;
   }
 }
 
-
-int firstParam(char* command)
+int firstParam(char *command)
 {
   int result = 0;
-  char* remainder = command;
-  char* token = strtok_r(command, " ", &remainder);
+  char *remainder = command;
+  char *token = strtok_r(command, " ", &remainder);
 
-  if (token) 
+  if (token)
   {
     // look for the next (the second) token -- this is the first parameter to the command
     token = strtok_r(remainder, " ", &remainder);
@@ -158,7 +176,7 @@ int firstParam(char* command)
         // "all"
         result = -1;
       }
-      else 
+      else
       {
         result = atoi(token);
       }
@@ -168,12 +186,10 @@ int firstParam(char* command)
   return result;
 }
 
-
-
 void serviceCommandLoop()
 {
   recvWithEndMarker();
-  if (!newData) 
+  if (!newData)
   {
     return;
   }
@@ -191,9 +207,10 @@ void serviceCommandLoop()
       Serial.println("Doing all on");
       incrementalOn();
     }
-    else 
+    else
     {
-      Serial.print("turning on led "); Serial.println(led);
+      Serial.print("turning on led ");
+      Serial.println(led);
       leds[led] = CRGB::White;
     }
   }
@@ -203,11 +220,12 @@ void serviceCommandLoop()
     if (-1 == led)
     {
       Serial.println("Doing all off");
-      incrementalOff();  
+      incrementalOff();
     }
-    else 
+    else
     {
-      Serial.print("turning off led "); Serial.println(led);
+      Serial.print("turning off led ");
+      Serial.println(led);
       leds[led] = CRGB::Black;
     }
   }
@@ -219,15 +237,12 @@ void serviceCommandLoop()
   FastLED.show();
 }
 
-
-
 static uint32_t loopCount = 0;
-void loop() 
+void loop()
 {
   loopCount++;
-  // Serial.print("loopCount "); Serial.println(loopCount); 
+  // Serial.print("loopCount "); Serial.println(loopCount);
 
   toggleBuiltinLED();
   serviceCommandLoop();
 }
-
