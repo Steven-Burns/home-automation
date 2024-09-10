@@ -1,0 +1,55 @@
+esphome:
+  name: pico-test
+
+rp2040:
+  board: pico
+  framework:
+    platform_version: https://github.com/maxgerhardt/platform-raspberrypi.git
+
+# Enable logging
+logger:
+
+network:
+
+# Enable Home Assistant API
+api:
+#  password: ""
+
+ota:
+  - platform: esphome
+    password: ""
+
+# not available on rp2040 esphome platform as of 2024-09-09
+# ethernet:
+#   type: W5500
+#   clk_pin: GPIO18
+#   mosi_pin: GPIO19
+#   miso_pin: GPIO16
+#   cs_pin: GPIO17
+#   interrupt_pin: GPIO21
+#   reset_pin: GPIO20
+
+# compiles, loads, but does not activate the W5500.
+spi:
+  - id: spi_bus0
+    clk_pin: GPIO18
+    mosi_pin: GPIO19
+    miso_pin: GPIO16
+    interface: hardware
+
+# not available on rp2040 esphome platform as of 2024-09-09
+# web_server:
+
+output:
+  - platform: gpio
+    pin:
+      number: 25    # builtin LED on the pico
+      mode: output
+    id: LED
+
+interval:
+  - interval: 500ms
+    then:
+      - output.turn_on: LED
+      - delay: 250ms
+      - output.turn_off: LED
