@@ -15,9 +15,9 @@ network:
 api:
   password: ""
 
-ota:
-  - platform: esphome
-    password: ""
+# ota:
+#   - platform: esphome
+#     password: ""
 
 wifi:
   ssid: "Son-of-pescadonet"

@@ -1,0 +1,76 @@
+esphome:
+  name: picow-led
+
+rp2040:
+  board: rpipicow
+  framework:
+    platform_version: https://github.com/maxgerhardt/platform-raspberrypi.git
+
+# Enable logging
+logger:
+
+network:
+
+# Enable Home Assistant API
+api:
+  password: ""
+
+ota:
+  - platform: esphome
+    password: ""
+
+wifi:
+  ssid: "Son-of-pescadonet"
+  password: "Patter69Son"
+
+# not avail as of 2024-09-10
+# web_server:
+
+output:
+  - platform: gpio
+    pin:
+      number: 32    # builtin LED on the pico-w
+      mode: output
+    id: LED
+
+interval:
+  - interval: 500ms
+    then:
+      - output.turn_on: LED
+      - delay: 250ms
+      - output.turn_off: LED
+
+# fastLED not supported with rp2040 as of 2024-09-10 :-(
+# light:
+#   - platform: fastled_clockless
+#     chipset: WS2813
+#     pin: GPIO20
+#     num_leds: 10
+#     rgb_order: GRB
+#     name: "FastLED WS2813 Light strip"
+
+# neopixelbus not supported for rp20240 as of 2024-09-10
+# light:
+#   - platform: neopixelbus
+#     type: GRB
+#     variant: WS2813
+#     pin: GPIO20
+#     num_leds: 10
+#     name: "NeoPixel Light"
+
+light:
+  - platform: rp2040_pio_led_strip
+    name: led_strip
+    id: led_strip
+    pin: GPIO20
+    num_leds: 10
+    pio: 0
+    rgb_order: GRB
+    chipset: WS2812B
+    default_transition_length: 0.5s
+    effects:
+          - addressable_random_twinkle:
+          - addressable_random_twinkle:
+              name: Random Twinkle Effect With Custom Values
+              twinkle_probability: 5%
+              progress_interval: 32ms
