@@ -30,14 +30,38 @@ captive_portal:
 
 web_server:
 
+# this component sync the local gadget to the time of the Home Asst server
+time:
+  - platform: homeassistant
+    id: esptime
+
+i2c:
+  sda: GPIO6
+  scl: GPIO7
+  # goose up the frequency so that we don't get runtime warnings about the display component
+  # taking too long to update.
+  frequency: 300kHz
+
+font:
+  - file: "fonts/spleen-5x8.bdf"
+    id: spleen_font
+
+display:
+  - platform: ssd1306_i2c
+    model: "SH1106 128x64"
+    update_interval: 0.5s
+    lambda: |-
+      it.print(0, 0, id(spleen_font), "Hello World!");
+      it.print(0, 1, id(spleen_font), "two");
+
 switch:
   - platform: gpio
     id: "laser_beam_01"
     name: "LaserBeam"
     pin: GPIO5
-  - platform: ld2410
-    engineering_mode:
-      name: "mmWave sensor engineering mode"
+  # - platform: ld2410
+  #   engineering_mode:
+  #     name: "mmWave sensor engineering mode"
 
 binary_sensor:
   - platform: gpio
@@ -46,7 +70,7 @@ binary_sensor:
   - platform: gpio
     name: "Button0"
     pin:
-      number: 6
+      number: 2
       mode:
         input: true
         pulldown: true
@@ -75,7 +99,7 @@ binary_sensor:
   - platform: gpio
     name: "Button1"
     pin:
-      number: 7
+      number: 10
       mode:
         input: true
         pulldown: true
@@ -130,8 +154,163 @@ binary_sensor:
         - logger.log: "Single Short Clicked"
       invalid_cooldown: 0.5s
 
+light:
+  - platform: esp32_rmt_led_strip
+    id: led_strip
+    rgb_order: GRB
+    pin: GPIO9
+    num_leds: 10
+    rmt_channel: 0
+    chipset: ws2812
+    name: "My Light"
+    default_transition_length: 0.5s
+    effects:
+      # Use default parameters:
+      - random:
+      # Customize parameters
+      - random:
+          name: "My Slow Random Effect"
+          transition_length: 30s
+          update_interval: 30s
+      - random:
+          name: "My Fast Random Effect"
+          transition_length: 4s
+          update_interval: 5s
+      - pulse:
+      - pulse:
+          name: "Fast Pulse"
+          transition_length: 0.5s
+          update_interval: 0.5s
+          min_brightness: 0%
+          max_brightness: 100%
+      - pulse:
+          name: "Slow Pulse"
+          # transition_length: 1s      # defaults to 1s
+          update_interval: 2s
+      - pulse:
+          name: "Asymmetrical Pulse"
+          transition_length:
+            on_length: 1s
+            off_length: 500ms
+          update_interval: 1.5s
+      - strobe:
+      - strobe:
+          name: Strobe Effect With Custom Values
+          colors:
+            - state: true
+              brightness: 100%
+              red: 100%
+              green: 90%
+              blue: 0%
+              duration: 500ms
+            - state: false
+              duration: 250ms
+            - state: true
+              brightness: 100%
+              red: 0%
+              green: 100%
+              blue: 0%
+              duration: 500ms
+      - flicker:
+      - flicker:
+          name: Flicker Effect With Custom Values
+          alpha: 95%
+          intensity: 1.5%
+      - lambda:
+          name: My Custom Effect
+          update_interval: 1s
+          lambda: |-
+            static int state = 0;
+            auto call = id(led_strip).turn_on();
+            // Transition of 1000ms = 1s
+            call.set_transition_length(1000);
+            if (state == 0) {
+              call.set_rgb(1.0, 1.0, 1.0);
+            } else if (state == 1) {
+              call.set_rgb(1.0, 0.0, 1.0);
+            } else if (state == 2) {
+              call.set_rgb(0.0, 0.0, 1.0);
+            } else {
+              call.set_rgb(1.0, 0.0, 0.0);
+            }
+            call.perform();
+            state += 1;
+            if (state == 4)
+              state = 0;
+      - addressable_rainbow:
+      - addressable_rainbow:
+          name: Rainbow Effect With Custom Values
+          speed: 10
+          width: 5
+      - addressable_color_wipe:
+      - addressable_color_wipe:
+          name: Color Wipe Effect With Custom Values
+          colors:
+            - red: 100%
+              green: 100%
+              blue: 100%
+              num_leds: 5
+              gradient: true
+            - red: 0%
+              green: 0%
+              blue: 0%
+              num_leds: 1
+          add_led_interval: 100ms
+          reverse: true
+      - addressable_scan:
+      - addressable_scan:
+          name: Scan Effect With Custom Values
+          move_interval: 100ms
+          scan_width: 2
+      - addressable_twinkle:
+      - addressable_twinkle:
+          name: Twinkle Effect With Custom Values
+          twinkle_probability: 5%
+          progress_interval: 4ms
+      - addressable_random_twinkle:
+      - addressable_random_twinkle:
+          name: Random Twinkle Effect With Custom Values
+          twinkle_probability: 5%
+          progress_interval: 32ms
+      - addressable_fireworks:
+      - addressable_fireworks:
+          name: Fireworks Effect With Custom Values
+          update_interval: 32ms
+          spark_probability: 10%
+          use_random_color: false
+          fade_out_rate: 120
+      - addressable_flicker:
+      - addressable_flicker:
+          name: addressable Flicker Effect With Custom Values
+          update_interval: 16ms
+          intensity: 5%
+      - addressable_lambda:
+          name: "lambda"
+          update_interval: 16ms
+          lambda: |-
+            // it.size() - Number of LEDs
+            // it[num] - Access the LED at index num.
+            // Set the LED at num to the given r, g, b values
+            // it[num] = Color(r, g, b);
+            // Get the color at index num (Color instance)
+            // it[num].get();
 
+            // Example: Simple color wipe
+            for (int i = it.size() - 1; i > 0; i--) {
+              it[i] = it[i - 1].get();
+            }
+            it[0] = Color::random_color();
 
+            // Bonus: use .range() and .all() to set many LEDs without having to write a loop.
+            // it.range(0, 50) = Color::BLACK;
+            it.all().fade_to_black(10);          
+
+# display:
+#   - platform: addressable_light
+#     id: led_matrix_display
+#     addressable_light_id: led_strip
+#     width: 10
+#     height: 1
 
 
   # - platform: gpio
@@ -148,14 +327,14 @@ binary_sensor:
   #   out_pin_presence_status:
   #     name: out pin presence status
 
-uart:
-  id: uart_01
-  tx_pin: GPIO21
-  rx_pin: GPIO20
-  baud_rate: 256000
+# uart:
+#   id: uart_01
+#   tx_pin: GPIO21
+#   rx_pin: GPIO20
+#   baud_rate: 256000
 
-ld2410:
-  uart_id: uart_01
+# ld2410:
+#   uart_id: uart_01
 
 sensor:
   - platform: dht
