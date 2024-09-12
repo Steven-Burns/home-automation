@@ -1,5 +1,12 @@
 esphome:
   name: esp32c3-test
+  friendly_name: Steve's ESP32C3 test gadget
+  comment: test board to play around with ESPHome
+  area: Gym
+  name_add_mac_suffix: true
+  project:
+    name: "arkadiahouse.home_automation"
+    version: "0.1.0"
 
 esp32:
   board: seeed_xiao_esp32c3
@@ -18,13 +25,38 @@ ota:
     password: ""
 
 wifi:
-  ssid: "Son-of-pescadonet"
-  password: "Patter69Son"
-
+  id: wifi_id
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "Esp32C3-test Fallback Hotspot"
     password: "PJnNb7VRCS3I"
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: ESP IP Address
+      address_0:
+        name: ESP IP Address 0
+      address_1:
+        name: ESP IP Address 1
+      address_2:
+        name: ESP IP Address 2
+      address_3:
+        name: ESP IP Address 3
+      address_4:
+        name: ESP IP Address 4
+    ssid:
+      name: ESP Connected SSID
+    bssid:
+      name: ESP Connected BSSID
+    mac_address:
+      name: ESP Mac Wifi Address
+    scan_results:
+      name: ESP Latest Scan Results
+    dns_address:
+      name: ESP DNS Address
 
 captive_portal:
 
@@ -55,18 +87,32 @@ display:
   - platform: ssd1306_i2c
     model: "SH1106 128x64"
     update_interval: 1s
-    offset_x: 0
-    offset_y: 0
+    contrast: 20%
+    invert: false
     lambda: |-
       auto width = it.get_width();
       auto height = it.get_height();
       auto font_id = id(spleen_font);
+      auto wifi_component = id(wifi_id);
       int char_height = 9;
-      it.print(0, 0, font_id, "Hello World!");
-      for (int i = 1; i < 8; ++i) 
+      int left_margin = 2;
+      int line = 0;
+      it.printf(left_margin, line++ * char_height, font_id, "H:%s", App.get_name().c_str());
+      for (auto &ip : wifi_component->get_ip_addresses()) 
       {
-        it.printf(0, i * char_height, font_id, "line %d", i);
+        if (ip.is_set()) {
+          it.printf(left_margin, line * char_height, font_id, "I:%s", ip.str().c_str());
+          ++line;
+        }
       }
+      // it.printf(left_margin, line++ * char_height, font_id, "Conn:%s", wifi_component->is_connected() ? "Y" : "N");
+
+      /*
+      for (int i = 1; i < (height / char_height); ++i) 
+      {
+        it.printf(left_margin, i * char_height, font_id, "line %d", i);
+      }
+      */
 
       it.qr_code(width - 35, 16, id(homepage_qr), Color(255,255,255), 1);
 
@@ -90,6 +136,8 @@ binary_sensor:
     name: "PIR Motion"
     pin: GPIO21
     device_class: motion
+    filters:
+      - delayed_on_off: 1s
   - platform: gpio
     name: "Button0"
     pin:
