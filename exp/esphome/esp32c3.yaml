@@ -46,13 +46,29 @@ font:
   - file: "fonts/spleen-5x8.bdf"
     id: spleen_font
 
+qr_code:
+  - id: homepage_qr
+    value: https://arkadiahouse.us
+    ecc: MEDIUM
+
 display:
   - platform: ssd1306_i2c
     model: "SH1106 128x64"
-    update_interval: 0.5s
+    update_interval: 1s
+    offset_x: 0
+    offset_y: 0
     lambda: |-
-      it.print(0, 0, id(spleen_font), "Hello World!");
-      it.print(0, 1, id(spleen_font), "two");
+      auto width = it.get_width();
+      auto height = it.get_height();
+      auto font_id = id(spleen_font);
+      int char_height = 9;
+      it.print(0, 0, font_id, "Hello World!");
+      for (int i = 1; i < 8; ++i) 
+      {
+        it.printf(0, i * char_height, font_id, "line %d", i);
+      }
+
+      it.qr_code(width - 35, 16, id(homepage_qr), Color(255,255,255), 1);
 
 switch:
   - platform: gpio
@@ -67,6 +83,13 @@ binary_sensor:
   - platform: gpio
     name: "photodiode"
     pin: GPIO3
+    filters:
+      - delayed_on_off: 1s    
+      - settle: 1s
+  - platform: gpio
+    name: "PIR Motion"
+    pin: GPIO21
+    device_class: motion
   - platform: gpio
     name: "Button0"
     pin:
@@ -341,8 +364,18 @@ sensor:
     pin: GPIO4
     temperature:
       name: "Temperature"
+      accuracy_decimals: 1
+      device_class: temperature
+      filters:
+        - delta: 0.1
+        - heartbeat: 30s
     humidity:
       name: "Humidity"
+      accuracy_decimals: 1
+      device_class: humidity
+      filters:
+        - delta: 0.1
+        - heartbeat: 30s        
     update_interval: 31s
   
   # - platform: ld2410
