@@ -92,6 +92,13 @@ display:
     lambda: |-
       auto width = it.get_width();
       auto height = it.get_height();
+
+      // en lieu of a hardware blinky light, toggle a software light every 
+      // time the display is updated (1s interval)
+      static bool blinky_is_lit = false;
+      blinky_is_lit = !blinky_is_lit;
+      it.filled_circle(3, height - 4, 3, blinky_is_lit ? COLOR_ON : COLOR_OFF);
+
       auto font_id = id(spleen_font);
       auto wifi_component = id(wifi_id);
       int char_height = 9;
