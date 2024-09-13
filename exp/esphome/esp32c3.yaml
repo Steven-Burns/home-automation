@@ -36,27 +36,27 @@ wifi:
 text_sensor:
   - platform: wifi_info
     ip_address:
-      name: ESP IP Address
-      address_0:
-        name: ESP IP Address 0
-      address_1:
-        name: ESP IP Address 1
-      address_2:
-        name: ESP IP Address 2
-      address_3:
-        name: ESP IP Address 3
-      address_4:
-        name: ESP IP Address 4
+      name: IP Address
+      # address_0:
+      #   name: ESP IP Address 0
+      # address_1:
+      #   name: ESP IP Address 1
+      # address_2:
+      #   name: ESP IP Address 2
+      # address_3:
+      #   name: ESP IP Address 3
+      # address_4:
+      #   name: ESP IP Address 4
     ssid:
-      name: ESP Connected SSID
+      name: Connected SSID
     bssid:
-      name: ESP Connected BSSID
+      name: Connected BSSID
     mac_address:
-      name: ESP Mac Wifi Address
+      name: Wifi MAC Address
     scan_results:
       name: ESP Latest Scan Results
     dns_address:
-      name: ESP DNS Address
+      name: DNS Addresses
 
 captive_portal:
 
@@ -85,7 +85,7 @@ qr_code:
 
 display:
   - platform: ssd1306_i2c
-    model: "SH1106 128x64"
+    model: "SSD1306_128x64"
     update_interval: 1s
     contrast: 20%
     invert: false
@@ -102,7 +102,7 @@ display:
       auto font_id = id(spleen_font);
       auto wifi_component = id(wifi_id);
       int char_height = 9;
-      int left_margin = 2;
+      int left_margin = 0;
       int line = 0;
       it.printf(left_margin, line++ * char_height, font_id, "H:%s", App.get_name().c_str());
       for (auto &ip : wifi_component->get_ip_addresses()) 
@@ -144,7 +144,7 @@ binary_sensor:
     pin: GPIO21
     device_class: motion
     filters:
-      - delayed_on_off: 1s
+      - delayed_on_off: 0s
   - platform: gpio
     name: "Button0"
     pin:
@@ -417,6 +417,7 @@ light:
 sensor:
   - platform: dht
     pin: GPIO4
+    model: DHT11
     temperature:
       name: "Temperature"
       accuracy_decimals: 1
@@ -431,7 +432,7 @@ sensor:
       filters:
         - delta: 0.1
         - heartbeat: 30s        
-    update_interval: 31s
+    update_interval: 61s
   
   # - platform: ld2410
   #   light:
