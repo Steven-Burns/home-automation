@@ -1,0 +1,223 @@
+esphome:
+  name: esp32c3-multisensor-mk3
+  friendly_name: arkadiahome multisensor, Mk III 
+  comment: |- 
+    temp, humidity, mm wave radar presence, light level, two momentary buttons, display
+  area: Gym
+  name_add_mac_suffix: true
+  project:
+    name: "arkadiahouse.home_automation"
+    version: "0.1.1"
+
+esp32:
+  board: seeed_xiao_esp32c3
+  framework:
+    type: arduino
+
+logger:
+
+api:
+  password: ""
+
+ota:
+  - platform: esphome
+    password: ""
+
+wifi:
+  id: wifi_id
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "Esp32C3-test Fallback Hotspot"
+    password: "PJnNb7VRCS3I"
+
+captive_portal:
+
+web_server:
+
+time:
+  - platform: homeassistant
+    id: time_id
+
+font:
+  - file: "fonts/spleen-5x8.bdf"
+    id: spleen_font
+
+i2c:
+  sda: GPIO6
+  scl: GPIO7
+  # goose up the frequency so that we don't get runtime warnings about the display component
+  # taking too long to update.
+  frequency: 300kHz
+
+display:
+  - platform: ssd1306_i2c
+    model: "SSD1306_128x64"
+    update_interval: 1s
+    contrast: 20%
+    invert: false
+    lambda: |-
+      auto width = it.get_width();
+      auto height = it.get_height();
+
+      // en lieu of a hardware blinky light, toggle a software light every 
+      // time the display is updated (1s interval)
+      static bool blinky_is_lit = false;
+      blinky_is_lit = !blinky_is_lit;
+      it.filled_circle(3, height - 4, 3, blinky_is_lit ? COLOR_ON : COLOR_OFF);
+
+      auto font_id = id(spleen_font);
+      auto wifi_component = id(wifi_id);
+      int char_height = 9;
+      int left_margin = 0;
+      int line = 0;
+      it.printf(left_margin, line++ * char_height, font_id, "H:%s", App.get_name().c_str());
+      for (auto &ip : wifi_component->get_ip_addresses()) 
+      {
+        if (ip.is_set()) {
+          it.printf(left_margin, line * char_height, font_id, "I:%s", ip.str().c_str());
+          ++line;
+        }
+      }
+
+uart:
+  id: uart_0
+  tx_pin: GPIO21
+  rx_pin: GPIO20
+  baud_rate: 256000 
+  parity: NONE
+  stop_bits: 1
+
+ld2410:
+  uart_id: uart_0
+  id: ld2410_0
+
+binary_sensor:
+  - platform: gpio
+    name: "photodiode"
+    pin: GPIO3
+    filters:
+      - delayed_on_off: 1s    
+      - settle: 1s
+  - platform: gpio
+    name: "button_0"
+    id: button_0
+    pin:
+      number: 2
+      mode:
+        input: true
+        pulldown: true
+    on_multi_click:
+    - timing:
+        - ON for at most 0.75s
+        - OFF for at most 0.3s
+        - ON for at most 0.75s
+        - OFF for at least 0.1s
+      then:
+        - logger.log: "Double Clicked"
+    - timing:
+        - ON for 0.75s to 3s
+        - OFF for at least 0.1s
+      then:
+        - logger.log: "Single Long Clicked"
+    - timing:
+        - ON for at most 1s
+        - OFF for at least 0.2s
+      then:
+        - logger.log: "Single Short Clicked"
+      invalid_cooldown: 0.5s
+  - platform: gpio
+    name: button_1
+    id: button_1
+    pin:
+      number: 10
+      mode:
+        input: true
+        pulldown: true
+    on_multi_click:
+    - timing:
+        - ON for at most 0.75s
+        - OFF for at most 0.3s
+        - ON for at most 0.75s
+        - OFF for at least 0.1s
+      then:
+        - logger.log: "Double Clicked"
+    - timing:
+        - ON for 0.75s to 3s
+        - OFF for at least 0.1s
+      then:
+        - logger.log: "Single Long Clicked"
+    - timing:
+        - ON for at most 1s
+        - OFF for at least 0.2s
+      then:
+        - logger.log: "Single Short Clicked"
+      invalid_cooldown: 0.5s
+  - platform: gpio
+    pin: GPIO5
+    name: "Radar Presence"
+  - platform: ld2410
+    ld2410_id: ld2410_0
+    has_target:
+      name: "Radar Presence 2"
+    has_moving_target:
+      name: "Radar Moving Target"
+    has_still_target:
+      name: "Radar Still Target"
+
+switch:
+  - platform: ld2410
+    ld2410_id: ld2410_0
+    engineering_mode:
+      name: "Radar Enable Engineering Mode"
+    bluetooth:
+      name: "Radar Enable Bluetooth"
+
+button:
+  - platform: ld2410
+    ld2410_id: ld2410_0
+    factory_reset:
+      name: "Rader Factory Reset"
+    restart:
+      name: "Radar Restart"
+    query_params:
+      name: "Radar Query Params"
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "WiFi IP"
+    ssid:
+      name: "WiFi SSID"
+    bssid:
+      name: "WiFi BSSID"
+    mac_address:
+      name: "WiFi MAC"
+    dns_address:
+      name: "WiFi DNS Server"
+  - platform: ld2410
+    ld2410_id: ld2410_0
+    version:
+      name: "Radar Firmware Ver"
+    mac_address:
+      name: "Radar BT MAC"
+      
+sensor:
+  - platform: dht
+    pin: GPIO4
+    model: DHT11
+    temperature:
+      name: "Temperature"
+      accuracy_decimals: 1
+      device_class: temperature
+      filters:
+        - delta: 0.1
+        - heartbeat: 30s
+    humidity:
+      name: "Humidity"
+      accuracy_decimals: 1
+      device_class: humidity
+      filters:
+        - delta: 0.1
+        - heartbeat: 30s        
+    update_interval: 61s
