@@ -1,0 +1,131 @@
+esphome:
+  name: esp32c3-test2
+  friendly_name: Steve's ESP32C3 test gadget, Mk2
+  comment: |- 
+    test board to play around with ESPHome. This template attempts to get mmWave prescence 
+    and RFID hardware working.
+  area: Gym
+  name_add_mac_suffix: true
+  project:
+    name: "arkadiahouse.home_automation"
+    version: "0.1.1"
+
+esp32:
+  board: seeed_xiao_esp32c3
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: ""
+
+ota:
+  - platform: esphome
+    password: ""
+
+wifi:
+  id: wifi_id
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Esp32C3-test Fallback Hotspot"
+    password: "PJnNb7VRCS3I"
+
+captive_portal:
+
+web_server:
+
+# this component sync the local gadget to the time of the Home Asst server
+time:
+  - platform: homeassistant
+    id: esptime
+
+
+spi:
+  - id: spi_bus0
+    clk_pin: GPIO8
+    mosi_pin: GPIO10
+    miso_pin: GPIO9
+    interface: hardware
+
+rc522_spi:
+  cs_pin: GPIO2
+  spi_id: spi_bus0
+
+uart:
+  id: uart_0
+  tx_pin: GPIO21
+  rx_pin: GPIO20
+  # per the DFRobot docs at: https://wiki.dfrobot.com/SKU_SEN0557_24GHz_Human_Presence_Sensing_Module, the 
+  # default baud rate is 57600; I connected to the gadget via bluetooth (yes, it has a BT radio!) using the
+  # HLKRadarTool IOS app, and changed the device's baud rate to 256000.
+  baud_rate: 256000 
+  parity: NONE
+  stop_bits: 1
+
+ld2410:
+  uart_id: uart_0
+  id: ld2410_0
+
+binary_sensor:
+  - platform: rc522
+    uid: 03-DE-31-0E
+    name: "blue fob RFID Tag"
+  - platform: rc522
+    uid: 60-15-E6-57
+    name: "blank keycard"
+  - platform: gpio
+    pin: GPIO7
+    name: "gp presence"
+  - platform: ld2410
+    ld2410_id: ld2410_0
+    has_target:
+      name: Presence
+    has_moving_target:
+      name: Moving Target
+    has_still_target:
+      name: Still Target
+    out_pin_presence_status:
+      name: out pin presence status
+
+switch:
+  - platform: ld2410
+    ld2410_id: ld2410_0
+    engineering_mode:
+      name: "engineering mode"
+    bluetooth:
+      name: "control bluetooth"
+
+button:
+  - platform: ld2410
+    ld2410_id: ld2410_0
+    factory_reset:
+      name: "factory reset"
+    restart:
+      name: "restart"
+    query_params:
+      name: query params
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: IP Address
+    ssid:
+      name: Connected SSID
+    bssid:
+      name: Connected BSSID
+    mac_address:
+      name: Wifi MAC Address
+    dns_address:
+      name: DNS Addresses
+  - platform: ld2410
+    ld2410_id: ld2410_0
+    version:
+      name: "firmware version"
+    mac_address:
+      name: "mac address"
+      
