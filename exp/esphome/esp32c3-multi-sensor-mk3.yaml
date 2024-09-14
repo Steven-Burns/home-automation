@@ -43,6 +43,11 @@ font:
   - file: "fonts/spleen-5x8.bdf"
     id: spleen_font
 
+image:
+  - file: "images/motion-detected-icon.png"
+    id: motion_detected_icon_id
+    type: BINARY
+
 i2c:
   sda: GPIO6
   scl: GPIO7
@@ -65,6 +70,8 @@ display:
       static bool blinky_is_lit = false;
       blinky_is_lit = !blinky_is_lit;
       it.filled_circle(3, height - 4, 3, blinky_is_lit ? COLOR_ON : COLOR_OFF);
+
+      it.image(12, 44, id(motion_detected_icon_id));
 
       auto font_id = id(spleen_font);
       auto wifi_component = id(wifi_id);
@@ -177,7 +184,7 @@ button:
   - platform: ld2410
     ld2410_id: ld2410_0
     factory_reset:
-      name: "Rader Factory Reset"
+      name: "Radar Factory Reset"
     restart:
       name: "Radar Restart"
     query_params:
