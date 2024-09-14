@@ -1,0 +1,58 @@
+esphome:
+  name: esp32c3-baseline
+  friendly_name: starting configuration for an ESP32 ESPHome gadget 
+  comment: |- 
+    Start with this and add hardware...
+  area: Gym
+  name_add_mac_suffix: true
+  project:
+    name: "arkadiahouse.home_automation"
+    version: "0.1.1"
+
+esp32:
+  board: seeed_xiao_esp32c3
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: ""
+
+ota:
+  - platform: esphome
+    password: ""
+
+wifi:
+  id: wifi_id
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Esp32C3-test Fallback Hotspot"
+    password: "PJnNb7VRCS3I"
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: IP Address
+    ssid:
+      name: Connected SSID
+    bssid:
+      name: Connected BSSID
+    mac_address:
+      name: Wifi MAC Address
+    dns_address:
+      name: DNS Addresses
+
+captive_portal:
+
+web_server:
+
+# this component sync the local gadget to the time of the Home Asst server
+time:
+  - platform: homeassistant
+    id: esptime
+
