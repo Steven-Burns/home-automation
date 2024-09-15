@@ -1,3 +1,8 @@
+# hardware wired up for this configuration:
+# https://devices.esphome.io/devices/temt6000
+# https://community.home-assistant.io/t/aht20-bmp280-combined-sensor/366411
+# https://wiki.dfrobot.com/SKU_SEN0557_24GHz_Human_Presence_Sensing_Module
+
 esphome:
   name: esp32c3-multisensor-mk3
   friendly_name: arkadiahome multisensor, Mk III 
@@ -101,16 +106,10 @@ ld2410:
 
 binary_sensor:
   - platform: gpio
-    name: "photodiode"
-    pin: GPIO3
-    filters:
-      - delayed_on_off: 1s    
-      - settle: 1s
-  - platform: gpio
     name: "button_0"
     id: button_0
     pin:
-      number: 2
+      number: 3
       mode:
         input: true
         pulldown: true
@@ -210,21 +209,43 @@ text_sensor:
       name: "Radar BT MAC"
       
 sensor:
-  - platform: dht
-    pin: GPIO4
-    model: DHT11
+  - platform: adc
+    pin: GPIO2
+    name: "TEMT6000 Illuminance"
+    device_class: illuminance
+    unit_of_measurement: lx
+    filters:
+      - lambda: |-
+          return (x / 10000.0) * 2000000.0;
+  - platform: bmp280
+    address: 0x77
+    update_interval: 60s
     temperature:
-      name: "Temperature"
+      name: "BMP Temperature"
+      oversampling: 2x
+    pressure:
+      name: "BMP Pressure"
+  - platform: aht10
+    address: 0x38
+    variant: aht20
+    update_interval: 60s
+    temperature:
+      name: "AHT20 Temperature"
+      id: aht20_temp
       accuracy_decimals: 1
-      device_class: temperature
-      filters:
-        - delta: 0.1
-        - heartbeat: 30s
+      # filters:
+      # - filter_out: 0.0
+      # - median:
+      #     window_size: 3
+      #     send_every: 3
+      #     send_first_at: 1
     humidity:
-      name: "Humidity"
+      name: "AHT20 Humidity"
+      id: aht20_humidity
       accuracy_decimals: 1
-      device_class: humidity
-      filters:
-        - delta: 0.1
-        - heartbeat: 30s        
-    update_interval: 61s
+      # filters:
+      # - filter_out: 0.0
+      # - median:
+      #     window_size: 3
+      #     send_every: 3
+      #     send_first_at: 1
