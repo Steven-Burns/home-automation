@@ -159,13 +159,10 @@ binary_sensor:
       then:
         - logger.log: "Single Short Clicked"
       invalid_cooldown: 0.5s
-  - platform: gpio
-    pin: GPIO5
-    name: "Radar Presence"
   - platform: ld2410
     ld2410_id: ld2410_0
     has_target:
-      name: "Radar Presence 2"
+      name: "Radar Presence"
     has_moving_target:
       name: "Radar Moving Target"
     has_still_target:
