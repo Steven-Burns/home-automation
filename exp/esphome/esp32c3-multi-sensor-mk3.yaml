@@ -159,10 +159,14 @@ binary_sensor:
       then:
         - logger.log: "Single Short Clicked"
       invalid_cooldown: 0.5s
+  - platform: gpio
+    pin: GPIO5
+    name: "Radar Presence Pin"
+    device_class: presence
   - platform: ld2410
     ld2410_id: ld2410_0
     has_target:
-      name: "Radar Presence"
+      name: "Radar Has Target"
     has_moving_target:
       name: "Radar Moving Target"
     has_still_target:
@@ -208,7 +212,7 @@ text_sensor:
 sensor:
   - platform: adc
     pin: GPIO2
-    name: "TEMT6000 Illuminance"
+    name: "Illuminance"
     device_class: illuminance
     unit_of_measurement: lx
     filters:
@@ -216,16 +220,16 @@ sensor:
           return (x / 10000.0) * 2000000.0;
   - platform: bmp280
     address: 0x77
-    update_interval: 60s
+    # update_interval: 60s
     temperature:
       name: "BMP Temperature"
       oversampling: 2x
     pressure:
-      name: "BMP Pressure"
+      name: "Pressure"
   - platform: aht10
     address: 0x38
     variant: aht20
-    update_interval: 60s
+    # update_interval: 60s
     temperature:
       name: "AHT20 Temperature"
       id: aht20_temp
@@ -237,7 +241,7 @@ sensor:
       #     send_every: 3
       #     send_first_at: 1
     humidity:
-      name: "AHT20 Humidity"
+      name: "Humidity"
       id: aht20_humidity
       accuracy_decimals: 1
       # filters:
