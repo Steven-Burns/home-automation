@@ -47,10 +47,16 @@ time:
 font:
   - file: "fonts/spleen-5x8.bdf"
     id: spleen_font
+  - file: "fonts/LibreFranklin-Medium.ttf"
+    id: temperature_font
+    size: 34
 
 image:
-  - file: "images/motion-detected-icon.png"
-    id: motion_detected_icon_id
+  - file: "images/presence-detected-icon.png"
+    id: presence_detected_icon_id
+    type: BINARY
+  - file: "images/no-presence-detected-icon.png"
+    id: no_presence_detected_icon_id
     type: BINARY
 
 i2c:
@@ -74,9 +80,17 @@ display:
       // time the display is updated (1s interval)
       static bool blinky_is_lit = false;
       blinky_is_lit = !blinky_is_lit;
-      it.filled_circle(3, height - 4, 3, blinky_is_lit ? COLOR_ON : COLOR_OFF);
+      it.filled_rectangle(width - 2, height - 2, 2, 2, blinky_is_lit ? COLOR_ON : COLOR_OFF);
 
-      it.image(12, 44, id(motion_detected_icon_id));
+      /*
+      it.filled_circle(3, height - 16, 3, COLOR_ON);
+      it.circle(3, height - 16, 3, COLOR_ON);
+      it.filled_circle(3, height - 10, 3, COLOR_ON);
+      it.circle(3, height - 10, 3, COLOR_ON);
+      */
+
+      auto radar_target = id(ld2410_0_moving_target_binary_sensor);
+      it.image(0, 44, radar_target->state ? id(presence_detected_icon_id) : id(no_presence_detected_icon_id));
 
       auto font_id = id(spleen_font);
       auto wifi_component = id(wifi_id);
@@ -91,6 +105,15 @@ display:
           ++line;
         }
       }
+
+      auto radar_moving = id(ld2410_0_moving_target_binary_sensor);
+      it.printf(left_margin, 3 * char_height, font_id, "%s", radar_moving->state ? " M" : "!M");
+
+      auto temp = id(bmp_temperature_sensor);
+      font_id = id(temperature_font);
+      it.printf(36, 35, font_id, "%2.1f°", temp->state);
+
+
 
 uart:
   id: uart_0
@@ -107,7 +130,7 @@ ld2410:
 binary_sensor:
   - platform: gpio
     name: "button_0"
-    id: button_0
+    id: button_0_binary_sensor
     pin:
       number: 3
       mode:
@@ -134,7 +157,7 @@ binary_sensor:
       invalid_cooldown: 0.5s
   - platform: gpio
     name: button_1
-    id: button_1
+    id: button_1_binary_sensor
     pin:
       number: 10
       mode:
@@ -159,17 +182,18 @@ binary_sensor:
       then:
         - logger.log: "Single Short Clicked"
       invalid_cooldown: 0.5s
-  - platform: gpio
-    pin: GPIO5
-    name: "Radar Presence Pin"
-    device_class: presence
   - platform: ld2410
     ld2410_id: ld2410_0
     has_target:
+      id: ld2410_0_target_binary_sensor
       name: "Radar Has Target"
     has_moving_target:
+      # this changes immediately on motion detection.
+      id: ld2410_0_moving_target_binary_sensor
       name: "Radar Moving Target"
     has_still_target:
+      # "If true a still target is detected"
+      id: ld2410_0_still_target_binary_sensor
       name: "Radar Still Target"
 
 switch:
@@ -223,6 +247,7 @@ sensor:
     # update_interval: 60s
     temperature:
       name: "BMP Temperature"
+      id: bmp_temperature_sensor
       oversampling: 2x
     pressure:
       name: "Pressure"
