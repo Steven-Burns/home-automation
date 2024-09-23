@@ -2,6 +2,7 @@
 # https://devices.esphome.io/devices/temt6000
 # https://community.home-assistant.io/t/aht20-bmp280-combined-sensor/366411
 # https://wiki.dfrobot.com/SKU_SEN0557_24GHz_Human_Presence_Sensing_Module
+# https://wiki.seeedstudio.com/Grove-Relay/
 
 esphome:
   name: esp32c3-multisensor-mk3
@@ -48,15 +49,26 @@ font:
   - file: "fonts/spleen-5x8.bdf"
     id: spleen_font
   - file: "fonts/LibreFranklin-Medium.ttf"
-    id: temperature_font
-    size: 34
+    id: temperature_large_font
+    size: 48
+  - file: "fonts/LibreFranklin-Medium.ttf"
+    id: temperature_small_font
+    size: 24
 
 image:
-  - file: "images/presence-detected-icon.png"
-    id: presence_detected_icon_id
+  # - file: "images/presence-detected-icon.png"
+  #   id: presence_detected_icon_id
+  #   type: BINARY
+  # - file: "images/no-presence-detected-icon.png"
+  #   id: no_presence_detected_icon_id
+  #   type: BINARY
+  - file: "images/person-standing-still-icon.png"
+    id: standing_still_icon_id
     type: BINARY
-  - file: "images/no-presence-detected-icon.png"
-    id: no_presence_detected_icon_id
+
+animation:
+  - file: "images/falling-head.gif"
+    id: motion_detected_animation_id
     type: BINARY
 
 i2c:
@@ -69,49 +81,62 @@ i2c:
 display:
   - platform: ssd1306_i2c
     model: "SSD1306_128x64"
-    update_interval: 1s
+    update_interval: 0.5s
     contrast: 20%
     invert: false
     lambda: |-
       auto width = it.get_width();
       auto height = it.get_height();
 
-      // en lieu of a hardware blinky light, toggle a software light every 
-      // time the display is updated (1s interval)
+      // en lieu of a hardware blinky light, toggle a software light every time the display is updated
       static bool blinky_is_lit = false;
       blinky_is_lit = !blinky_is_lit;
-      it.filled_rectangle(width - 2, height - 2, 2, 2, blinky_is_lit ? COLOR_ON : COLOR_OFF);
-
-      /*
-      it.filled_circle(3, height - 16, 3, COLOR_ON);
-      it.circle(3, height - 16, 3, COLOR_ON);
-      it.filled_circle(3, height - 10, 3, COLOR_ON);
-      it.circle(3, height - 10, 3, COLOR_ON);
-      */
-
-      auto radar_target = id(ld2410_0_moving_target_binary_sensor);
-      it.image(0, 44, radar_target->state ? id(presence_detected_icon_id) : id(no_presence_detected_icon_id));
+      it.filled_rectangle(0, 12, 2, 2, blinky_is_lit ? COLOR_ON : COLOR_OFF);
 
       auto font_id = id(spleen_font);
       auto wifi_component = id(wifi_id);
-      int char_height = 9;
-      int left_margin = 0;
+      int char_height = 8;
       int line = 0;
-      it.printf(left_margin, line++ * char_height, font_id, "H:%s", App.get_name().c_str());
+      it.printf(0, ++line * char_height, font_id, TextAlign::BASELINE_LEFT, "%s", App.get_name().c_str());
       for (auto &ip : wifi_component->get_ip_addresses()) 
       {
         if (ip.is_set()) {
-          it.printf(left_margin, line * char_height, font_id, "I:%s", ip.str().c_str());
-          ++line;
+          it.printf(width, ++line * char_height, font_id, TextAlign::BASELINE_RIGHT, "%s", ip.str().c_str());
         }
       }
+      bool button0_state = id(button_0_binary_sensor)->state;
+      bool button1_state = id(button_1_binary_sensor)->state;
+      bool relay_state = id(relay_0_id)->state;
+      bool radar_moving = id(ld2410_0_moving_target_binary_sensor)->state;
+      it.printf(5, line * char_height, font_id, TextAlign::BASELINE_LEFT, 
+        "%s %s %s %s",
+        button0_state ? "B0" : "  ",
+        button1_state ? "B1" : "  ",
+        relay_state ? "R" : " ",
+        radar_moving ? "M" : " ");
 
-      auto radar_moving = id(ld2410_0_moving_target_binary_sensor);
-      it.printf(left_margin, 3 * char_height, font_id, "%s", radar_moving->state ? " M" : "!M");
+      auto radar_target = id(ld2410_0_moving_target_binary_sensor);
+      if (radar_target->state)
+      {
+        // motion detected: play the current animation frame and advance the frame
+        auto ani = id(motion_detected_animation_id);
+        it.image(0, 44, ani, COLOR_ON, COLOR_OFF);
+        ani->next_frame();
+      }
+      else 
+      {
+        // no motion detected: show the standing still icon
+        it.image(0, 44, id(standing_still_icon_id)); 
+      }
 
-      auto temp = id(bmp_temperature_sensor);
-      font_id = id(temperature_font);
-      it.printf(36, 35, font_id, "%2.1f°", temp->state);
+      float temp = id(bmp_temperature_sensor)->state;
+      temp = temp * 1.8 + 32;
+      font_id = id(temperature_large_font);
+      it.printf(width - 15, height, font_id, TextAlign::BASELINE_RIGHT, "%02.0f", truncf(temp));
+      // dunno if I like the decimal point...
+      // it.filled_rectangle(width - 18, 43, 3, 3, COLOR_ON); 
+      font_id = id(temperature_small_font);
+      it.printf(width, 25, font_id, TextAlign::TOP_RIGHT, "%1d", (int)(temp * 10) % 10);
 
 
 
@@ -119,7 +144,7 @@ uart:
   id: uart_0
   tx_pin: GPIO21
   rx_pin: GPIO20
-  baud_rate: 256000 
+  baud_rate: 57600 
   parity: NONE
   stop_bits: 1
 
@@ -203,6 +228,10 @@ switch:
       name: "Radar Enable Engineering Mode"
     bluetooth:
       name: "Radar Enable Bluetooth"
+  - platform: gpio
+    name: "Relay 0"
+    id: relay_0_id
+    pin: GPIO9
 
 button:
   - platform: ld2410
@@ -213,6 +242,8 @@ button:
       name: "Radar Restart"
     query_params:
       name: "Radar Query Params"
+  - platform: restart
+    name: "Restart Sensor Device"
 
 text_sensor:
   - platform: wifi_info
@@ -232,7 +263,25 @@ text_sensor:
       name: "Radar Firmware Ver"
     mac_address:
       name: "Radar BT MAC"
-      
+  # when wired, I suppose this is the thing to replace wifi_info
+  # - platform: ethernet_info
+  #   ip_address:
+  #     name: ESP IP Address
+  #     address_0:
+  #       name: ESP IP Address 0
+  #     address_1:
+  #       name: ESP IP Address 1
+  #     address_2:
+  #       name: ESP IP Address 2
+  #     address_3:
+  #       name: ESP IP Address 3
+  #     address_4:
+  #       name: ESP IP Address 4
+  #   dns_address:
+  #     name: ESP DNS Address
+  #   mac_address:
+  #     name: ESP MAC Address
+
 sensor:
   - platform: adc
     pin: GPIO2
