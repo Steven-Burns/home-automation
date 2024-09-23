@@ -10,16 +10,20 @@ esphome:
     version: "0.1.1"
 
 esp32:
-  board: seeed_xiao_esp32c3
+  board: PUT_THE_DEVICE_BOARD_HERE
   framework:
     type: arduino
 
 # Enable logging
 logger:
+#  level: DEBUG
 
 # Enable Home Assistant API
 api:
   password: ""
+  # reboot_timeout set to 0s will keep the board running even when networking (connection to the home asst api)
+  # is lost, even if lost forever. 
+  # reboot_timeout: 0s
 
 ota:
   - platform: esphome
@@ -47,9 +51,29 @@ text_sensor:
     dns_address:
       name: DNS Addresses
 
+# ethernet_info is used with the ethernet component (so uncomment this if using ethernet instead of wifi)
+  # - platform: ethernet_info
+  #   ip_address:
+  #     name: ETH IP Address
+  #     address_0:
+  #       name: ETH IP Address 0
+  #     address_1:
+  #       name: ETH IP Address 1
+  #     address_2:
+  #       name: ETH IP Address 2
+  #     address_3:
+  #       name: ETH IP Address 3
+  #     address_4:
+  #       name: ETH IP Address 4
+  #   dns_address:
+  #     name: ETH DNS Addresses
+  #   mac_address:
+  #     name: ETH MAC Address
+
 captive_portal:
 
 web_server:
+  port: 80
 
 # this component sync the local gadget to the time of the Home Asst server
 time:
