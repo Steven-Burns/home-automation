@@ -12,12 +12,15 @@ substitutions:
   ethernet_cs_pin: "GPIO5"
   ethernet_interrupt_pin: "GPIO21"
   ethernet_reset_pin: "GPIO22"
+  button_0_pin: "GPIO25"
+  button_1_pin: "GPIO26"
+  relay_0_pin: "GPIO4"
 
 esphome:
   name: 903-wired
   friendly_name: 903-wired 
   comment: |- 
-    Start with this and add hardware...
+    Complete sensor array running on board 903 connected on wired ethernet.
   area: Gym
 
 esp32:
@@ -28,165 +31,14 @@ packages:
   radar_motion: !include include/radar-motion.yaml
   light_temp_humidity: !include include/light-temp-humidity.yaml
   wired_ethernet: !include include/wired-ethernet.yaml
-
-
-# wifi and (wired) ethernet are mutally exclusive in esphome, lamentably. 
-# wifi:
-#   id: wifi_id
-#   ssid: !secret wifi_ssid
-#   password: !secret wifi_password
-#   # Enable fallback hotspot (captive portal) in case wifi connection fails
-#   ap:
-#     ssid: "Fallback Hotspot"
-#     password: "PJnNb7VRCS3I"
-# 
-# captive_portal is only for wifi
-# captive_portal:
-
-
-font:
-  - file: "fonts/spleen-5x8.bdf"
-    id: spleen_font
-  - file: "fonts/LibreFranklin-Medium.ttf"
-    id: temperature_large_font
-    size: 60
-  - file: "fonts/LibreFranklin-Medium.ttf"
-    id: temperature_small_font
-    size: 24
-
-image:
-  - file: "images/person-standing-still-icon.png"
-    id: standing_still_icon_id
-    type: BINARY
-
-animation:
-  - file: "images/falling-head.gif"
-    id: motion_detected_animation_id
-    type: BINARY
-
-display:
-  - platform: ssd1306_i2c
-    model: "SSD1306_128x64"
-    update_interval: 0.25s
-    contrast: 20%
-    invert: false
-    lambda: |-
-      auto width = it.get_width();
-      auto height = it.get_height();
-
-      // en lieu of a hardware blinky light, toggle a software light every time the display is updated
-      static bool blinky_is_lit = false;
-      blinky_is_lit = !blinky_is_lit;
-      it.filled_rectangle(0, 12, 2, 2, blinky_is_lit ? COLOR_ON : COLOR_OFF);
-
-      auto font_id = id(spleen_font);
-      auto net_component = id(ethernet_id);
-      int char_height = 8;
-      int line = 0;
-      it.printf(width, ++line * char_height, font_id, TextAlign::BASELINE_RIGHT, "%s", App.get_name().c_str());
-      for (auto &ip : net_component->get_ip_addresses()) 
-      {
-        if (ip.is_set()) {
-          it.printf(width, ++line * char_height, font_id, TextAlign::BASELINE_RIGHT, "%s", ip.str().c_str());
-        }
-      }
-      
-      bool button0_state = id(button_0_binary_sensor_id)->state;
-      bool button1_state = id(button_1_binary_sensor_id)->state;
-      bool relay_state = id(relay_0_id)->state;
-      bool radar_moving = id(ld2410_0_moving_target_binary_sensor)->state;
-      it.printf(5, line * char_height, font_id, TextAlign::BASELINE_LEFT, 
-        "%s %s %s %s",
-        button0_state ? "B0" : "  ",
-        button1_state ? "B1" : "  ",
-        relay_state ? "R" : " ",
-        radar_moving ? "M" : " ");
-      /*
-      auto radar_target = id(ld2410_0_moving_target_binary_sensor);
-      if (radar_target->state)
-      {
-        // motion detected: play the current animation frame and advance the frame
-        auto ani = id(motion_detected_animation_id);
-        it.image(0, 44, ani, COLOR_ON, COLOR_OFF);
-        ani->next_frame();
-      }
-      else 
-      {
-        // no motion detected: show the standing still icon
-        it.image(0, 44, id(standing_still_icon_id)); 
-      }
-      */
-      float temp = id(bmp_temperature_sensor)->state;
-      temp = temp * 1.8 + 32;
-      font_id = id(temperature_large_font);
-      it.printf(width - 15, height, font_id, TextAlign::BASELINE_RIGHT, "%2.0f", truncf(temp));
-      // dunno if I like the decimal point...
-      // it.filled_rectangle(width - 18, 43, 3, 3, COLOR_ON); 
-      // or the fractional temp.
-      font_id = id(temperature_small_font);
-      it.printf(width, 15, font_id, TextAlign::TOP_RIGHT, "%1d", (int)(temp * 10) % 10);
-      
-binary_sensor:
-  - platform: gpio
-    name: "button_0"
-    id: button_0_binary_sensor_id
-    pin:
-      number: 25
-      mode:
-        input: true
-        pulldown: true
-    on_multi_click:
-    - timing:
-        - ON for at most 0.75s
-        - OFF for at most 0.3s
-        - ON for at most 0.75s
-        - OFF for at least 0.1s
-      then:
-        - logger.log: "Double Clicked"
-    - timing:
-        - ON for 0.75s to 3s
-        - OFF for at least 0.1s
-      then:
-        - logger.log: "Single Long Clicked"
-    - timing:
-        - ON for at most 1s
-        - OFF for at least 0.2s
-      then:
-        - logger.log: "Single Short Clicked"
-      invalid_cooldown: 0.5s
-  - platform: gpio
-    name: button_1
-    id: button_1_binary_sensor_id
-    pin:
-      number: 26
-      mode:
-        input: true
-        pulldown: true
-    on_multi_click:
-    - timing:
-        - ON for at most 0.75s
-        - OFF for at most 0.3s
-        - ON for at most 0.75s
-        - OFF for at least 0.1s
-      then:
-        - logger.log: "Double Clicked"
-    - timing:
-        - ON for 0.75s to 3s
-        - OFF for at least 0.1s
-      then:
-        - logger.log: "Single Long Clicked"
-    - timing:
-        - ON for at most 1s
-        - OFF for at least 0.2s
-      then:
-        - logger.log: "Single Short Clicked"
-      invalid_cooldown: 0.5s
+  buttons: !include include/buttons.yaml
+  display: !include include/display.yaml
 
 switch:
   - platform: gpio
     name: "Relay 0"
     id: relay_0_id
-    pin: GPIO4
+    pin: ${relay_0_pin}
 
 
 

@@ -1,0 +1,84 @@
+font:
+  - file: "fonts/spleen-5x8.bdf"
+    id: spleen_font
+  - file: "fonts/LibreFranklin-Medium.ttf"
+    id: temperature_large_font
+    size: 60
+  - file: "fonts/LibreFranklin-Medium.ttf"
+    id: temperature_small_font
+    size: 24
+
+image:
+  - file: "images/person-standing-still-icon.png"
+    id: standing_still_icon_id
+    type: BINARY
+
+animation:
+  - file: "images/falling-head.gif"
+    id: motion_detected_animation_id
+    type: BINARY
+
+display:
+  - platform: ssd1306_i2c
+    model: "SSD1306_128x64"
+    update_interval: 0.25s
+    contrast: 20%
+    invert: false
+    lambda: |-
+      auto width = it.get_width();
+      auto height = it.get_height();
+
+      // en lieu of a hardware blinky light, toggle a software light every time the display is updated
+      static bool blinky_is_lit = false;
+      blinky_is_lit = !blinky_is_lit;
+      it.filled_rectangle(0, 12, 2, 2, blinky_is_lit ? COLOR_ON : COLOR_OFF);
+
+      auto font_id = id(spleen_font);
+      auto net_component = id(ethernet_id);
+      int char_height = 8;
+      int line = 0;
+      it.printf(width, ++line * char_height, font_id, TextAlign::BASELINE_RIGHT, "%s", App.get_name().c_str());
+      for (auto &ip : net_component->get_ip_addresses()) 
+      {
+        if (ip.is_set()) {
+          it.printf(width, ++line * char_height, font_id, TextAlign::BASELINE_RIGHT, "%s", ip.str().c_str());
+        }
+      }
+      
+      bool button0_state = id(button_0_binary_sensor_id)->state;
+      bool button1_state = id(button_1_binary_sensor_id)->state;
+      bool relay_state = id(relay_0_id)->state;
+      bool radar_moving = id(ld2410_0_moving_target_binary_sensor)->state;
+      it.printf(5, line * char_height, font_id, TextAlign::BASELINE_LEFT, 
+        "%s %s %s %s",
+        button0_state ? "B0" : "  ",
+        button1_state ? "B1" : "  ",
+        relay_state ? "R" : " ",
+        radar_moving ? "M" : " ");
+      /*
+      auto radar_target = id(ld2410_0_moving_target_binary_sensor);
+      if (radar_target->state)
+      {
+        // motion detected: play the current animation frame and advance the frame
+        auto ani = id(motion_detected_animation_id);
+        it.image(0, 44, ani, COLOR_ON, COLOR_OFF);
+        ani->next_frame();
+      }
+      else 
+      {
+        // no motion detected: show the standing still icon
+        it.image(0, 44, id(standing_still_icon_id)); 
+      }
+      */
+      float temp = id(bmp_temperature_sensor)->state;
+      temp = temp * 1.8 + 32;
+      font_id = id(temperature_large_font);
+      it.printf(width - 15, height, font_id, TextAlign::BASELINE_RIGHT, "%2.0f", truncf(temp));
+      // dunno if I like the decimal point...
+      // it.filled_rectangle(width - 18, 43, 3, 3, COLOR_ON); 
+      // or the fractional temp.
+      font_id = id(temperature_small_font);
+      it.printf(width, 15, font_id, TextAlign::TOP_RIGHT, "%1d", (int)(temp * 10) % 10);
+
+
+
