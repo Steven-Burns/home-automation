@@ -21,7 +21,7 @@ api:
 
 ota:
   - platform: esphome
-    password: ""
+    password: !secret ota_password
       
 web_server:
   port: 80
@@ -55,7 +55,7 @@ interval:
 button:
   - platform: restart
     icon: mdi:power-cycle
-    name: "Safely Restart Sensor Device"
+    name: "Safely Restart Device"
     entity_category: diagnostic
 
 sensor:

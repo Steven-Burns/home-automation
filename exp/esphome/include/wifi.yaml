@@ -5,7 +5,7 @@ wifi:
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "Fallback Hotspot"
-    password: "PJnNb7VRCS3I"
+    password: !secret fallback_hotspot_password
 
 captive_portal:
 
@@ -19,15 +19,19 @@ sensor:
 text_sensor:
   - platform: wifi_info
     ip_address:
-      name: IP Address
+      name: WiFi IP Address
       entity_category: "diagnostic"
     ssid:
       name: Connected SSID
+      entity_category: diagnostic
     bssid:
       name: Connected BSSID
+      entity_category: diagnostic
     mac_address:
       name: Wifi MAC Address
+      entity_category: diagnostic
     dns_address:
-      name: DNS Addresses
+      name: WiFi DNS Addresses
+      entity_category: diagnostic
 
 

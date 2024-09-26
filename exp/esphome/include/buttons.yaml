@@ -1,6 +1,6 @@
 binary_sensor:
   - platform: gpio
-    name: "button_0"
+    name: "Top Button"
     id: button_0_binary_sensor_id
     pin:
       number: ${button_0_pin}
@@ -27,7 +27,7 @@ binary_sensor:
         - logger.log: "Single Short Clicked"
       invalid_cooldown: 0.5s
   - platform: gpio
-    name: button_1
+    name: "Bottom Button"
     id: button_1_binary_sensor_id
     pin:
       number: ${button_1_pin}

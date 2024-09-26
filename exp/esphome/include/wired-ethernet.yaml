@@ -14,22 +14,22 @@ ethernet:
 text_sensor:
   - platform: ethernet_info
     ip_address:
-      name: ETH IP Address
+      name: Wired IP Address
       entity_category: diagnostic
       # address_0:
-      #   name: ETH IP Address 0
+      #   name: Wired IP Address 0
       # address_1:
-      #   name: ETH IP Address 1
+      #   name: Wired IP Address 1
       # address_2:
-      #   name: ETH IP Address 2
+      #   name: Wired IP Address 2
       # address_3:
-      #   name: ETH IP Address 3
+      #   name: Wired IP Address 3
       # address_4:
-      #   name: ETH IP Address 4
+      #   name: Wired IP Address 4
     dns_address:
-      name: ETH DNS Addresses
+      name: Wired DNS Addresses
       entity_category: diagnostic
     mac_address:
-      name: ETH MAC Address
+      name: Wired MAC Address
       entity_category: diagnostic
 

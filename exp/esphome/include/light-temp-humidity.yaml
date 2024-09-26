@@ -3,7 +3,7 @@ i2c:
   scl: ${i2c_scl_pin}
   # goose up the i2c bus frequency so that we don't get runtime warnings about the display component
   # taking too long to update.
-  frequency: 300kHz
+  frequency: 320kHz
 
 sensor:
   - platform: adc
