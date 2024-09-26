@@ -93,7 +93,7 @@ i2c:
   scl: GPIO33
   # goose up the i2c bus frequency so that we don't get runtime warnings about the display component
   # taking too long to update.
-  frequency: 320kHz
+  frequency: 300kHz
 
 display:
   - platform: ssd1306_i2c
