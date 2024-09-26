@@ -1,0 +1,54 @@
+i2c:
+  sda: ${i2c_sda_pin}
+  scl: ${i2c_scl_pin}
+  # goose up the i2c bus frequency so that we don't get runtime warnings about the display component
+  # taking too long to update.
+  frequency: 300kHz
+
+sensor:
+  - platform: adc
+    pin: ${illuminance_pin}
+    name: "Illuminance"
+    device_class: illuminance
+    unit_of_measurement: lx
+    filters:
+      - lambda: |-
+          return (x / 10000.0) * 2000000.0;
+  - platform: bmp280
+    address: 0x77
+    # update_interval: 60s
+    # the irr_filter supposedly lowers noise at the expense of power consumption.
+    # We don't care about power consumption (for wired devices), so max out the filter.
+    iir_filter: 16x
+    temperature:
+      name: "BMP Temperature"
+      id: bmp_temperature_sensor
+      oversampling: 2x
+    pressure:
+      name: "Pressure"
+      oversampling: 16x
+  - platform: aht10
+    address: 0x38
+    variant: aht20
+    # update_interval: 60s
+    temperature:
+      name: "AHT20 Temperature"
+      id: aht20_temp
+      accuracy_decimals: 1
+      # filters:
+      # - filter_out: 0.0
+      # - median:
+      #     window_size: 3
+      #     send_every: 3
+      #     send_first_at: 1
+    humidity:
+      name: "Humidity"
+      id: aht20_humidity
+      accuracy_decimals: 1
+      # filters:
+      # - filter_out: 0.0
+      # - median:
+      #     window_size: 3
+      #     send_every: 3
+      #     send_first_at: 1
+

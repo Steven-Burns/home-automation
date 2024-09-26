@@ -1,0 +1,35 @@
+ethernet:
+  id: ethernet_id
+  type: W5500
+  clk_pin: ${ethernet_clk_pin}
+  mosi_pin: ${ethernet_mosi_pin}
+  miso_pin: ${ethernet_miso_pin}
+  cs_pin: 
+      number: ${ethernet_cs_pin}
+      ignore_strapping_warning: true  
+  interrupt_pin: ${ethernet_interrupt_pin}
+  reset_pin: ${ethernet_reset_pin}
+  clock_speed: 26.67Mhz 
+
+text_sensor:
+  - platform: ethernet_info
+    ip_address:
+      name: ETH IP Address
+      entity_category: diagnostic
+      # address_0:
+      #   name: ETH IP Address 0
+      # address_1:
+      #   name: ETH IP Address 1
+      # address_2:
+      #   name: ETH IP Address 2
+      # address_3:
+      #   name: ETH IP Address 3
+      # address_4:
+      #   name: ETH IP Address 4
+    dns_address:
+      name: ETH DNS Addresses
+      entity_category: diagnostic
+    mac_address:
+      name: ETH MAC Address
+      entity_category: diagnostic
+

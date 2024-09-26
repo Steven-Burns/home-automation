@@ -1,0 +1,64 @@
+uart:
+  id: uart_2_id
+  tx_pin: ${uart_2_tx_pin}
+  rx_pin: ${uart_2_rx_pin}
+  baud_rate: 57600 
+  parity: NONE
+  stop_bits: 1
+
+ld2410:
+  uart_id: uart_2_id
+  id: ld2410_0_id
+
+binary_sensor:
+  - platform: ld2410
+    ld2410_id: ld2410_0_id
+    has_target:
+      id: ld2410_0_target_binary_sensor
+      name: "Radar Has Target"
+      device_class: occupancy
+    has_moving_target:
+      # this changes immediately on motion detection.
+      id: ld2410_0_moving_target_binary_sensor
+      name: "Radar Moving Target"
+      device_class: motion
+      internal: true
+    has_still_target:
+      # "If true a still target is detected"
+      id: ld2410_0_still_target_binary_sensor
+      name: "Radar Still Target"
+      device_class: motion
+      internal: true
+
+switch:
+  - platform: ld2410
+    ld2410_id: ld2410_0_id
+    engineering_mode:
+      name: "Radar Enable Engineering Mode"
+      entity_category: diagnostic
+    bluetooth:
+      name: "Radar Enable Bluetooth"
+      entity_category: diagnostic
+
+button:
+  - platform: ld2410
+    ld2410_id: ld2410_0_id
+    factory_reset:
+      name: "Radar Factory Reset"
+      entity_category: diagnostic
+    restart:
+      name: "Radar Restart"
+      entity_category: diagnostic
+    query_params:
+      name: "Radar Query Params"
+      entity_category: diagnostic
+
+text_sensor:
+  - platform: ld2410
+    ld2410_id: ld2410_0_id
+    version:
+      name: "Radar Firmware Ver"
+      entity_category: diagnostic
+    mac_address:
+      name: "Radar BT MAC Address"
+      entity_category: diagnostic

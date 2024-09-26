@@ -1,0 +1,86 @@
+esphome:
+  name_add_mac_suffix: true
+  project:
+    name: "arkadiahouse.home_automation"
+    version: "0.1.1"
+
+esp32:
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+  level: DEBUG
+
+# Enable Home Assistant API
+api:
+  password: ""
+  # reboot_timeout set to 0s will keep the board running even when networking (connection to the home asst api)
+  # is lost, even if lost forever. 
+  # reboot_timeout: 0s
+
+ota:
+  - platform: esphome
+    password: ""
+      
+web_server:
+  port: 80
+
+# this component sync the local gadget to the time of the Home Asst server
+time:
+  - platform: homeassistant
+    id: esptime
+
+# this combination of output and interval will blink the on-board led
+# without creating a home assistant entity. No entity means that the 
+# state transitions will not be communicated with Home Assistant and 
+# therefore generate no traffic no data logging history. This blinky is 
+# just to tell me that the "loop is running" -- when the board is horked
+# it does not flash.
+output:
+  - platform: gpio
+    pin:
+      number: ${builtin_led_pin}
+      mode: output
+      ignore_strapping_warning: true
+    id: on_board_led_id
+
+interval:
+  - interval: 500ms
+    then:
+      - output.turn_on: on_board_led_id
+      - delay: 250ms
+      - output.turn_off: on_board_led_id
+
+button:
+  - platform: restart
+    icon: mdi:power-cycle
+    name: "Safely Restart Sensor Device"
+    entity_category: diagnostic
+
+sensor:
+  - platform: template
+    id: sys_esp_temperature
+    name: CPU Temperature
+    lambda: return temperatureRead();
+    unit_of_measurement: °C
+    device_class: temperature
+    state_class: measurement
+    update_interval: 60s
+    entity_category: "diagnostic"
+  - platform: uptime
+    name: Device Uptime (approx)
+    id: sys_uptime
+    state_class: total_increasing
+    update_interval: 60s
+    entity_category: "diagnostic"
+  - platform: template
+    id: esp_memory
+    icon: mdi:memory
+    name: Free Heap
+    lambda: return heap_caps_get_free_size(MALLOC_CAP_INTERNAL) / 1024;
+    unit_of_measurement: 'kB'
+    state_class: measurement
+    entity_category: "diagnostic"
+    update_interval: 60s
+

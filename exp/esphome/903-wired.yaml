@@ -1,46 +1,34 @@
+substitutions:
+  builtin_led_pin: "2"
+  # 16 and 17 are supposedly the pins for ESP32 hardware UART 2
+  uart_2_tx_pin: "GPIO17"
+  uart_2_rx_pin: "GPIO16"
+  i2c_sda_pin: "GPIO32"
+  i2c_scl_pin: "GPIO33"
+  illuminance_pin: "GPIO35"
+  ethernet_clk_pin: "GPIO18"
+  ethernet_mosi_pin: "GPIO23"
+  ethernet_miso_pin: "GPIO19"
+  ethernet_cs_pin: "GPIO5"
+  ethernet_interrupt_pin: "GPIO21"
+  ethernet_reset_pin: "GPIO22"
+
 esphome:
   name: 903-wired
   friendly_name: 903-wired 
   comment: |- 
     Start with this and add hardware...
   area: Gym
-  name_add_mac_suffix: true
-  project:
-    name: "arkadiahouse.home_automation"
-    version: "0.1.1"
 
 esp32:
   board: nodemcu-32s
-  framework:
-    type: arduino
 
-# Enable logging
-logger:
-  level: DEBUG
+packages:
+  device_base: !include include/device-baseline.yaml
+  radar_motion: !include include/radar-motion.yaml
+  light_temp_humidity: !include include/light-temp-humidity.yaml
+  wired_ethernet: !include include/wired-ethernet.yaml
 
-# Enable Home Assistant API
-api:
-  password: ""
-  # reboot_timeout set to 0s will keep the board running even when networking (connection to the home asst api)
-  # is lost, even if lost forever. 
-  # reboot_timeout: 0s
-
-ota:
-  - platform: esphome
-    password: ""
-
-ethernet:
-  id: ethernet_id
-  type: W5500
-  clk_pin: GPIO18
-  mosi_pin: GPIO23
-  miso_pin: GPIO19
-  cs_pin: 
-      number: 5
-      ignore_strapping_warning: true  
-  interrupt_pin: GPIO21
-  reset_pin: GPIO22
-  clock_speed: 26.67Mhz 
 
 # wifi and (wired) ethernet are mutally exclusive in esphome, lamentably. 
 # wifi:
@@ -55,18 +43,6 @@ ethernet:
 # captive_portal is only for wifi
 # captive_portal:
 
-uart:
-  id: uart_2_id
-  # 16 and 17 are supposedly the pins for ESP32 hardware UART 2
-  tx_pin: GPIO17
-  rx_pin: GPIO16
-  baud_rate: 57600 
-  parity: NONE
-  stop_bits: 1
-
-ld2410:
-  uart_id: uart_2_id
-  id: ld2410_0_id
 
 font:
   - file: "fonts/spleen-5x8.bdf"
@@ -87,13 +63,6 @@ animation:
   - file: "images/falling-head.gif"
     id: motion_detected_animation_id
     type: BINARY
-
-i2c:
-  sda: GPIO32
-  scl: GPIO33
-  # goose up the i2c bus frequency so that we don't get runtime warnings about the display component
-  # taking too long to update.
-  frequency: 300kHz
 
 display:
   - platform: ssd1306_i2c
@@ -157,35 +126,6 @@ display:
       font_id = id(temperature_small_font);
       it.printf(width, 15, font_id, TextAlign::TOP_RIGHT, "%1d", (int)(temp * 10) % 10);
       
-web_server:
-  port: 80
-
-# this component sync the local gadget to the time of the Home Asst server
-time:
-  - platform: homeassistant
-    id: esptime
-
-# this combination of output and interval will blink the on-board led
-# without creating a home assistant entity. No entity means that the 
-# state transitions will not be communicated with Home Assistant and 
-# therefore generate no traffic no data logging history. This blinky is 
-# just to tell me that the "loop is running" -- when the board is horked
-# it does not flash.
-output:
-  - platform: gpio
-    pin:
-      number: 2
-      mode: output
-      ignore_strapping_warning: true
-    id: on_board_led_id
-
-interval:
-  - interval: 500ms
-    then:
-      - output.turn_on: on_board_led_id
-      - delay: 250ms
-      - output.turn_off: on_board_led_id
-
 binary_sensor:
   - platform: gpio
     name: "button_0"
@@ -241,153 +181,12 @@ binary_sensor:
       then:
         - logger.log: "Single Short Clicked"
       invalid_cooldown: 0.5s
-  - platform: ld2410
-    ld2410_id: ld2410_0_id
-    has_target:
-      id: ld2410_0_target_binary_sensor
-      name: "Radar Has Target"
-    has_moving_target:
-      # this changes immediately on motion detection.
-      id: ld2410_0_moving_target_binary_sensor
-      name: "Radar Moving Target"
-    has_still_target:
-      # "If true a still target is detected"
-      id: ld2410_0_still_target_binary_sensor
-      name: "Radar Still Target"
 
 switch:
-  - platform: ld2410
-    ld2410_id: ld2410_0_id
-    engineering_mode:
-      name: "Radar Enable Engineering Mode"
-    bluetooth:
-      name: "Radar Enable Bluetooth"
   - platform: gpio
     name: "Relay 0"
     id: relay_0_id
     pin: GPIO4
 
-button:
-  - platform: ld2410
-    ld2410_id: ld2410_0_id
-    factory_reset:
-      name: "Radar Factory Reset"
-    restart:
-      name: "Radar Restart"
-    query_params:
-      name: "Radar Query Params"
-  - platform: restart
-    icon: mdi:power-cycle
-    name: "Safe Restart Sensor Device"
-    entity_category: diagnostic
 
-
-sensor:
-  - platform: adc
-    pin: GPIO35
-    name: "Illuminance"
-    device_class: illuminance
-    unit_of_measurement: lx
-    filters:
-      - lambda: |-
-          return (x / 10000.0) * 2000000.0;
-  - platform: bmp280
-    address: 0x77
-    # update_interval: 60s
-    temperature:
-      name: "BMP Temperature"
-      id: bmp_temperature_sensor
-      oversampling: 2x
-    pressure:
-      name: "Pressure"
-  - platform: aht10
-    address: 0x38
-    variant: aht20
-    # update_interval: 60s
-    temperature:
-      name: "AHT20 Temperature"
-      id: aht20_temp
-      accuracy_decimals: 1
-      # filters:
-      # - filter_out: 0.0
-      # - median:
-      #     window_size: 3
-      #     send_every: 3
-      #     send_first_at: 1
-    humidity:
-      name: "Humidity"
-      id: aht20_humidity
-      accuracy_decimals: 1
-      # filters:
-      # - filter_out: 0.0
-      # - median:
-      #     window_size: 3
-      #     send_every: 3
-      #     send_first_at: 1
-  - platform: template
-    id: sys_esp_temperature
-    name: CPU Temperature
-    lambda: return temperatureRead();
-    unit_of_measurement: °C
-    device_class: temperature
-    update_interval: 60s
-    entity_category: "diagnostic"
-  - platform: uptime
-    name: Device Uptime (approx)
-    id: sys_uptime
-    update_interval: 60s
-  # requires wifi component
-  # - platform: wifi_signal 
-  #   name: RSSI
-  #   id: wifi_signal_db
-  #   update_interval: 60s
-  #   entity_category: "diagnostic"
-  - platform: template
-    id: esp_memory
-    icon: mdi:memory
-    name: Free Heap
-    lambda: return heap_caps_get_free_size(MALLOC_CAP_INTERNAL) / 1024;
-    unit_of_measurement: 'kB'
-    state_class: measurement
-    entity_category: "diagnostic"
-    update_interval: 60s
-
-text_sensor:
-  - platform: ld2410
-    ld2410_id: ld2410_0_id
-    version:
-      name: "Radar Firmware Ver"
-    mac_address:
-      name: "Radar BT MAC Address"
-
-  # - platform: wifi_info
-  #   ip_address:
-  #     name: IP Address
-  #   ssid:
-  #     name: Connected SSID
-  #   bssid:
-  #     name: Connected BSSID
-  #   mac_address:
-  #     name: Wifi MAC Address
-  #   dns_address:
-  #     name: DNS Addresses
-
-# ethernet_info is used with the ethernet component (so uncomment this if using ethernet instead of wifi)
-  - platform: ethernet_info
-    ip_address:
-      name: ETH IP Address
-      # address_0:
-      #   name: ETH IP Address 0
-      # address_1:
-      #   name: ETH IP Address 1
-      # address_2:
-      #   name: ETH IP Address 2
-      # address_3:
-      #   name: ETH IP Address 3
-      # address_4:
-      #   name: ETH IP Address 4
-    dns_address:
-      name: ETH DNS Addresses
-    mac_address:
-      name: ETH MAC Address
 
