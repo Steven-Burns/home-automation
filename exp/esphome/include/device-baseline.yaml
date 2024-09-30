@@ -1,4 +1,7 @@
 esphome:
+  name: ${device_name}
+  friendly_name: ${device_name} 
+  comment: ${device_comment}
   name_add_mac_suffix: true
   project:
     name: "arkadiahouse.home_automation"
@@ -11,6 +14,8 @@ esp32:
 # Enable logging
 logger:
   level: DEBUG
+  # this will disable serial logging (API access should still work, tho)
+  # baud_rate:0 
 
 # Enable Home Assistant API
 api:
@@ -69,7 +74,7 @@ sensor:
     update_interval: 60s
     entity_category: "diagnostic"
   - platform: uptime
-    name: Device Uptime (approx)
+    name: Uptime (approx)
     id: sys_uptime
     state_class: total_increasing
     update_interval: 60s
