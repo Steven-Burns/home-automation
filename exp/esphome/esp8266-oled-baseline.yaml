@@ -23,8 +23,7 @@ display:
       int char_height = 8;
       int line = 0;
       it.printf(width, ++line * char_height, font_id, TextAlign::BASELINE_RIGHT, "%s", App.get_name().c_str());
-      it.printf(width, ++line * char_height, font_id, TextAlign::BASELINE_RIGHT, "%s", ip_addr.c_str());
-        
+      it.printf(width, ++line * char_height, font_id, TextAlign::BASELINE_RIGHT, "%s", ip_addr.c_str());  
 
 # "All Device" baseline stuff here
 

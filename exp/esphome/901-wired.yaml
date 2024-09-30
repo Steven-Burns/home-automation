@@ -1,360 +1,50 @@
-esphome:
-  name: 901-wired
-  friendly_name: 901-wired 
-  comment: |- 
-    Start with this and add hardware...
-  area: Gym
-  name_add_mac_suffix: true
-  project:
-    name: "arkadiahouse.home_automation"
-    version: "0.1.1"
-
 esp32:
   board: nodemcu-32s
-  framework:
-    type: arduino
 
-# Enable logging
-logger:
-  level: DEBUG
+packages:
+  wired_ethernet: !include
+    file: include/wired-ethernet.yaml
+    vars:
+      ethernet_clk_pin: "GPIO18"
+      ethernet_mosi_pin: "GPIO23"
+      ethernet_miso_pin: "GPIO19"
+      ethernet_cs_pin: "GPIO5"
+      ethernet_interrupt_pin: "GPIO21"
+      ethernet_reset_pin: "GPIO22"
+  radar_motion: !include
+    file: include/radar-motion.yaml
+    vars:
+      # 16 and 17 are supposedly the pins for ESP32 hardware UART 2
+      uart_2_tx_pin: "GPIO17"
+      uart_2_rx_pin: "GPIO16"
+  i2c: !include 
+    file: include/i2c.yaml
+    vars:
+      i2c_sda_pin: "GPIO32"
+      i2c_scl_pin: "GPIO33"
+  light_temp_humidity: !include 
+    file: include/light-temp-humidity.yaml
+    vars:
+      illuminance_pin: "GPIO35"
+  buttons: !include  
+    file: include/buttons.yaml
+    vars:
+      button_0_pin: "GPIO25"
+      button_1_pin: "GPIO26"
+  relay: !include 
+    file: include/single-relay.yaml
+    vars: 
+      relay_0_pin: "GPIO4"
+  display: !include 
+    file: include/display.yaml
 
-# Enable Home Assistant API
-api:
-  password: ""
-  # reboot_timeout set to 0s will keep the board running even when networking (connection to the home asst api)
-  # is lost, even if lost forever. 
-  # reboot_timeout: 0s
+# "All Device" baseline stuff here
 
-ota:
-  - platform: esphome
-    password: ""
+<<: !include 
+  file: include/esp32-device-baseline.yaml
+  vars:
+    device_name: "901-wired"
+    device_comment: "Complete sensor array running on board 901 connected on wired ethernet."
+    builtin_led_pin: "2"
 
-ethernet:
-  id: ethernet_id
-  type: W5500
-  clk_pin: GPIO18
-  mosi_pin: GPIO23
-  miso_pin: GPIO19
-  cs_pin: GPIO5
-  interrupt_pin: GPIO21
-  reset_pin: GPIO22
-  clock_speed: 26.67Mhz 
-
-# wifi and (wired) ethernet are mutally exclusive in esphome, lamentably. 
-# wifi:
-#   id: wifi_id
-#   ssid: !secret wifi_ssid
-#   password: !secret wifi_password
-#   # Enable fallback hotspot (captive portal) in case wifi connection fails
-#   ap:
-#     ssid: "Fallback Hotspot"
-#     password: "PJnNb7VRCS3I"
-# 
-# captive_portal is only for wifi
-# captive_portal:
-
-uart:
-  id: uart_2_id
-  # 16 and 17 are supposedly the pins for ESP32 hardware UART 2
-  tx_pin: GPIO17
-  rx_pin: GPIO16
-  baud_rate: 57600 
-  parity: NONE
-  stop_bits: 1
-
-ld2410:
-  uart_id: uart_2_id
-  id: ld2410_0_id
-
-font:
-  - file: "fonts/spleen-5x8.bdf"
-    id: spleen_font
-  - file: "fonts/LibreFranklin-Medium.ttf"
-    id: temperature_large_font
-    size: 60
-  - file: "fonts/LibreFranklin-Medium.ttf"
-    id: temperature_small_font
-    size: 24
-
-image:
-  - file: "images/person-standing-still-icon.png"
-    id: standing_still_icon_id
-    type: BINARY
-
-animation:
-  - file: "images/falling-head.gif"
-    id: motion_detected_animation_id
-    type: BINARY
-
-i2c:
-  sda: GPIO32
-  scl: GPIO33
-  # goose up the i2c bus frequency so that we don't get runtime warnings about the display component
-  # taking too long to update.
-  frequency: 300kHz
-
-display:
-  - platform: ssd1306_i2c
-    model: "SSD1306_128x64"
-    update_interval: 0.25s
-    contrast: 20%
-    invert: false
-    lambda: |-
-      auto width = it.get_width();
-      auto height = it.get_height();
-
-      // en lieu of a hardware blinky light, toggle a software light every time the display is updated
-      static bool blinky_is_lit = false;
-      blinky_is_lit = !blinky_is_lit;
-      it.filled_rectangle(0, 12, 2, 2, blinky_is_lit ? COLOR_ON : COLOR_OFF);
-
-      auto font_id = id(spleen_font);
-      auto net_component = id(ethernet_id);
-      int char_height = 8;
-      int line = 0;
-      it.printf(width, ++line * char_height, font_id, TextAlign::BASELINE_RIGHT, "%s", App.get_name().c_str());
-      for (auto &ip : net_component->get_ip_addresses()) 
-      {
-        if (ip.is_set()) {
-          it.printf(width, ++line * char_height, font_id, TextAlign::BASELINE_RIGHT, "%s", ip.str().c_str());
-        }
-      }
-      
-      bool button0_state = id(button_0_binary_sensor_id)->state;
-      bool button1_state = id(button_1_binary_sensor_id)->state;
-      bool relay_state = id(relay_0_id)->state;
-      bool radar_moving = id(ld2410_0_moving_target_binary_sensor)->state;
-      it.printf(5, line * char_height, font_id, TextAlign::BASELINE_LEFT, 
-        "%s %s %s %s",
-        button0_state ? "B0" : "  ",
-        button1_state ? "B1" : "  ",
-        relay_state ? "R" : " ",
-        radar_moving ? "M" : " ");
-
-      auto radar_target = id(ld2410_0_moving_target_binary_sensor);
-      if (radar_target->state)
-      {
-        // motion detected: play the current animation frame and advance the frame
-        auto ani = id(motion_detected_animation_id);
-        it.image(0, 44, ani, COLOR_ON, COLOR_OFF);
-        ani->next_frame();
-      }
-      else 
-      {
-        // no motion detected: show the standing still icon
-        it.image(0, 44, id(standing_still_icon_id)); 
-      }
-      
-      float temp = id(bmp_temperature_sensor)->state;
-      temp = temp * 1.8 + 32;
-      font_id = id(temperature_large_font);
-      it.printf(width, height, font_id, TextAlign::BASELINE_RIGHT, "%2.0f", truncf(temp));
-      // dunno if I like the decimal point...
-      // it.filled_rectangle(width - 18, 43, 3, 3, COLOR_ON); 
-      // or the fractional temp.
-      // font_id = id(temperature_small_font);
-      // it.printf(width, 25, font_id, TextAlign::TOP_RIGHT, "%1d", (int)(temp * 10) % 10);
-      
-web_server:
-  port: 80
-
-# this component sync the local gadget to the time of the Home Asst server
-time:
-  - platform: homeassistant
-    id: esptime
-
-# this combination of output and interval will blink the on-board led
-# without creating a home assistant entity. No entity means that the 
-# state transitions will not be communicated with Home Assistant and 
-# therefore generate no traffic no data logging history. This blinky is 
-# just to tell me that the "loop is running" -- when the board is horked
-# it does not flash.
-output:
-  - platform: gpio
-    pin:
-      number: 2
-      mode: output
-    id: on_board_led_id
-
-interval:
-  - interval: 500ms
-    then:
-      - output.turn_on: on_board_led_id
-      - delay: 250ms
-      - output.turn_off: on_board_led_id
-
-binary_sensor:
-  - platform: gpio
-    name: "button_0"
-    id: button_0_binary_sensor_id
-    pin:
-      number: 25
-      mode:
-        input: true
-        pulldown: true
-    on_multi_click:
-    - timing:
-        - ON for at most 0.75s
-        - OFF for at most 0.3s
-        - ON for at most 0.75s
-        - OFF for at least 0.1s
-      then:
-        - logger.log: "Double Clicked"
-    - timing:
-        - ON for 0.75s to 3s
-        - OFF for at least 0.1s
-      then:
-        - logger.log: "Single Long Clicked"
-    - timing:
-        - ON for at most 1s
-        - OFF for at least 0.2s
-      then:
-        - logger.log: "Single Short Clicked"
-      invalid_cooldown: 0.5s
-  - platform: gpio
-    name: button_1
-    id: button_1_binary_sensor_id
-    pin:
-      number: 26
-      mode:
-        input: true
-        pulldown: true
-    on_multi_click:
-    - timing:
-        - ON for at most 0.75s
-        - OFF for at most 0.3s
-        - ON for at most 0.75s
-        - OFF for at least 0.1s
-      then:
-        - logger.log: "Double Clicked"
-    - timing:
-        - ON for 0.75s to 3s
-        - OFF for at least 0.1s
-      then:
-        - logger.log: "Single Long Clicked"
-    - timing:
-        - ON for at most 1s
-        - OFF for at least 0.2s
-      then:
-        - logger.log: "Single Short Clicked"
-      invalid_cooldown: 0.5s
-  - platform: ld2410
-    ld2410_id: ld2410_0_id
-    has_target:
-      id: ld2410_0_target_binary_sensor
-      name: "Radar Has Target"
-    has_moving_target:
-      # this changes immediately on motion detection.
-      id: ld2410_0_moving_target_binary_sensor
-      name: "Radar Moving Target"
-    has_still_target:
-      # "If true a still target is detected"
-      id: ld2410_0_still_target_binary_sensor
-      name: "Radar Still Target"
-
-switch:
-  - platform: ld2410
-    ld2410_id: ld2410_0_id
-    engineering_mode:
-      name: "Radar Enable Engineering Mode"
-    bluetooth:
-      name: "Radar Enable Bluetooth"
-  - platform: gpio
-    name: "Relay 0"
-    id: relay_0_id
-    pin: GPIO4
-
-button:
-  - platform: ld2410
-    ld2410_id: ld2410_0_id
-    factory_reset:
-      name: "Radar Factory Reset"
-    restart:
-      name: "Radar Restart"
-    query_params:
-      name: "Radar Query Params"
-  - platform: restart
-    name: "Restart Sensor Device"
-
-sensor:
-  - platform: adc
-    pin: GPIO35
-    name: "Illuminance"
-    device_class: illuminance
-    unit_of_measurement: lx
-    filters:
-      - lambda: |-
-          return (x / 10000.0) * 2000000.0;
-  - platform: bmp280
-    address: 0x77
-    # update_interval: 60s
-    temperature:
-      name: "BMP Temperature"
-      id: bmp_temperature_sensor
-      oversampling: 2x
-    pressure:
-      name: "Pressure"
-  - platform: aht10
-    address: 0x38
-    variant: aht20
-    # update_interval: 60s
-    temperature:
-      name: "AHT20 Temperature"
-      id: aht20_temp
-      accuracy_decimals: 1
-      # filters:
-      # - filter_out: 0.0
-      # - median:
-      #     window_size: 3
-      #     send_every: 3
-      #     send_first_at: 1
-    humidity:
-      name: "Humidity"
-      id: aht20_humidity
-      accuracy_decimals: 1
-      # filters:
-      # - filter_out: 0.0
-      # - median:
-      #     window_size: 3
-      #     send_every: 3
-      #     send_first_at: 1
-
-text_sensor:
-  - platform: ld2410
-    ld2410_id: ld2410_0_id
-    version:
-      name: "Radar Firmware Ver"
-    mac_address:
-      name: "Radar BT MAC Address"
-
-  # - platform: wifi_info
-  #   ip_address:
-  #     name: IP Address
-  #   ssid:
-  #     name: Connected SSID
-  #   bssid:
-  #     name: Connected BSSID
-  #   mac_address:
-  #     name: Wifi MAC Address
-  #   dns_address:
-  #     name: DNS Addresses
-
-# ethernet_info is used with the ethernet component (so uncomment this if using ethernet instead of wifi)
-  - platform: ethernet_info
-    ip_address:
-      name: ETH IP Address
-      # address_0:
-      #   name: ETH IP Address 0
-      # address_1:
-      #   name: ETH IP Address 1
-      # address_2:
-      #   name: ETH IP Address 2
-      # address_3:
-      #   name: ETH IP Address 3
-      # address_4:
-      #   name: ETH IP Address 4
-    dns_address:
-      name: ETH DNS Addresses
-    mac_address:
-      name: ETH MAC Address
 
