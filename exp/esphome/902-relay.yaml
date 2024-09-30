@@ -1,0 +1,45 @@
+substitutions:
+  builtin_led_pin: "2"
+  # 16 and 17 are supposedly the pins for ESP32 hardware UART 2
+  uart_2_tx_pin: "GPIO17"
+  uart_2_rx_pin: "GPIO16"
+  i2c_sda_pin: "GPIO32"
+  i2c_scl_pin: "GPIO33"
+  illuminance_pin: "GPIO35"
+  ethernet_clk_pin: "GPIO18"
+  ethernet_mosi_pin: "GPIO23"
+  ethernet_miso_pin: "GPIO19"
+  ethernet_cs_pin: "GPIO5"
+  ethernet_interrupt_pin: "GPIO21"
+  ethernet_reset_pin: "GPIO22"
+  button_0_pin: "GPIO25"
+  button_1_pin: "GPIO26"
+  relay_0_pin: "GPIO4"
+
+esphome:
+  name: 903-relay
+  friendly_name: 903-relay 
+  comment: |- 
+    Board 903 running baseline + single relay.
+  area: Gym
+
+esp32:
+  board: nodemcu-32s
+
+packages:
+  device_base: !include include/device-baseline.yaml
+  # radar_motion: !include include/radar-motion.yaml
+  # light_temp_humidity: !include include/light-temp-humidity.yaml
+  # wired_ethernet: !include include/wired-ethernet.yaml
+  # buttons: !include include/buttons.yaml
+  # display: !include include/display.yaml
+  wifi: !include include/wifi.yaml
+
+switch:
+  - platform: gpio
+    name: "Relay 0"
+    id: relay_0_id
+    pin: ${relay_0_pin}
+
+
+
