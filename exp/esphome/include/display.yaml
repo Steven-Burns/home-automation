@@ -6,7 +6,10 @@ font:
     size: 60
   - file: "fonts/LibreFranklin-Medium.ttf"
     id: temperature_small_font
-    size: 24
+    size: 30
+  - file: "fonts/LibreFranklin-Medium.ttf"
+    id: humidity_font
+    size: 16
 
 image:
   - file: "images/person-standing-still-icon.png"
@@ -28,11 +31,6 @@ display:
       auto width = it.get_width();
       auto height = it.get_height();
 
-      // en lieu of a hardware blinky light, toggle a software light every time the display is updated
-      static bool blinky_is_lit = false;
-      blinky_is_lit = !blinky_is_lit;
-      it.filled_rectangle(0, 12, 2, 2, blinky_is_lit ? COLOR_ON : COLOR_OFF);
-
       auto font_id = id(spleen_font);
       auto net_component = id(ethernet_id);
       int char_height = 8;
@@ -49,36 +47,94 @@ display:
       bool button1_state = id(button_1_binary_sensor_id)->state;
       bool relay_state = id(relay_0_id)->state;
       bool radar_moving = id(ld2410_0_moving_target_binary_sensor)->state;
-      it.printf(5, line * char_height, font_id, TextAlign::BASELINE_LEFT, 
-        "%s %s %s %s",
-        button0_state ? "B0" : "  ",
-        button1_state ? "B1" : "  ",
+      it.printf(width, 7 * char_height, font_id, TextAlign::BASELINE_RIGHT, 
+        "%s%s",
+        button0_state ? "B" : " ",
+        button1_state ? "b" : " ");
+      it.printf(width, 8 * char_height, font_id, TextAlign::BASELINE_RIGHT, 
+        "%s%s",
         relay_state ? "R" : " ",
         radar_moving ? "M" : " ");
-      /*
-      auto radar_target = id(ld2410_0_moving_target_binary_sensor);
-      if (radar_target->state)
+
+      // blinky routine as an array of connected points.
+      static const int NUM_BLINKIES = 4;
+      static int blinky_x[] = {0, 30, 10, 75};
+      static int blinky_y[] = {0, 5, 127, 30};
+      static int blinky_dx[] = {1, 1, -2, -3};
+      static int blinky_dy[] = {1, -2, 1, 1};
+      //if (radar_moving)
+      //{
+        for (int i = 0; i < NUM_BLINKIES; ++i) 
+        {
+          blinky_x[i] += blinky_dx[i];
+          blinky_y[i] += blinky_dy[i];
+          if (blinky_x[i] > 128) { blinky_x[i] = 128;  blinky_dx[i] = -blinky_dx[i]; }
+          if (blinky_y[i] > 64) { blinky_y[i] = 64;  blinky_dy[i] = -blinky_dy[i]; }
+          if (blinky_x[i] < 0 ) { blinky_x[i] = 0; blinky_dx[i] = -blinky_dx[i]; }
+          if (blinky_y[i] < 0 ) { blinky_y[i] = 0; blinky_dy[i] = -blinky_dy[i]; }
+        }
+      //}
+      for (int i = 0; i < NUM_BLINKIES; ++i)
       {
-        // motion detected: play the current animation frame and advance the frame
-        auto ani = id(motion_detected_animation_id);
-        it.image(0, 44, ani, COLOR_ON, COLOR_OFF);
-        ani->next_frame();
+      
+        if (NUM_BLINKIES - 1 == i) 
+        {
+          it.line(blinky_x[i], blinky_y[i], blinky_x[0], blinky_y[0], COLOR_ON);
+          break;
+        }
+        it.line(blinky_x[i], blinky_y[i], blinky_x[i + 1], blinky_y[i + 1], COLOR_ON);
+      
+      //  it.draw_pixel_at(blinky_x[i], blinky_y[i], COLOR_ON);
       }
-      else 
-      {
-        // no motion detected: show the standing still icon
-        it.image(0, 44, id(standing_still_icon_id)); 
-      }
-      */
+
       float temp = id(bmp_temperature_sensor)->state;
       temp = temp * 1.8 + 32;
       font_id = id(temperature_large_font);
-      it.printf(width - 15, height, font_id, TextAlign::BASELINE_RIGHT, "%2.0f", truncf(temp));
+      it.printf(0, height, font_id, TextAlign::BASELINE_LEFT, "%2.0f", truncf(temp));
       // dunno if I like the decimal point...
-      // it.filled_rectangle(width - 18, 43, 3, 3, COLOR_ON); 
+      it.filled_rectangle(74, height - 3, 3, 3, COLOR_ON); 
       // or the fractional temp.
       font_id = id(temperature_small_font);
-      it.printf(width, 15, font_id, TextAlign::TOP_RIGHT, "%1d", (int)(temp * 10) % 10);
+      it.printf(78, height, font_id, TextAlign::BASELINE_LEFT, "%1d", (int)(temp * 10) % 10);
+
+      float hum = id(aht20_humidity)->state;
+      font_id = id(humidity_font);
+      it.printf(width, 15, font_id, TextAlign::TOP_RIGHT, "%2.1f%%", hum);
 
 
 
+
+# // en lieu of a hardware blinky light, toggle a software light every time the display is updated
+# static bool blinky_is_lit = true;
+# static int blinky_x = 0;
+# static int blinky_y = 0;
+# static int dx = 1;
+# static int dy = 1;
+# // auto radar_target = id(ld2410_0_moving_target_binary_sensor);
+# if (radar_moving)
+# {
+#   /*
+#   // motion detected: play the current animation frame and advance the frame
+#   auto ani = id(motion_detected_animation_id);
+#   it.image(0, 44, ani, COLOR_ON, COLOR_OFF);
+#   ani->next_frame();
+#   */
+
+#   // move the blinky.
+#   blinky_is_lit = true;
+#   blinky_x += dx; blinky_y += dy;
+#   if (blinky_x < 0) { blinky_x = 0; dx = -dx; }
+#   if (blinky_x > 16) { blinky_x = 16; dx = -dx; }
+#   if (blinky_y < 0) { blinky_y = 0; dy = -dy; }
+#   if (blinky_y > 12) { blinky_y = 12; dy = -dy; }
+# }
+# else 
+# {
+#   /*
+#   // no motion detected: show the standing still icon
+#   it.image(0, 44, id(standing_still_icon_id)); 
+#   */
+#   blinky_is_lit = !blinky_is_lit;
+
+# }
+# it.filled_rectangle(blinky_x, blinky_y, 2, 2, blinky_is_lit ? COLOR_ON : COLOR_OFF);
