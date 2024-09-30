@@ -1,10 +1,3 @@
-i2c:
-  sda: ${i2c_sda_pin}
-  scl: ${i2c_scl_pin}
-  # goose up the i2c bus frequency so that we don't get runtime warnings about the display component
-  # taking too long to update.
-  frequency: 420kHz
-
 sensor:
   - platform: adc
     pin: ${illuminance_pin}
@@ -14,7 +7,7 @@ sensor:
     filters:
       - lambda: |-
           return (x / 10000.0) * 2000000.0;
-  - platform: bmp280
+  - platform: bmp280_i2c
     address: 0x77
     # update_interval: 60s
     # the irr_filter supposedly lowers noise at the expense of power consumption.

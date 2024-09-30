@@ -47,7 +47,7 @@ output:
     pin:
       number: ${builtin_led_pin}
       mode: output
-      ignore_strapping_warning: true
+      # ignore_strapping_warning: true
     id: on_board_led_id
 
 interval:
@@ -65,7 +65,7 @@ button:
 
 sensor:
   - platform: template
-    id: sys_esp_temperature
+    id: sys_esp_temperature_id
     name: CPU Temperature
     lambda: return temperatureRead();
     unit_of_measurement: °C
@@ -75,12 +75,12 @@ sensor:
     entity_category: "diagnostic"
   - platform: uptime
     name: Uptime (approx)
-    id: sys_uptime
+    id: sys_uptime_id
     state_class: total_increasing
     update_interval: 60s
     entity_category: "diagnostic"
   - platform: template
-    id: esp_memory
+    id: sys_esp_memory_id
     icon: mdi:memory
     name: Free Heap
     lambda: return heap_caps_get_free_size(MALLOC_CAP_INTERNAL) / 1024;

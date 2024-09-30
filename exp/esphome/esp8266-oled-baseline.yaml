@@ -1,98 +1,37 @@
-esphome:
-  name: esp8266-oled-baseline
-  friendly_name: esp8266-oled-baseline 
-  comment: |- 
-    Start with this and add hardware...
-  area: Gym
-  name_add_mac_suffix: true
-  project:
-    name: "arkadiahouse.home_automation"
-    version: "0.1.1"
-
 esp8266:
   board: nodemcuv2
 
-# Enable logging
-logger:
-#  level: DEBUG
+packages:
+  wifi: !include
+    file: include/wifi.yaml
+  i2c: !include
+    file: include/i2c.yaml
+    vars:
+      i2c_sda_pin: "GPIO12"
+      i2c_scl_pin: "GPIO14"
+  display: !include 
+    file: include/display.yaml
 
-# Enable Home Assistant API
-api:
-  password: ""
-  # reboot_timeout set to 0s will keep the board running even when networking (connection to the home asst api)
-  # is lost, even if lost forever. 
-  # reboot_timeout: 0s
+display:
+  - id: !extend ssd1306_id
+    lambda: |-
+      auto width = it.get_width();
+      auto height = it.get_height();
 
-ota:
-  - platform: esphome
-    password: ""
+      auto font_id = id(spleen_font);
+      auto ip_addr = id(ip_address_id)->get_state();
+      int char_height = 8;
+      int line = 0;
+      it.printf(width, ++line * char_height, font_id, TextAlign::BASELINE_RIGHT, "%s", App.get_name().c_str());
+      it.printf(width, ++line * char_height, font_id, TextAlign::BASELINE_RIGHT, "%s", ip_addr.c_str());
+        
 
-wifi:
-  id: wifi_id
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
-  ap:
-    ssid: "Fallback Hotspot"
-    password: "PJnNb7VRCS3I"
+# "All Device" baseline stuff here
 
-text_sensor:
-  - platform: wifi_info
-    ip_address:
-      name: IP Address
-    ssid:
-      name: Connected SSID
-    bssid:
-      name: Connected BSSID
-    mac_address:
-      name: Wifi MAC Address
-    dns_address:
-      name: DNS Addresses
+<<: !include 
+  file: include/esp8266-device-baseline.yaml
+  vars:
+    device_name: "801-wifi"
+    device_comment: "esp8266 with built-in display."
+    builtin_led_pin: "2"
 
-# ethernet_info is used with the ethernet component (so uncomment this if using ethernet instead of wifi)
-  # - platform: ethernet_info
-  #   ip_address:
-  #     name: ETH IP Address
-  #     address_0:
-  #       name: ETH IP Address 0
-  #     address_1:
-  #       name: ETH IP Address 1
-  #     address_2:
-  #       name: ETH IP Address 2
-  #     address_3:
-  #       name: ETH IP Address 3
-  #     address_4:
-  #       name: ETH IP Address 4
-  #   dns_address:
-  #     name: ETH DNS Addresses
-  #   mac_address:
-  #     name: ETH MAC Address
-
-captive_portal:
-
-web_server:
-  port: 80
-
-# this component sync the local gadget to the time of the Home Asst server
-time:
-  - platform: homeassistant
-    id: esptime
-
-# this combination of output and interval will blink the on-board led
-# without creating a home assistant entity. No entity means that the 
-# state transitions will not be communicated with Home Assistant and 
-# therefore generate no traffic no data logging history.
-
-output:
-  - platform: gpio
-    pin:
-      number: 2
-      mode: output
-    id: on_board_led_id
-
-interval:
-  - interval: 500ms
-    then:
-      - output.turn_on: on_board_led_id
-      - delay: 250ms
-      - output.turn_off: on_board_led_id

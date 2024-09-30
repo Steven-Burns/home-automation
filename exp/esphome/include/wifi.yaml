@@ -19,6 +19,7 @@ sensor:
 text_sensor:
   - platform: wifi_info
     ip_address:
+      id: ip_address_id
       name: WiFi IP Address
       entity_category: "diagnostic"
     ssid:

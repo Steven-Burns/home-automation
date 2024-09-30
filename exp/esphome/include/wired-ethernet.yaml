@@ -15,6 +15,7 @@ text_sensor:
   - platform: ethernet_info
     ip_address:
       name: Wired IP Address
+      id: ip_address_id
       entity_category: diagnostic
       # address_0:
       #   name: Wired IP Address 0

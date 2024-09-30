@@ -11,18 +11,19 @@ font:
     id: humidity_font
     size: 16
 
-image:
-  - file: "images/person-standing-still-icon.png"
-    id: standing_still_icon_id
-    type: BINARY
+# image:
+#   - file: "images/person-standing-still-icon.png"
+#     id: standing_still_icon_id
+#     type: BINARY
 
-animation:
-  - file: "images/falling-head.gif"
-    id: motion_detected_animation_id
-    type: BINARY
+# animation:
+#   - file: "images/falling-head.gif"
+#     id: motion_detected_animation_id
+#     type: BINARY
 
 display:
   - platform: ssd1306_i2c
+    id: ssd1306_id
     model: "SSD1306_128x64"
     update_interval: 0.25s
     contrast: 20%
@@ -32,16 +33,11 @@ display:
       auto height = it.get_height();
 
       auto font_id = id(spleen_font);
-      auto net_component = id(ethernet_id);
+      auto ip_addr = id(ip_address_id)->get_state();
       int char_height = 8;
       int line = 0;
       it.printf(width, ++line * char_height, font_id, TextAlign::BASELINE_RIGHT, "%s", App.get_name().c_str());
-      for (auto &ip : net_component->get_ip_addresses()) 
-      {
-        if (ip.is_set()) {
-          it.printf(width, ++line * char_height, font_id, TextAlign::BASELINE_RIGHT, "%s", ip.str().c_str());
-        }
-      }
+      it.printf(width, ++line * char_height, font_id, TextAlign::BASELINE_RIGHT, "%s", ip_addr.c_str());
       
       bool button0_state = id(button_0_binary_sensor_id)->state;
       bool button1_state = id(button_1_binary_sensor_id)->state;
