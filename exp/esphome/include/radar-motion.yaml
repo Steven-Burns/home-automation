@@ -6,6 +6,7 @@ uart:
   parity: NONE
   stop_bits: 1
 
+# https://wiki.dfrobot.com/SKU_SEN0557_24GHz_Human_Presence_Sensing_Module
 ld2410:
   uart_id: uart_2_id
   id: ld2410_0_id

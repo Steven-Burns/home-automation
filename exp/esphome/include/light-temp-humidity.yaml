@@ -1,4 +1,5 @@
 sensor:
+    # https://devices.esphome.io/devices/temt6000
   - platform: adc
     pin: ${illuminance_pin}
     name: "Illuminance"
@@ -7,6 +8,7 @@ sensor:
     filters:
       - lambda: |-
           return (x / 10000.0) * 2000000.0;
+    # https://community.home-assistant.io/t/aht20-bmp280-combined-sensor/366411
   - platform: bmp280_i2c
     address: 0x77
     # update_interval: 60s

@@ -1,3 +1,4 @@
+# https://wiki.seeedstudio.com/Grove-Relay/
 switch:
   - platform: gpio
     name: "Relay 0"
