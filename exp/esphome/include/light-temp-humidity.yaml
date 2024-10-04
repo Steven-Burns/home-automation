@@ -22,7 +22,7 @@ sensor:
       filters:
           # the offset appears to be applied once per sampling, so since we're 2x oversampling, 
           # we halve the offset (which was determined by comparison to a reference thermometer).
-        - offset: -0.5 
+        - offset: 0.0 
     pressure:
       name: "Pressure"
       oversampling: 16x
