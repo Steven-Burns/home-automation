@@ -2,6 +2,10 @@ esp32:
   board: nodemcu-32s
 
 packages:
+  blinky: !include
+    file: include/interval-blinky.yaml
+    vars:
+      builtin_led_pin: "GPIO2"
   wifi: !include
     file: include/wifi.yaml
   relay: !include 
@@ -16,4 +20,3 @@ packages:
   vars:
     device_name: "902-relay"
     device_comment: "Single relay controlled by Board 902 connected on wifi."
-    builtin_led_pin: "2"

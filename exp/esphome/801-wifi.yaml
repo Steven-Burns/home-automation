@@ -2,6 +2,10 @@ esp8266:
   board: nodemcuv2
 
 packages:
+  blinky: !include
+    file: include/interval-blinky.yaml
+    vars:
+      builtin_led_pin: "GPIO2"
   wifi: !include
     file: include/wifi.yaml
   i2c: !include
@@ -32,5 +36,5 @@ display:
   vars:
     device_name: "801-wifi"
     device_comment: "esp8266 with built-in display."
-    builtin_led_pin: "2"
+
 

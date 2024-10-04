@@ -2,6 +2,10 @@ esp32:
   board: nodemcu-32s
 
 packages:
+  blinky: !include
+    file: include/interval-blinky.yaml
+    vars:
+      builtin_led_pin: "GPIO2"
   wired_ethernet: !include
     file: include/wired-ethernet.yaml
     vars:
@@ -45,6 +49,5 @@ packages:
   vars:
     device_name: "901-wired"
     device_comment: "Complete sensor array running on board 901 connected on wired ethernet."
-    builtin_led_pin: "2"
 
 

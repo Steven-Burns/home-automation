@@ -2,6 +2,10 @@ esp32:
   board: nodemcu-32s
 
 packages:
+  blinky: !include
+    file: include/interval-blinky.yaml
+    vars:
+      builtin_led_pin: "GPIO2"
   wifi: !include  
     file: include/wifi.yaml
   radar_motion: !include
@@ -38,6 +42,5 @@ packages:
   vars:
     device_name: "901-wireless"
     device_comment: "Complete sensor array running on board 901 connected on WiFi."
-    builtin_led_pin: "2"
 
 
