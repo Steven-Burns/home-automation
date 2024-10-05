@@ -2,7 +2,7 @@ esphome:
   name: ${device_name}
   friendly_name: ${device_name} 
   comment: ${device_comment}
-  name_add_mac_suffix: true
+  name_add_mac_suffix: false
   project:
     name: "arkadiahouse.home_automation"
     version: "0.1.1"
