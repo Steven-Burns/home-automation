@@ -32,6 +32,18 @@ time:
   - platform: homeassistant
     id: esptime
 
+debug:
+  update_interval: 15s
+
+text_sensor:
+  - platform: debug
+    device:
+      name: "Device Info"
+      entity_category: "diagnostic"
+    reset_reason:
+      name: "Reset Reason"
+      entity_category: "diagnostic"
+
 button:
   - platform: restart
     icon: mdi:power-cycle
@@ -45,4 +57,19 @@ sensor:
     state_class: total_increasing
     update_interval: 60s
     entity_category: "diagnostic"
+  - platform: debug
+    free:
+      name: "Heap Free"
+      entity_category: "diagnostic"
+      unit_of_measurement: B
+      state_class: measurement
+    fragmentation:
+      name: "Heap Fragmentation"
+      entity_category: "diagnostic"
+    block:
+      name: "Heap Max Block"
+      entity_category: "diagnostic"
+    loop_time:
+      name: "Loop Time"
+      entity_category: "diagnostic"
 

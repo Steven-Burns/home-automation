@@ -36,6 +36,22 @@ time:
   - platform: homeassistant
     id: esptime
 
+debug:
+  update_interval: 15s
+
+# needed to supply "Free PSRAM" sensor value
+# Does not appear to work as of 04 Oct 2024
+# psram:
+
+text_sensor:
+  - platform: debug
+    device:
+      name: "Device Info"
+      entity_category: "diagnostic"
+    reset_reason:
+      name: "Reset Reason"
+      entity_category: "diagnostic"
+  
 button:
   - platform: restart
     icon: mdi:power-cycle
@@ -58,13 +74,32 @@ sensor:
     state_class: total_increasing
     update_interval: 60s
     entity_category: "diagnostic"
-  - platform: template
-    id: sys_esp_memory_id
-    icon: mdi:memory
-    name: Free Heap
-    lambda: return heap_caps_get_free_size(MALLOC_CAP_INTERNAL) / 1024;
-    unit_of_measurement: 'kB'
-    state_class: measurement
-    entity_category: "diagnostic"
-    update_interval: 60s
+  - platform: debug
+    free:
+      name: "Heap Free"
+      entity_category: "diagnostic"
+      unit_of_measurement: B
+      state_class: measurement
+    block:
+      name: "Heap Max Block"
+      entity_category: "diagnostic"
+    loop_time:
+      name: "Loop Time"
+      entity_category: "diagnostic"
+# Does not appear to work as of 4 Oct 2024
+    # psram:
+    #   name: "Free PSRAM"
+    #   entity_category: "diagnostic"
+# commenting this version of free heap as it is not as encapsulated 
+# and therefore platform agnostic as the debug component sensor, and 
+# the results appear to match.
+  # - platform: template
+  #   id: sys_esp_memory_id
+  #   icon: mdi:memory
+  #   name: Free Heap
+  #   lambda: return heap_caps_get_free_size(MALLOC_CAP_INTERNAL) / 1024;
+  #   unit_of_measurement: 'kB'
+  #   state_class: measurement
+  #   entity_category: "diagnostic"
+  #   update_interval: 60s
 
