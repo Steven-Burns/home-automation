@@ -34,7 +34,7 @@ display:
 <<: !include 
   file: include/esp8266-device-baseline.yaml
   vars:
-    device_name: "801-wifi"
+    device_name: "801.esphome"
     device_comment: "esp8266 with built-in display."
 
 

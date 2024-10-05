@@ -18,5 +18,5 @@ packages:
 <<: !include 
   file: include/device-baseline.yaml
   vars:
-    device_name: "902-relay"
+    device_name: "902.esphome"
     device_comment: "Single relay controlled by Board 902 connected on wifi."
