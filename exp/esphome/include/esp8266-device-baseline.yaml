@@ -63,12 +63,14 @@ sensor:
       entity_category: "diagnostic"
       unit_of_measurement: B
       state_class: measurement
+      device_class: data_size
     fragmentation:
       name: "Heap Fragmentation"
       entity_category: "diagnostic"
     block:
       name: "Heap Max Block"
       entity_category: "diagnostic"
+      device_class: data_size
     loop_time:
       name: "Loop Time"
       entity_category: "diagnostic"

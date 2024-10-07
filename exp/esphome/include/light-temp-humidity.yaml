@@ -26,6 +26,7 @@ sensor:
     pressure:
       name: "Pressure"
       oversampling: 16x
+      device_class: atmospheric_pressure
   - platform: aht10
     address: 0x38
     variant: aht20

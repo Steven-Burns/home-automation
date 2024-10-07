@@ -1,0 +1,95 @@
+# https://esphome.io/components/sensor/ld2420.html
+
+uart:
+  id: uart_2_id
+  tx_pin: ${uart_2_tx_pin}
+  rx_pin: ${uart_2_rx_pin}
+  baud_rate: 115200 
+  parity: NONE
+  stop_bits: 1
+
+ld2420:
+  uart_id: uart_2_id
+  id: ld2420_0_id
+
+text_sensor:
+  - platform: ld2420
+    fw_version:
+      name: LD2420 Firmware Version
+      entity_category: diagnostic
+
+sensor:
+  - platform: ld2420
+    moving_distance:
+      id: ld_2420_moving_distance_id
+      name : LD2420 Moving Distance
+
+binary_sensor:
+  - platform: ld2420
+    has_target:
+      name: LD2420 Presence
+      device_class: occupancy
+
+select:
+  - platform: ld2420
+    operating_mode:
+      name: LD2420 Operating Mode
+      entity_category: config
+
+number:
+  - platform: ld2420
+    presence_timeout:
+      name: LD2420 Detection Presence Timeout
+      entity_category: config
+    min_gate_distance:
+      name: LD2420 Detection Gate Minimum
+      entity_category: config
+    max_gate_distance:
+      name: LD2420 Detection Gate Maximum
+      entity_category: config
+    gate_select:
+      name: LD2420 Select Gate to Set
+      entity_category: config
+    still_threshold:
+      name: LD2420 Set Still Threshold Value
+      entity_category: config
+    move_threshold:
+      name: LD2420 Set Move Threshold Value
+      entity_category: config
+    gate_move_sensitivity:
+      name: LD2420 Move Calibration Sensitivity Factor
+      entity_category: config
+    gate_still_sensitivity:
+      name: LD2420 Still Calibration Sensitivity Factor
+      entity_category: config
+
+button:
+  - platform: ld2420
+    apply_config:
+      name: LD2420 Apply Configuration
+      entity_category: config
+    factory_reset:
+      name: LD2420 Factory Reset
+      entity_category: diagnostic 
+    restart_module:
+      name: LD2420 Restart Module
+      entity_category: diagnostic
+    revert_config:
+      name: LD2420 Undo Config Edits
+      entity_category: config
+
+
+# binary_sensor:
+#     has_moving_target:
+#       # this changes immediately on motion detection.
+#       id: ld2410_0_moving_target_binary_sensor
+#       name: "Radar Moving Target"
+#       device_class: motion
+#       internal: true
+#     has_still_target:
+#       # "If true a still target is detected"
+#       id: ld2410_0_still_target_binary_sensor
+#       name: "Radar Still Target"
+#       device_class: motion
+#       internal: true
+

@@ -42,7 +42,7 @@ display:
       bool button0_state = id(button_0_binary_sensor_id)->state;
       bool button1_state = id(button_1_binary_sensor_id)->state;
       bool relay_state = id(relay_0_id)->state;
-      bool radar_moving = id(ld2410_0_moving_target_binary_sensor)->state;
+      bool radar_moving = false; // id(ld2410_0_moving_target_binary_sensor)->state;
       it.printf(width, 7 * char_height, font_id, TextAlign::BASELINE_RIGHT, 
         "%s%s",
         button0_state ? "B" : " ",
