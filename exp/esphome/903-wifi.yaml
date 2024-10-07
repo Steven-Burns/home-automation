@@ -9,7 +9,7 @@ packages:
   wifi: !include  
     file: include/wifi.yaml
   radar_motion: !include
-    file: include/radar-motion.yaml
+    file: include/HLK-LD2410-radar-motion.yaml
     vars:
       # 16 and 17 are supposedly the pins for ESP32 hardware UART 2
       uart_2_tx_pin: "GPIO17"

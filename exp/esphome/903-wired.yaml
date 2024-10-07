@@ -16,7 +16,7 @@ packages:
       ethernet_interrupt_pin: "GPIO21"
       ethernet_reset_pin: "GPIO22"
   radar_motion: !include
-    file: include/radar-motion.yaml
+    file: include/HLK-LD2410-radar-motion.yaml
     vars:
       # 16 and 17 are supposedly the pins for ESP32 hardware UART 2
       uart_2_tx_pin: "GPIO17"

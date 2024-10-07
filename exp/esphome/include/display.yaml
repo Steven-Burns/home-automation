@@ -1,15 +1,15 @@
 font:
   - file: "fonts/spleen-5x8.bdf"
     id: spleen_font
-  - file: "fonts/LibreFranklin-Medium.ttf"
+  - file: "fonts/BebasNeue-Regular.ttf"
     id: temperature_large_font
-    size: 60
-  - file: "fonts/LibreFranklin-Medium.ttf"
+    size: 69
+  - file: "fonts/BebasNeue-Regular.ttf"
     id: temperature_small_font
-    size: 30
-  - file: "fonts/LibreFranklin-Medium.ttf"
+    size: 34
+  - file: "fonts/BebasNeue-Regular.ttf"
     id: humidity_font
-    size: 16
+    size: 22
 
 # image:
 #   - file: "images/person-standing-still-icon.png"
@@ -43,11 +43,11 @@ display:
       bool button1_state = id(button_1_binary_sensor_id)->state;
       bool relay_state = id(relay_0_id)->state;
       bool radar_moving = false; // id(ld2410_0_moving_target_binary_sensor)->state;
-      it.printf(width, 7 * char_height, font_id, TextAlign::BASELINE_RIGHT, 
+      it.printf(0, 1 * char_height, font_id, TextAlign::BASELINE_LEFT, 
         "%s%s",
         button0_state ? "B" : " ",
         button1_state ? "b" : " ");
-      it.printf(width, 8 * char_height, font_id, TextAlign::BASELINE_RIGHT, 
+      it.printf(0, 2 * char_height, font_id, TextAlign::BASELINE_LEFT, 
         "%s%s",
         relay_state ? "R" : " ",
         radar_moving ? "M" : " ");
@@ -88,15 +88,16 @@ display:
       font_id = id(temperature_large_font);
       it.printf(0, height, font_id, TextAlign::BASELINE_LEFT, "%2.0f", truncf(temp));
       // dunno if I like the decimal point...
-      it.filled_rectangle(74, height - 3, 3, 3, COLOR_ON); 
+      it.filled_rectangle(48, height - 3, 3, 3, COLOR_ON); 
       // or the fractional temp.
       font_id = id(temperature_small_font);
-      it.printf(78, height, font_id, TextAlign::BASELINE_LEFT, "%1d", (int)(temp * 10) % 10);
+      it.printf(52, height, font_id, TextAlign::BASELINE_LEFT, "%1d", (int)(temp * 10) % 10);
 
       float hum = id(aht20_humidity)->state;
       font_id = id(humidity_font);
-      it.printf(width, 15, font_id, TextAlign::TOP_RIGHT, "%2.1f%%", hum);
-
+      it.printf(width, 12, font_id, TextAlign::TOP_RIGHT, "%2.1f%%", hum);
+      it.printf(width, 28, font_id, TextAlign::TOP_RIGHT, "%2.1f%%", hum);
+      it.printf(width, height, font_id, TextAlign::BASELINE_RIGHT, "%2.1f%%", hum);
 
 
 
