@@ -32,6 +32,8 @@ packages:
       relay_0_pin: "GPIO4"
   display: !include
     file: include/display.yaml
+  # cpu_speed_selector: !include 
+  #   file: include/cpu_speed_selector.yaml
 
 # "All Device" baseline stuff here
 

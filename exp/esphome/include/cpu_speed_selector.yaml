@@ -1,0 +1,20 @@
+# This CPU speed selector works, but seems like a bad idea to generally expose, so packaging it
+# as an include-able component.
+select:
+  - platform: template
+    id: sys_set_cpu_freq_id
+    name: CPU Speed MHz
+    entity_category: config 
+    options:
+      - "240"
+      - "160"
+      - "80"
+    initial_option: "240"
+    set_action:
+      - lambda: |- 
+          setCpuFrequencyMhz(
+            "240" == x ? 240 :
+              "160" == x ? 160 :
+                "80" == x ? 80 :
+                  240); 
+

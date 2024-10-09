@@ -6,6 +6,11 @@ esphome:
   project:
     name: "arkadiahouse.home_automation"
     version: "0.1.1"
+  # if one were to want to bake the CPU clock freq at build time, the below 
+  # stanza will do it.
+  # platformio_options:
+  #     board_build.f_cpu: 160000000L
+
 
 esp32:
   framework:
@@ -37,7 +42,7 @@ time:
     id: esptime
 
 debug:
-  update_interval: 15s
+  update_interval: 63s
 
 # needed to supply "Free PSRAM" sensor value
 # Does not appear to work as of 04 Oct 2024
@@ -81,13 +86,44 @@ sensor:
       unit_of_measurement: B
       state_class: measurement
       device_class: data_size
+      filters:
+        delta: 100
     block:
       name: "Heap Max Block"
       entity_category: "diagnostic"
       device_class: data_size
+      filters:
+        delta: 100
     loop_time:
       name: "Loop Time"
       entity_category: "diagnostic"
+      filters:
+        delta: 1
+  - platform: template
+    id: sys_esp_cpu_freq_id
+    name: "CPU Speed"
+    unit_of_measurement: MHz
+    state_class: measurement
+    entity_category: "diagnostic"
+    update_interval: 60s
+    lambda: return getCpuFrequencyMhz(); 
+  - platform: template
+    id: sys_esp_xtal_freq_id
+    name: "Crystal Speed"
+    unit_of_measurement: MHz
+    state_class: measurement
+    entity_category: "diagnostic"
+    update_interval: 60s
+    lambda: return getXtalFrequencyMhz();
+  - platform: template
+    id: sys_esp_apb_bus_freq_id
+    name: "APB Bus Speed"
+    unit_of_measurement: MHz
+    state_class: measurement
+    entity_category: "diagnostic"
+    update_interval: 60s
+    lambda: return getApbFrequency() / 1000000;
+
 # Does not appear to work as of 4 Oct 2024
     # psram:
     #   name: "Free PSRAM"

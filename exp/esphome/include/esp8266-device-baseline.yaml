@@ -33,7 +33,7 @@ time:
     id: esptime
 
 debug:
-  update_interval: 15s
+  update_interval: 63s
 
 text_sensor:
   - platform: debug
@@ -64,14 +64,21 @@ sensor:
       unit_of_measurement: B
       state_class: measurement
       device_class: data_size
+      filters:
+        delta: 100      
     fragmentation:
       name: "Heap Fragmentation"
       entity_category: "diagnostic"
+      filters:
+        delta: 1      
     block:
       name: "Heap Max Block"
       entity_category: "diagnostic"
       device_class: data_size
+      filters:
+        delta: 100      
     loop_time:
       name: "Loop Time"
       entity_category: "diagnostic"
-
+      filters:
+        delta: 1
