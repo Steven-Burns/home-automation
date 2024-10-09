@@ -3,6 +3,7 @@ sensor:
   - platform: adc
     pin: ${illuminance_pin}
     name: "Illuminance"
+    id: illuminance_id
     device_class: illuminance
     unit_of_measurement: lx
     filters:
@@ -17,7 +18,7 @@ sensor:
     iir_filter: 16x
     temperature:
       name: "BMP Temperature"
-      id: bmp_temperature_sensor
+      id: temperature_id
       oversampling: 2x
       filters:
           # the offset appears to be applied once per sampling, so since we're 2x oversampling, 
@@ -43,7 +44,7 @@ sensor:
       #     send_first_at: 1
     humidity:
       name: "Humidity"
-      id: aht20_humidity
+      id: humidity_id
       accuracy_decimals: 1
       # filters:
       # - filter_out: 0.0
