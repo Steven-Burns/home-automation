@@ -6,10 +6,10 @@ font:
     size: 68
   - file: "fonts/BebasNeue-Regular.ttf"
     id: temperature_small_font
-    size: 33
+    size: 34
   - file: "fonts/BebasNeue-Regular.ttf"
     id: humidity_font
-    size: 26
+    size: 28
 
 # image:
 #   - file: "images/person-standing-still-icon.png"
@@ -93,15 +93,15 @@ display:
       it.printf(0, height, big_font, TextAlign::BASELINE_LEFT, "%2.0f", truncf(temp));
       it.printf(57, 17, tiny_font, TextAlign::TOP_LEFT, "F");
       // dunno if I like the decimal point...
-      it.filled_rectangle(53, height - 11, 3, 3, COLOR_ON); 
+      it.filled_rectangle(54, height - 9, 3, 3, COLOR_ON); 
       // or the fractional temp.
       auto small_font = id(temperature_small_font);
-      it.printf(57, (height - 12) / 2, small_font, TextAlign::TOP_LEFT, "%1d", (int)(temp * 10) % 10);
+      it.printf(57, (height - 9) / 2, small_font, TextAlign::TOP_LEFT, "%1d", (int)(temp * 10) % 10);
 
       float hum = id(humidity_id)->state;
       auto font = id(humidity_font);
       it.printf(width, 12, font, TextAlign::TOP_RIGHT, "%2.1f  ", hum);
-      it.printf(width, 17, tiny_font, TextAlign::TOP_RIGHT, "%%");
+      it.printf(width, 24, tiny_font, TextAlign::TOP_RIGHT, "%%");
 
       float lux = id(illuminance_id)->state;
       it.printf(width, height, font, TextAlign::BASELINE_RIGHT, "%2.0f  ", lux);
