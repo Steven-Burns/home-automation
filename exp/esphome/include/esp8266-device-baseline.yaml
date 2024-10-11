@@ -43,7 +43,10 @@ text_sensor:
     reset_reason:
       name: "Reset Reason"
       entity_category: "diagnostic"
-
+  - platform: version
+    name: "Device Firmware Version"
+    entity_category: "diagnostic"
+    
 button:
   - platform: restart
     icon: mdi:power-cycle
@@ -82,3 +85,12 @@ sensor:
       entity_category: "diagnostic"
       filters:
         delta: 1
+  - platform: template
+    id: sys_esp_cpu_freq_id
+    name: "CPU Speed"
+    unit_of_measurement: MHz
+    state_class: measurement
+    entity_category: "diagnostic"
+    filters:
+      delta: 1
+    lambda: return system_get_cpu_freq();  

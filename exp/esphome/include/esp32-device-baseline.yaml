@@ -56,7 +56,10 @@ text_sensor:
     reset_reason:
       name: "Reset Reason"
       entity_category: "diagnostic"
-  
+  - platform: version
+    name: "Device Firmware Version"
+    entity_category: "diagnostic"
+
 button:
   - platform: restart
     icon: mdi:power-cycle
@@ -105,7 +108,8 @@ sensor:
     unit_of_measurement: MHz
     state_class: measurement
     entity_category: "diagnostic"
-    update_interval: 60s
+    filters:
+      delta: 1
     lambda: return getCpuFrequencyMhz(); 
   - platform: template
     id: sys_esp_xtal_freq_id
@@ -113,7 +117,7 @@ sensor:
     unit_of_measurement: MHz
     state_class: measurement
     entity_category: "diagnostic"
-    update_interval: 60s
+    update_interval: never
     lambda: return getXtalFrequencyMhz();
   - platform: template
     id: sys_esp_apb_bus_freq_id
@@ -121,7 +125,7 @@ sensor:
     unit_of_measurement: MHz
     state_class: measurement
     entity_category: "diagnostic"
-    update_interval: 60s
+    update_interval: never
     lambda: return getApbFrequency() / 1000000;
 
 # Does not appear to work as of 4 Oct 2024
