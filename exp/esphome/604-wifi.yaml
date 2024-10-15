@@ -1,0 +1,20 @@
+rp2040:
+  board: pico
+
+packages:
+  blinky: !include
+    file: include/interval-blinky.yaml
+    vars:
+      builtin_led_pin: "GPIO25"
+  wifi: !include  
+    file: include/wifi.yaml
+
+# "All Device" baseline stuff here
+
+<<: !include 
+  file: include/rp2040-device-baseline.yaml
+  vars:
+    device_name: "604-esphome"
+    device_comment: "WiFi basic on 604."
+
+
