@@ -35,6 +35,11 @@ ota:
       
 web_server:
   port: 80
+  version: 3
+  include_internal: true
+  log: true
+  ota: false 
+  local: true
 
 # this component sync the local gadget to the time of the Home Asst server
 time:
@@ -59,6 +64,18 @@ text_sensor:
   - platform: version
     name: "Device Firmware Version"
     entity_category: "diagnostic"
+  - platform: template
+    id: sys_esp_xtal_freq_id
+    name: "Crystal Speed MHz"
+    entity_category: "diagnostic"
+    lambda: return std::to_string(getXtalFrequencyMhz());
+    update_interval: 12h
+  - platform: template
+    id: sys_esp_apb_bus_freq_id
+    name: "APB Bus Speed MHz"
+    entity_category: "diagnostic"
+    lambda: return std::to_string(getApbFrequency() / 1000000);
+    update_interval: 12h
 
 button:
   - platform: restart
@@ -86,7 +103,7 @@ sensor:
     free:
       name: "Heap Free"
       entity_category: "diagnostic"
-      unit_of_measurement: B
+      unit_of_measurement: bytes
       state_class: measurement
       device_class: data_size
       filters:
@@ -94,6 +111,7 @@ sensor:
     block:
       name: "Heap Max Block"
       entity_category: "diagnostic"
+      unit_of_measurement: bytes
       device_class: data_size
       filters:
         delta: 100
@@ -111,22 +129,6 @@ sensor:
     filters:
       delta: 1
     lambda: return getCpuFrequencyMhz(); 
-  - platform: template
-    id: sys_esp_xtal_freq_id
-    name: "Crystal Speed"
-    unit_of_measurement: MHz
-    state_class: measurement
-    entity_category: "diagnostic"
-    update_interval: never
-    lambda: return getXtalFrequencyMhz();
-  - platform: template
-    id: sys_esp_apb_bus_freq_id
-    name: "APB Bus Speed"
-    unit_of_measurement: MHz
-    state_class: measurement
-    entity_category: "diagnostic"
-    update_interval: never
-    lambda: return getApbFrequency() / 1000000;
 
 # Does not appear to work as of 4 Oct 2024
     # psram:
