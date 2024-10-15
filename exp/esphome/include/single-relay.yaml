@@ -1,6 +1,14 @@
+substitutions:
+  invert_relay_0_pin: "false"
+
 # https://wiki.seeedstudio.com/Grove-Relay/
 switch:
   - platform: gpio
     name: "Relay 0"
     id: relay_0_id
-    pin: ${relay_0_pin}
+    pin: 
+      number: ${relay_0_pin}
+      inverted: ${invert_relay_0_pin}
+      mode:
+        output: true
+        pulldown: true
