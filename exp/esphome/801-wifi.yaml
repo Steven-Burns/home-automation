@@ -36,6 +36,6 @@ display:
   vars:
     device_name: "801-esphome"
     device_comment: "esp8266 with built-in display."
-    webserver_version: 2
+
 
 
