@@ -11,4 +11,4 @@ switch:
       inverted: ${invert_relay_0_pin}
       mode:
         output: true
-        pulldown: true
+        pulldown: ! ${invert_relay_0_pin}
