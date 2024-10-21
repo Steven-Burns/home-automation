@@ -18,6 +18,7 @@ packages:
 
 display:
   - id: !extend ssd1306_id
+    update_interval: 100ms
     lambda: |-
       auto width = it.get_width();
       auto height = it.get_height();
@@ -28,6 +29,36 @@ display:
       int line = 0;
       it.printf(width, ++line * char_height, font_id, TextAlign::BASELINE_RIGHT, "%s", App.get_name().c_str());
       it.printf(width, ++line * char_height, font_id, TextAlign::BASELINE_RIGHT, "%s", ip_addr.c_str());  
+
+      // blinky routine as an array of connected points.
+      static const int NUM_BLINKIES = 7;
+      static const int MIN_X = 0;
+      static const int MAX_X = width;
+      static const int MIN_Y = 16;
+      static const int MAX_Y = height;
+      static int blinky_x[] = {30, 45, 64, 10, 120, 75, 90};
+      static int blinky_y[] = {5, 10, 15, 20, 25, 30, 60};
+      static int blinky_dx[] = {1, 1, 1, 1, 1, -1, -2};
+      static int blinky_dy[] = {1, 2, 2, -2, 4, 4, -1};
+      for (int i = 0; i < NUM_BLINKIES; ++i) 
+      {
+        blinky_x[i] += blinky_dx[i];
+        blinky_y[i] += blinky_dy[i];
+        if (blinky_x[i] > MAX_X) { blinky_x[i] = MAX_X;  blinky_dx[i] = -blinky_dx[i]; }
+        if (blinky_y[i] > MAX_Y) { blinky_y[i] = MAX_Y;  blinky_dy[i] = -blinky_dy[i]; }
+        if (blinky_x[i] < MIN_X ) { blinky_x[i] = MIN_X; blinky_dx[i] = -blinky_dx[i]; }
+        if (blinky_y[i] < MIN_Y ) { blinky_y[i] = MIN_Y; blinky_dy[i] = -blinky_dy[i]; }
+      }
+      for (int i = 0; i < NUM_BLINKIES; ++i)
+      {
+        if (NUM_BLINKIES - 1 == i) 
+        {
+          it.line(blinky_x[i], blinky_y[i], blinky_x[0], blinky_y[0], COLOR_ON);
+          break;
+        }
+        it.line(blinky_x[i], blinky_y[i], blinky_x[i + 1], blinky_y[i + 1], COLOR_ON);     
+      }
+
 
 # "All Device" baseline stuff here
 
