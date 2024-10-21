@@ -6,7 +6,6 @@ ethernet:
   miso_pin: ${ethernet_miso_pin}
   cs_pin: 
       number: ${ethernet_cs_pin}
-      ignore_strapping_warning: true  
   interrupt_pin: ${ethernet_interrupt_pin}
   reset_pin: ${ethernet_reset_pin}
   clock_speed: 26.67Mhz 
