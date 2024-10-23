@@ -18,7 +18,6 @@ packages:
 
 display:
   - id: !extend ssd1306_id
-    update_interval: 100ms
     lambda: |-
       auto width = it.get_width();
       auto height = it.get_height();
