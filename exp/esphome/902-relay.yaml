@@ -15,4 +15,22 @@ packages:
   file: include/esp32-device-baseline.yaml
   vars:
     device_name: "902-esphome"
-    device_comment: "Single relay controlled by Board 902 connected on wifi."
+    device_comment: "Single relay with override button. Installed at outdoor kitchen to control fenceline lights."
+
+
+binary_sensor:
+  - platform: gpio
+    name: "Lighting Override Button"
+    id: button_0_id
+    pin:
+      number: GPIO5
+      mode:
+        input: true
+        pullup: true
+    filters:
+      - invert:
+    on_click:
+      min_length: 10ms
+      max_length: 1000ms
+      then:
+        - switch.toggle: relay_0_id
