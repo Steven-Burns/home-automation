@@ -20,7 +20,7 @@ packages:
 
 binary_sensor:
   - platform: gpio
-    name: "Lighting Override Button"
+    name: "Relay Toggle Button"
     id: button_0_id
     pin:
       number: GPIO5
