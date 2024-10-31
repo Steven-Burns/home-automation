@@ -1,0 +1,59 @@
+esp32:
+  board: lolin_s2_mini
+  variant: ESP32S2
+
+packages:
+  blinky: !include
+    file: include/interval-blinky.yaml
+    vars:
+      builtin_led_pin: "GPIO15"
+# wifi: !include  
+#   file: include/wifi.yaml
+  wired_ethernet: !include
+    file: include/wired-ethernet.yaml
+    vars:
+      ethernet_clk_pin: "GPIO34"  
+      ethernet_mosi_pin: "GPIO36" 
+      ethernet_miso_pin: "GPIO11" 
+      ethernet_cs_pin: "GPIO21" 
+      ethernet_interrupt_pin: "GPIO17" 
+      ethernet_reset_pin: "GPIO9"
+  radar_motion: !include
+    file: include/HLK-LD2420-radar-motion.yaml
+    vars:
+      # UART 1
+      uart_2_tx_pin: "GPIO16"
+      uart_2_rx_pin: "GPIO18"
+  i2c: !include
+    file: include/i2c.yaml
+    vars:
+      i2c_sda_pin: "GPIO33"
+      i2c_scl_pin: "GPIO35"
+  light_temp_humidity: !include
+    file: include/light-temp-humidity.yaml
+    vars:
+      illuminance_pin: "GPIO14"
+  buttons: !include
+    file: include/buttons.yaml
+    vars:
+      button_0_pin: "GPIO38"
+      button_1_pin: "GPIO37"
+  relay: !include
+    file: include/single-relay.yaml
+    vars:
+      relay_0_pin: "GPIO13"
+  display: !include
+    file: include/display.yaml
+
+
+
+
+
+# "All Device" baseline stuff here
+
+<<: !include 
+  file: include/esp32-device-baseline.yaml
+  vars:
+    device_name: "916-esphome"
+    device_comment: "Baseline for board 916."
+
