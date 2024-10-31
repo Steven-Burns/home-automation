@@ -8,10 +8,6 @@ packages:
       builtin_led_pin: "GPIO2"
   wifi: !include
     file: include/wifi.yaml
-  relay: !include 
-    file: include/single-relay.yaml
-    vars: 
-      relay_0_pin: "GPIO1"
 
 # "All Device" baseline stuff here
 
@@ -19,6 +15,14 @@ packages:
   file: include/esp8266-device-baseline.yaml
   vars:
     device_name: "911-esphome"
-    device_comment: "Board 911 esp8266 ESP-01 with relay."
+    device_comment: "Board 911 controlling a transistor to remote power on/off Linda's BOSE speaker."
 
-
+switch:
+  - platform: gpio
+    pin: GPIO03
+    id: relay_0_id
+    name: "Remote Power On/Off"
+    icon: "mdi:power"
+    on_turn_on:
+    - delay: 100ms
+    - switch.turn_off: relay_0_id
