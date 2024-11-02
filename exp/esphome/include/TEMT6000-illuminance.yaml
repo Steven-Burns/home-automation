@@ -1,0 +1,11 @@
+sensor:
+    # https://devices.esphome.io/devices/temt6000
+  - platform: adc
+    pin: ${illuminance_pin}
+    name: "Illuminance"
+    id: illuminance_id
+    device_class: illuminance
+    unit_of_measurement: lx
+    filters:
+      - lambda: |-
+          return (x / 10000.0) * 2000000.0;
