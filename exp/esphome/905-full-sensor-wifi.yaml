@@ -6,6 +6,10 @@ esp32:
 packages:
   wifi: !include  
     file: include/wifi.yaml
+  illuminance: !include
+    file: include/TEMT6000-illuminance.yaml
+    vars:
+      illuminance_pin: "GPIO3"
   radar_motion: !include
     file: include/HLK-LD2420-radar-motion.yaml
     vars:
@@ -17,10 +21,11 @@ packages:
     vars:
       i2c_sda_pin: "GPIO47"
       i2c_scl_pin: "GPIO48"
-  light_temp_humidity: !include
-    file: include/light-temp-humidity.yaml
-    vars:
-      illuminance_pin: "GPIO3"
+        # goose up the i2c bus frequency so that we don't get runtime warnings about the display component
+        # taking too long to update.
+      i2c_freq: 420kHz
+  temp_humidity: !include
+    file: include/BMP280-AHT20-temp-humidity.yaml
   buttons: !include
     file: include/buttons.yaml
     vars:

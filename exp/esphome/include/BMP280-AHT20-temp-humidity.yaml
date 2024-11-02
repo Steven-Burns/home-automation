@@ -15,7 +15,7 @@ sensor:
           # we halve the offset (which was determined by comparison to a reference thermometer).
         - offset: 0.0 
     pressure:
-      name: "Pressure"
+      name: "Air Pressure"
       oversampling: 16x
       device_class: atmospheric_pressure
   - platform: aht10
