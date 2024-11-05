@@ -1,3 +1,6 @@
+substitutions:
+  logger_baud_rate: "115200"
+
 esphome:
   name: ${device_name}
   friendly_name: ${device_name} 
@@ -13,14 +16,14 @@ esphome:
 
 
 esp32:
-  framework:
-    type: arduino
+  # framework:
+  #   type: arduino
 
 # Enable logging
 logger:
   level: DEBUG
-  # this will disable serial logging (API access should still work, tho)
-  # baud_rate:0 
+  # baud_rate = 0 will disable serial logging (API access should still work, tho)
+  baud_rate: ${logger_baud_rate} 
 
 # Enable Home Assistant API
 api:
