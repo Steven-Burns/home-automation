@@ -30,8 +30,10 @@ packages:
     vars:
       i2c_sda_pin: "GPIO33"
       i2c_scl_pin: "GPIO35"
-      # board 905 can go as high as 420kHz, but this board fails to read the sensors at that freq.
-      i2c_freq: "100kHz"
+      # past 200kHz, this board fails to read the BMP and AHT sensors, failing with a 
+      # "bad chip ID" error. I believe that error message really means "could not read chip ID,"
+      # as dropping the freq <= 200kHz works.
+      i2c_freq: "200kHz"
   temp_humidity: !include
     file: include/BMP280-AHT20-temp-humidity.yaml
   buttons: !include
@@ -43,8 +45,13 @@ packages:
     file: include/single-relay.yaml
     vars:
       relay_0_pin: "GPIO13"
-  # display: !include
-  #   file: include/SDD1306-OLED-display-slow-boards.yaml
+
+  # An empty display lamba routine still takes 60ms to execute on this board. That causes 
+  # esphome to log continual warnings that the display component is taking too long.
+  # Conclusion: this board does not have the horsepower to run all the sensors, the 
+  # wired eithernet, the baseline components *AND* a display. So we drop the display.
+#  display: !include
+#    file: include/SDD1306-OLED-display-slow-boards.yaml
 
 # "All Device" baseline stuff here
 
