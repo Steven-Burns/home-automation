@@ -15,25 +15,25 @@ packages:
       ethernet_cs_pin: "GPIO5" 
       ethernet_interrupt_pin: "GPIO26" 
       ethernet_reset_pin: "GPIO17"
-
-
-  # illuminance: !include
-  #   file: include/TEMT6000-illuminance.yaml
-  #   vars:
-  #     illuminance_pin: "GPIO14"
-  # radar_motion: !include
-  #   file: include/HLK-LD2420-radar-motion.yaml
-  #   vars:
-  #     uart_2_tx_pin: "GPIO16"
-  #     uart_2_rx_pin: "GPIO18"
-  # i2c: !include
-  #   file: include/i2c.yaml
-  #   vars:
-  #     i2c_sda_pin: "GPIO33"
-  #     i2c_scl_pin: "GPIO35"
-  #     i2c_freq: "420kHz"
-  # temp_humidity: !include
-  #   file: include/BMP280-AHT20-temp-humidity.yaml
+  illuminance: !include
+    file: include/TEMT6000-illuminance.yaml
+    vars:
+      illuminance_pin: "GPIO34"
+  radar_motion: !include
+    file: include/HLK-LD2420-radar-motion.yaml
+    vars:
+      # GPIO9 and 10 are labeled on one pinout source as UART1, but hooking a wire to 9 locks up the board.
+      # GPIO1 and 3 are labeled as UART0, so let's try those.
+      uart_2_tx_pin: "GPIO1"
+      uart_2_rx_pin: "GPIO3"
+  i2c: !include
+    file: include/i2c.yaml
+    vars:
+      i2c_sda_pin: "GPIO21"
+      i2c_scl_pin: "GPIO22"
+      i2c_freq: "420kHz"
+  temp_humidity: !include
+    file: include/BMP280-AHT20-temp-humidity.yaml
   # buttons: !include
   #   file: include/buttons.yaml
   #   vars:
@@ -43,8 +43,8 @@ packages:
   #   file: include/single-relay.yaml
   #   vars:
   #     relay_0_pin: "GPIO13"
-  # display: !include
-  #   file: include/SDD1306-OLED-display-slow-boards.yaml
+  display: !include
+    file: include/SDD1306-OLED-display-fast-boards.yaml
 
 # "All Device" baseline stuff here
 
@@ -53,3 +53,5 @@ packages:
   vars:
     device_name: "912-esphome"
     device_comment: "Baseline for board 912."
+    # turn off logging on UART0, as we're using that for the radar
+    logger_baud_rate: "0"
