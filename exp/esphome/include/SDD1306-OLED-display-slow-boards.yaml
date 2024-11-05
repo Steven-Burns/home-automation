@@ -19,26 +19,19 @@ display:
     contrast: 20%
     invert: false
     lambda: |-
-      // do nothing.
+      static auto width = it.get_width();
+      static auto height = it.get_height();
+      static auto tiny_font = id(tiny_font_id);
+      static auto big_font = id(large_font_id);
+      static auto small_font = id(small_font_id);
+      static auto med_font = id(med_font_id);
+      static const int char_height = 8;
+      int line = 0;
+
+      auto ip_addr = id(ip_address_id)->get_state();
+      it.printf(width, ++line * char_height, tiny_font, TextAlign::BASELINE_RIGHT, "%s", App.get_name().c_str());
+      it.printf(width, ++line * char_height, tiny_font, TextAlign::BASELINE_RIGHT, "%s", ip_addr.c_str());
       
-
-
-# static auto width = it.get_width();
-# static auto height = it.get_height();
-# static auto tiny_font = id(tiny_font_id);
-# static auto big_font = id(large_font_id);
-# static auto small_font = id(small_font_id);
-# static auto med_font = id(med_font_id);
-# static const int char_height = 8;
-# int line = 0;
-
-# /*
-# auto ip_addr = id(ip_address_id)->get_state();
-# static const int char_height = 8;
-# int line = 0;
-# it.printf(width, ++line * char_height, tiny_font, TextAlign::BASELINE_RIGHT, "%s", App.get_name().c_str());
-# it.printf(width, ++line * char_height, tiny_font, TextAlign::BASELINE_RIGHT, "%s", ip_addr.c_str());
-# */
 
 # /*
 # bool button0_state = id(button_0_binary_sensor_id)->state;
