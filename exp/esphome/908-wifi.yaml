@@ -1,5 +1,6 @@
 esp32:
-  board: nodemcu-32s
+  # board: nodemcu-32s This also works.
+  board: wemos_d1_mini32
 
 packages:
   blinky: !include
