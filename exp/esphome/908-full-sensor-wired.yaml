@@ -34,11 +34,11 @@ packages:
       i2c_freq: "420kHz"
   temp_humidity: !include
     file: include/BMP280-AHT20-temp-humidity.yaml
-  # buttons: !include
-  #   file: include/buttons.yaml
-  #   vars:
-  #     button_0_pin: "GPIO32"
-  #     button_1_pin: "GPIO12"
+  buttons: !include
+    file: include/buttons.yaml
+    vars:
+      button_0_pin: "GPIO32"
+      button_1_pin: "GPIO12"
   display: !include
     file: include/SDD1306-OLED-display-fast-boards.yaml
 
@@ -47,7 +47,7 @@ packages:
 <<: !include 
   file: include/esp32-device-baseline.yaml
   vars:
-    device_name: "912-esphome"
-    device_comment: "Full Sensor config for board 912."
+    device_name: "908-esphome"
+    device_comment: "Full Sensor config for board 908."
     # turn off logging on UART0, as we're using that for the radar
     logger_baud_rate: "0"
