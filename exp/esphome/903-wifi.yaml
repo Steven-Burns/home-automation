@@ -21,7 +21,7 @@ spi:
   mosi_pin: GPIO23
   miso_pin: GPIO19
 
-# display D105
+# display D106
 display:
   - platform: ili9xxx
     id: display_0_id
@@ -89,8 +89,8 @@ touchscreen:
     y_min: 240
     y_max: 3680
   transform:
-    swap_xy: true
-    mirror_x: true
+    swap_xy: false
+    mirror_x: false
     mirror_y: true
   on_touch:
       - lambda: |-
