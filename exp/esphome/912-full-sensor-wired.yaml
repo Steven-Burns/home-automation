@@ -23,7 +23,7 @@ packages:
     file: include/HLK-LD2420-radar-motion.yaml
     vars:
       # GPIO9 and 10 are labeled on one pinout source as UART1, but hooking a wire to 9 locks up the board.
-      # GPIO1 and 3 are labeled as UART0, so let's try those.
+      # GPIO1 and 3 are labeled as UART0, so let's try that. 
       uart_2_tx_pin: "GPIO1"
       uart_2_rx_pin: "GPIO3"
   i2c: !include
@@ -34,11 +34,11 @@ packages:
       i2c_freq: "420kHz"
   temp_humidity: !include
     file: include/BMP280-AHT20-temp-humidity.yaml
-  # buttons: !include
-  #   file: include/buttons.yaml
-  #   vars:
-  #     button_0_pin: "GPIO32"
-  #     button_1_pin: "GPIO12"
+  buttons: !include
+    file: include/buttons.yaml
+    vars:
+      button_0_pin: "GPIO32"
+      button_1_pin: "GPIO12"
   display: !include
     file: include/SDD1306-OLED-display-fast-boards.yaml
 
