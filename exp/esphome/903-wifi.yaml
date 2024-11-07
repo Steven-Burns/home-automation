@@ -24,19 +24,24 @@ spi:
   # maximum rate in some circumstances, and is not required if the SPI bus 
   # is used only for the display."
 
-# display D102
+# display D103
 display:
   - platform: ili9xxx
     model: st7735
+    dimensions:
+      height: 128
+      width: 128
+      offset_height: 1
+      offset_width: 2
     dc_pin: GPIO25
     reset_pin: GPIO26
     cs_pin: GPIO5
     data_rate: 80MHz
     invert_colors: false
     color_palette: NONE
-    color_order: rgb
-    rotation: 180
-#    show_test_card: true
+    color_order: bgr
+    rotation: 0
+    # show_test_card: true
     update_interval: 0.1s
     lambda: |-
       static int width = it.get_width();
