@@ -16,20 +16,38 @@ binary_sensor:
     ld2410_id: ld2410_0_id
     has_target:
       id: ld2410_0_target_binary_sensor
-      name: "Radar Has Target"
+      name: "Radar Target Detected"
       device_class: occupancy
     has_moving_target:
       # this changes immediately on motion detection.
       id: ld2410_0_moving_target_binary_sensor
-      name: "Radar Moving Target"
+      name: "Radar Target Moving"
       device_class: motion
-      internal: true
+      # can make this internal if too noisy.
+      # internal: true
     has_still_target:
       # "If true a still target is detected"
       id: ld2410_0_still_target_binary_sensor
-      name: "Radar Still Target"
+      name: "Radar Target Motionless"
       device_class: motion
-      internal: true
+      # internal: true
+
+sensor:
+  - platform: ld2410
+    # The light level only works when the radar is in "engineering mode," which it 
+    # usually is not -- so this is not a useful data point.
+    # light:
+    #  name: Radar Light
+    moving_distance:
+      name: Radar Moving Distance
+    still_distance:
+      name: Radar Motionless Distance
+    moving_energy:
+      name: Radar Movement Energy
+    still_energy:
+      name: Radar Stillness Energy
+    detection_distance:
+      name: Radar Detection Distance
 
 switch:
   - platform: ld2410
