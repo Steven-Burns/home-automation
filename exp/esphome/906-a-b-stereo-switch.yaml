@@ -1,5 +1,5 @@
 esp32:
-  # esp32-WROOM-32*
+  # esp32-WROOM-32.  Waaay overkill for this application...
   board: nodemcu-32s
 
 packages:
@@ -9,11 +9,17 @@ packages:
       builtin_led_pin: "GPIO2"
   wifi: !include  
     file: include/wifi.yaml
-  relay: !include
-    file: include/single-relay.yaml
-    vars:
-      relay_0_pin: "GPIO13"
-      invert_relay_0_pin: "true"
+
+switch:
+  - platform: gpio
+    name: "Relay A-B"
+    id: relay_0_id
+    pin: 
+      number: 13
+      inverted: false
+      mode:
+        output: true
+        pulldown: true
 
 # "All Device" baseline stuff here
 
