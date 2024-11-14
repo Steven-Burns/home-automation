@@ -42,6 +42,7 @@ sensor:
     moving_distance:
       id: radar_moving_distance_id
       name: Radar Moving Distance
+      internal: true      
     still_distance:
       name: LD2410 Motionless Distance
       internal: true

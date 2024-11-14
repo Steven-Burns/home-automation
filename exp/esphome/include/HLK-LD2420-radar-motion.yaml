@@ -38,7 +38,7 @@ sensor:
     moving_distance:
       id: radar_moving_distance_id
       name : LD2420 Moving Distance
-
+      internal: true
 
 
 
