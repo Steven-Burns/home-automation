@@ -26,7 +26,7 @@ switch:
 <<: !include 
   file: include/esp8266-device-baseline.yaml
   vars:
-    device_name: "918-esphome"
-    device_comment: "Board 918 esp8266 ESP-01S with relay."
+    device_name: "920-esphome"
+    device_comment: "Board 920 esp8266 ESP-01S with relay."
 
 
