@@ -12,23 +12,65 @@ ld2420:
   uart_id: uart_2_id
   id: ld2420_0_id
 
-text_sensor:
+binary_sensor:
   - platform: ld2420
-    fw_version:
-      name: LD2420 Firmware Version
-      entity_category: diagnostic
+    has_target:
+      id: radar_has_target_id
+      name: Radar Target Detected
+      device_class: occupancy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 sensor:
   - platform: ld2420
     moving_distance:
-      id: ld_2420_moving_distance_id
+      id: radar_moving_distance_id
       name : LD2420 Moving Distance
 
-binary_sensor:
+
+
+
+
+
+
+
+
+
+
+
+
+button:
   - platform: ld2420
-    has_target:
-      name: LD2420 Presence
-      device_class: occupancy
+    factory_reset:
+      name: Radar Factory Reset
+      entity_category: diagnostic 
+    restart_module:
+      name: Radar Restart Module
+      entity_category: diagnostic
+    apply_config:
+      name: LD2420 Apply Configuration
+      entity_category: config
+    revert_config:
+      name: LD2420 Undo Config Edits
+      entity_category: config
+
+text_sensor:
+  - platform: ld2420
+    fw_version:
+      name: Radar Firmware Version
+      entity_category: diagnostic
 
 select:
   - platform: ld2420
@@ -63,33 +105,6 @@ number:
       name: LD2420 Still Calibration Sensitivity Factor
       entity_category: config
 
-button:
-  - platform: ld2420
-    apply_config:
-      name: LD2420 Apply Configuration
-      entity_category: config
-    factory_reset:
-      name: LD2420 Factory Reset
-      entity_category: diagnostic 
-    restart_module:
-      name: LD2420 Restart Module
-      entity_category: diagnostic
-    revert_config:
-      name: LD2420 Undo Config Edits
-      entity_category: config
 
 
-# binary_sensor:
-#     has_moving_target:
-#       # this changes immediately on motion detection.
-#       id: ld2410_0_moving_target_binary_sensor
-#       name: "Radar Moving Target"
-#       device_class: motion
-#       internal: true
-#     has_still_target:
-#       # "If true a still target is detected"
-#       id: ld2410_0_still_target_binary_sensor
-#       name: "Radar Still Target"
-#       device_class: motion
-#       internal: true
 
