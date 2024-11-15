@@ -14,7 +14,7 @@ packages:
       ethernet_mosi_pin: "GPIO36" 
       ethernet_miso_pin: "GPIO11" 
       ethernet_cs_pin: "GPIO21" 
-      ethernet_interrupt_pin: "GPIO17" 
+      ethernet_interrupt_pin: "GPIO16" 
       ethernet_reset_pin: "GPIO9"
   illuminance: !include
     file: include/TEMT6000-illuminance.yaml
@@ -23,7 +23,8 @@ packages:
   radar_motion: !include
     file: include/HLK-LD2420-radar-motion.yaml
     vars:
-      uart_2_tx_pin: "GPIO16"
+      # Espressif docs say 17 and 18 are UART1 TXD and RXD
+      uart_2_tx_pin: "GPIO17"
       uart_2_rx_pin: "GPIO18"
   i2c: !include
     file: include/i2c.yaml

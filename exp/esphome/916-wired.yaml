@@ -16,7 +16,7 @@ packages:
       ethernet_mosi_pin: "GPIO36" 
       ethernet_miso_pin: "GPIO11" 
       ethernet_cs_pin: "GPIO21" 
-      ethernet_interrupt_pin: "GPIO17" 
+      ethernet_interrupt_pin: "GPIO16" 
       ethernet_reset_pin: "GPIO9"
 
 # "All Device" baseline stuff here
