@@ -76,14 +76,12 @@ display:
 
       bool button0_state = false;
       bool button1_state = false;
-      bool relay_state = false;
-      bool radar_moving = false;
       /*
       bool button0_state = id(button_0_binary_sensor_id)->state;
       bool button1_state = id(button_1_binary_sensor_id)->state;
-      bool relay_state = id(relay_0_id)->state;
-      bool radar_moving = id(ld2410_0_moving_target_binary_sensor)->state;
       */
+      bool relay_state = id(relay_0_id)->state;
+      bool radar_target = id(radar_has_target_id)->state;
 
       it.printf(0, 1 * char_height, tiny_font, TextAlign::BASELINE_LEFT, 
         "%s%s",
@@ -92,7 +90,7 @@ display:
       it.printf(0, 2 * char_height, tiny_font, TextAlign::BASELINE_LEFT, 
         "%s%s",
         button1_state ? "b" : " ",
-        radar_moving ? "M" : " ");
+        radar_target ? "T" : " ");
 
       float temp = 0.0;
       temp = id(temperature_id)->state;
