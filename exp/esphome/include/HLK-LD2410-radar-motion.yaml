@@ -24,14 +24,14 @@ binary_sensor:
     has_moving_target:
       # this changes immediately on motion detection.
       id: ld2410_0_moving_target_binary_sensor
-      name: "LD2410 Target Moving"
+      name: "LD2410 Moving Target Detected"
       device_class: motion
-      # can make this internal if too noisy.
+      # made internal -- very noisy.
       internal: true
     has_still_target:
       # "If true a still target is detected"
       id: ld2410_0_still_target_binary_sensor
-      name: "LD2410 Target Motionless"
+      name: "LD2410 Motionless Target Detected"
       device_class: motion
       internal: true
 
