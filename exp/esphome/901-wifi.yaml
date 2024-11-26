@@ -8,12 +8,6 @@ packages:
       builtin_led_pin: "GPIO2"
   wifi: !include  
     file: include/wifi.yaml
-  radar_motion: !include
-    file: include/HLK-LD2420-radar-motion.yaml
-    vars:
-      # 16 and 17 are supposedly the pins for ESP32 hardware UART 2
-      uart_2_tx_pin: "GPIO17"
-      uart_2_rx_pin: "GPIO16"
 
 # "All Device" baseline stuff here
 
