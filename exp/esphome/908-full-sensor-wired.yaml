@@ -20,7 +20,7 @@ packages:
     vars:
       illuminance_pin: "GPIO34"
   radar_motion: !include
-    file: include/HLK-LD2420-radar-motion.yaml
+    file: include/HLK-LD2410-radar-motion.yaml
     vars:
       # GPIO9 and 10 are labeled on one pinout source as UART1, but hooking a wire to 9 locks up the board.
       # GPIO1 and 3 are labeled as UART0, so let's try those.
