@@ -62,6 +62,6 @@ binary_sensor:
   file: include/esp32-device-baseline.yaml
   vars:
     device_name: "908-esphome"
-    device_comment: "Retrofit sensor unit on board 908."
+    device_comment: "Retrofit sensor unit on board 908, yada yada."
     # turn off logging on UART0, as we're using that for the radar
     logger_baud_rate: "0"
