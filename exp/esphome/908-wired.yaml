@@ -16,17 +16,6 @@ packages:
       ethernet_interrupt_pin: "GPIO26" 
       ethernet_reset_pin: "GPIO17"
 
-switch:
-  - platform: gpio
-    name: "Solenoid 0"
-    id: solenoid_0_id
-    pin: 
-        number: 4
-        inverted: false
-        mode:
-          output: true
-          pulldown: true
-
 # "All Device" baseline stuff here
 
 <<: !include 
@@ -34,5 +23,3 @@ switch:
   vars:
     device_name: "908-esphome"
     device_comment: "Full Sensor config for board 908."
-    # turn off logging on UART0, as we're using that for the radar
-    logger_baud_rate: "0"
