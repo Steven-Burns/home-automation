@@ -18,6 +18,7 @@ packages:
   illuminance: !include
     file: include/TEMT6000-illuminance.yaml
     vars:
+      # this needs to be an analog input pin
       illuminance_pin: "GPIO34"
   radar_motion: !include
     file: include/HLK-LD2410-radar-motion.yaml
@@ -34,13 +35,27 @@ packages:
       i2c_freq: "420kHz"
   temp_humidity: !include
     file: include/BMP280-AHT20-temp-humidity.yaml
-  buttons: !include
-    file: include/buttons.yaml
+  relay: !include
+    file: include/single-relay.yaml
     vars:
-      button_0_pin: "GPIO4"
-      button_1_pin: "GPIO16"
+      relay_0_pin: "GPIO27"
   display: !include
     file: include/SDD1306-OLED-display-fast-boards.yaml
+
+binary_sensor:
+  - platform: gpio
+    name: "Relay Toggle Button"
+    id: button_0_id
+    pin:
+      number: GPIO32
+      mode:
+        input: true
+        pulldown: true
+    on_click:
+      min_length: 10ms
+      max_length: 1500ms
+      then:
+        - switch.toggle: relay_0_id
 
 # "All Device" baseline stuff here
 
@@ -48,6 +63,7 @@ packages:
   file: include/esp32-device-baseline.yaml
   vars:
     device_name: "912-esphome"
-    device_comment: "Full Sensor config for board 912."
+    device_comment: "Retrofit sensor unit on board 912."
     # turn off logging on UART0, as we're using that for the radar
     logger_baud_rate: "0"
+
