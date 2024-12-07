@@ -45,18 +45,28 @@ sensor:
       id: radar_moving_distance_id
       name: Radar Moving Distance
       internal: true      
+      filters:
+        - delta: 30
     still_distance:
       name: LD2410 Motionless Distance
       internal: true
+      filters:
+        - delta: 30
     moving_energy:
       name: LD2410 Movement Energy
       internal: true
+      filters:
+        - delta: 10
     still_energy:
       name: LD2410 Stillness Energy
       internal: true
+      filters:
+        - delta: 10
     detection_distance:
       name: LD2410 Detection Distance
       internal: true
+      filters:
+        - delta: 30
 
 button:
   - platform: ld2410
