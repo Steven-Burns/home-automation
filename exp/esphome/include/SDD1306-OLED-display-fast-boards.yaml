@@ -109,7 +109,7 @@ display:
 
       float lux = 0.0;
       lux = id(illuminance_id)->state;
-      it.printf(width, height, med_font, TextAlign::BASELINE_RIGHT, "%2.2f  ", lux);
+      it.printf(width, height, med_font, TextAlign::BASELINE_RIGHT, "%3.0f  ", lux);
       it.printf(width, height - char_height, tiny_font, TextAlign::BASELINE_RIGHT, "l"); 
       it.printf(width, height, tiny_font, TextAlign::BASELINE_RIGHT, "x"); 
 
