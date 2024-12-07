@@ -49,8 +49,9 @@ sensor:
     id: illuminance_id
     attenuation: auto
     update_interval: 1s
-    # filters:
-    #   - multiply: 1000
+    filters:
+      - multiply: 100
+      - delta: 5.0
 
 
 binary_sensor:
