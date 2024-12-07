@@ -8,13 +8,31 @@ packages:
 # seeed studio LED stick 10-ws2813 mini
 
 light:
-  - platform: neopixelbus
-    id: my_light
-    type: WRGB
-    variant: WS2811
+  - platform: esp32_rmt_led_strip
+    pin: GPIO10
+    rgb_order: RGB
+    is_wrgb: true
+    num_leds: 1
+    rmt_channel: 1
+    chipset: ws2811
+    name: "Short Strip"
+    effects:
+      - addressable_random_twinkle:
+      - addressable_fireworks:
+      - addressable_twinkle:
+      - addressable_scan:
+      - addressable_rainbow:
+      - strobe:
+      - pulse:
+  - platform: esp32_rmt_led_strip
     pin: GPIO09
+    rgb_order: RGB
+    is_wrgb: true
     num_leds: 9
-    name: "Long strip"
+    rmt_channel: 0
+    chipset: ws2811
+    name: "Long Strip"
+    id: my_light
     effects:
       - lambda:
           name: "Custom 1"
