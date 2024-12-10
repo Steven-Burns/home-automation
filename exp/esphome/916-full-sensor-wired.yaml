@@ -1,3 +1,6 @@
+# CONCLUSION: the s2 variant is single core and lacks the muscle to run the full
+# sensor suite, display, and wired ethernet.
+
 esp32:
   board: lolin_s2_mini
   variant: ESP32S2
