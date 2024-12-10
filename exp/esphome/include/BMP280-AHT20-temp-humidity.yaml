@@ -7,8 +7,10 @@ sensor:
     # We don't care about power consumption (for wired devices), so max out the filter.
     iir_filter: 16x
     temperature:
-      name: "BMP Temperature"
+      name: "Air Temperature (BMP280)"
       id: temperature_id
+      device_class: "temperature"
+      state_class: "measurement"
       oversampling: 2x
       filters:
           # the offset appears to be applied once per sampling, so since we're 2x oversampling, 
@@ -18,13 +20,17 @@ sensor:
       name: "Air Pressure"
       oversampling: 16x
       device_class: atmospheric_pressure
+      state_class: "measurement"
+      icon: mdi:gauge
   - platform: aht10
     address: 0x38
     variant: aht20
     # update_interval: 60s
     temperature:
-      name: "AHT20 Temperature"
+      name: "Air Temperature (AHT20)"
       id: aht20_temp
+      device_class: "temperature"
+      state_class: "measurement"
       accuracy_decimals: 1
       # filters:
       # - filter_out: 0.0
@@ -35,6 +41,7 @@ sensor:
     humidity:
       name: "Humidity"
       id: humidity_id
+      state_class: "measurement"
       accuracy_decimals: 1
       # filters:
       # - filter_out: 0.0

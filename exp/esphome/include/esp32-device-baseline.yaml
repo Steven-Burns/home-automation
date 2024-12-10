@@ -69,7 +69,7 @@ text_sensor:
     entity_category: "diagnostic"
   - platform: template
     id: sys_esp_xtal_freq_id
-    name: "Crystal Speed MHz"
+    name: "Crystal Freq MHz"
     entity_category: "diagnostic"
     lambda: return std::to_string(getXtalFrequencyMhz());
     update_interval: 12h
