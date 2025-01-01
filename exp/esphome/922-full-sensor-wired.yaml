@@ -20,6 +20,12 @@ packages:
   #   vars:
   #     # this needs to be an analog input pin
   #     illuminance_pin: "GPIO34"
+  # Why buy a TEMT6000 when a simple photoresistor may do the job? 
+  illuminance: !include 
+    file: include/photoresistor-illuminance.yaml
+    vars:
+        # this needs to be an analog input pin
+        illuminance_pin: "GPIO34"    
   radar_motion: !include
     file: include/HLK-LD2410-radar-motion.yaml
     vars:
@@ -41,18 +47,6 @@ packages:
       relay_0_pin: "GPIO27"
   display: !include
     file: include/SDD1306-OLED-display-fast-boards.yaml
-
-sensor:
-  - platform: adc
-    pin: GPIO34
-    name: "Photoresistor 0"
-    id: illuminance_id
-    attenuation: auto
-    update_interval: 1s
-    filters:
-      - multiply: 100
-      - delta: 5.0
-
 
 binary_sensor:
   - platform: gpio

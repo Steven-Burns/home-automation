@@ -1,0 +1,11 @@
+sensor:
+  - platform: adc
+    pin: ${illuminance_pin}
+    name: "Photoresistor 0"
+    id: illuminance_id
+    unit_of_measurement: mV
+    attenuation: auto
+    update_interval: 1s
+    filters:
+      - multiply: 100
+      - delta: 5.0
