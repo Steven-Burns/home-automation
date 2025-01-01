@@ -22,8 +22,9 @@ sensor:
     name: "Photoresistor 0"
     id: photo_0_id
     attenuation: auto
-    update_interval: 1s
-    # filters:
+    update_interval: 60s
+    filters:
+      - delta: 5.0
     #   - multiply: 3.3
     #   - lambda: |-
     #       return (x / 10000.0) * 2000000.0;
@@ -32,7 +33,9 @@ sensor:
     name: "Photoresistor 1"
     id: photo_1_id
     attenuation: auto
-    update_interval: 1s
+    update_interval: 60s
+    filters:
+      - delta: 5.0
 
 
 
