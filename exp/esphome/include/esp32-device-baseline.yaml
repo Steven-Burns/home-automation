@@ -16,8 +16,8 @@ esphome:
 
 
 esp32:
-  # framework:
-  #   type: arduino
+  framework:
+    type: arduino
 
 # Enable logging
 logger:
