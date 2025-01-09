@@ -5,6 +5,7 @@ sensor:
     name: "Illuminance"
     id: illuminance_id
     device_class: illuminance
+    update_interval: 10s
     unit_of_measurement: lx
     attenuation: auto
     filters:
