@@ -34,7 +34,17 @@ binary_sensor:
       - delayed_on: 50ms
       - delayed_off: 50ms
 
-
+switch:
+  - platform: gpio
+    name: "Door Lock"
+    id: door_lock_0_id
+    pin: 
+      number: GPIO40
+      inverted: true
+      mode:
+        output: true
+        pulldown: true
+        # pullup: false
 
 # "All Device" baseline stuff here
 
