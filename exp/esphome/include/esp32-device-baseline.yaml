@@ -2,8 +2,8 @@ substitutions:
   logger_baud_rate: "115200"
 
 esphome:
-  name: ${device_name}
-  friendly_name: ${device_name} 
+  name: ${device_hostname}
+  friendly_name: ${device_hostname} 
   comment: ${device_comment}
   name_add_mac_suffix: false
   project:
