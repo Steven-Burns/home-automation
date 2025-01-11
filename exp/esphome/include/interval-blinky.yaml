@@ -15,7 +15,8 @@ output:
 interval:
   - interval: 500ms
     then:
-      - output.turn_on: on_board_led_id
-      - delay: 250ms
-      - output.turn_off: on_board_led_id
+      lambda: |- 
+        static bool led_is_on = false;
+        led_is_on = !led_is_on;
+        id(on_board_led_id)->set_state(led_is_on);
 
