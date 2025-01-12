@@ -18,6 +18,11 @@ font:
   - file: "fonts/spleen-5x8.bdf"
     id: tiny_font_id
 
+animation:
+  - file: "images/falling-head.gif"
+    id: animation_id
+    type: BINARY
+
 display:
   - platform: ssd1306_i2c
     id: ssd1306_id
@@ -27,15 +32,22 @@ display:
     invert: false
     rotation: 0
     lambda: |-
+      static const int CHAR_HEIGHT_PX = 8;
       static auto width = it.get_width();
       static auto height = it.get_height();
+      static auto font = id(tiny_font_id);
 
-      static auto font_id = id(tiny_font_id);
       auto ip_addr = id(ip_address_id)->get_state();
-      int char_height = 8;
-      int line = 0;
-      it.printf(width, ++line * char_height, font_id, TextAlign::BASELINE_RIGHT, "%s", App.get_name().c_str());
-      it.printf(width, ++line * char_height, font_id, TextAlign::BASELINE_RIGHT, "%s", ip_addr.c_str());  
+      if (ip_addr.length())
+      {
+        int line = 0;
+        it.printf(width, ++line * CHAR_HEIGHT_PX, font, TextAlign::BASELINE_RIGHT, "%s", App.get_name().c_str());
+        it.printf(width, ++line * CHAR_HEIGHT_PX, font, TextAlign::BASELINE_RIGHT, "%s", ip_addr.c_str());  
+      }
+
+      auto ani = id(animation_id);
+      it.image(0, 44, ani, COLOR_ON, COLOR_OFF);
+      ani->next_frame();
 
       // blinky routine as an array of connected points.
       static const int NUM_BLINKIES = 3;
