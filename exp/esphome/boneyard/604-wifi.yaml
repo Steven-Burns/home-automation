@@ -14,7 +14,7 @@ packages:
 <<: !include 
   file: include/rp2040-device-baseline.yaml
   vars:
-    device_name: "604-esphome"
+    device_hostname: "604-esphome"
     device_comment: "WiFi basic on 604."
 
 

@@ -106,7 +106,7 @@ touchscreen:
 <<: !include 
   file: include/esp32-device-baseline.yaml
   vars:
-    device_name: "903-esphome"
+    device_hostname: "903-esphome"
     device_comment: "Board 903 connected on WiFi."
     # logger_baud_rate: "0"
 

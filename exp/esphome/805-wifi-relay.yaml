@@ -14,7 +14,7 @@ packages:
 <<: !include 
   file: include/esp8266-device-baseline.yaml
   vars:
-    device_name: "805-esphome-lava-lamp"
+    device_hostname: "805-esphome-lava-lamp"
     device_comment: "esp8266 ESP-01 with relay built into lava lamp cord."
 
 

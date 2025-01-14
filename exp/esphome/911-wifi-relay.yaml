@@ -14,7 +14,7 @@ packages:
 <<: !include 
   file: include/esp8266-device-baseline.yaml
   vars:
-    device_name: "911-esphome"
+    device_hostname: "911-esphome"
     device_comment: "Board 911 controlling a transistor to remote power on/off Linda's BOSE speaker."
 
 switch:
