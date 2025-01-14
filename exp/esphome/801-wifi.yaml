@@ -18,17 +18,61 @@ font:
   - file: "fonts/spleen-5x8.bdf"
     id: tiny_font_id
 
-animation:
-  - file: "images/falling-head.gif"
+external_components:
+  - source:
+      type: local
+      path: components
+    components: [ game_of_life_animation ]
+
+
+# idea: starting file is the initial world; this will allow start places from LifeWiki to be loaded
+# type is always BINARY
+# instead of next_frame, prev_frame, just next_generation()
+# set_frame reloads the initial image?
+# or maybe allow the initial image to be a multi-frame gif as in the case of animation component, where 
+# each frame can be selected as a start frame.
+
+
+game_of_life_animation:
+  - file: "images/GameOfLife/border-128x48.gif"
     id: animation_id
     type: BINARY
+
+animation:
+  - file: "images/falling-head.gif"
+    id: animation_1_id
+    type: BINARY
+
+interval:
+  - interval: 0.5s
+    then:
+      lambda: |-
+        static auto ani = id(animation_id);
+        ani->next_generation();
+
+switch:
+  - platform: template
+    name: "Next Generation"
+    id: nextgen_switch_id
+    turn_on_action:
+      lambda: |-
+        id(animation_id)->next_generation();
+        id(nextgen_switch_id)->turn_off();
+  - platform: template  
+    name: "Reset to frame 0"
+    id: reset_switch_id
+    turn_on_action:
+      lambda: |-
+        id(animation_id)->set_frame(0);
+        id(reset_switch_id)->turn_off();
+
 
 display:
   - platform: ssd1306_i2c
     id: ssd1306_id
     model: "SSD1306_128x64"
-    update_interval: 0.1s
-    contrast: 40%
+    update_interval: 1s
+    contrast: 60%
     invert: false
     rotation: 0
     lambda: |-
@@ -43,40 +87,13 @@ display:
         int line = 0;
         it.printf(width, ++line * CHAR_HEIGHT_PX, font, TextAlign::BASELINE_RIGHT, "%s", App.get_name().c_str());
         it.printf(width, ++line * CHAR_HEIGHT_PX, font, TextAlign::BASELINE_RIGHT, "%s", ip_addr.c_str());  
-      }
+      } 
 
-      auto ani = id(animation_id);
-      it.image(0, 44, ani, COLOR_ON, COLOR_OFF);
-      ani->next_frame();
-
-      // blinky routine as an array of connected points.
-      static const int NUM_BLINKIES = 3;
-      static const int MIN_X = 0;
-      static const int MAX_X = width;
-      static const int MIN_Y = 16;
-      static const int MAX_Y = height;
-      static int blinky_x[] = {30, 45, 64, 10, 120, 75, 90};
-      static int blinky_y[] = {5, 10, 15, 20, 25, 30, 60};
-      static int blinky_dx[] = {1, 1, 1, 1, 1, -1, -2};
-      static int blinky_dy[] = {1, 2, 2, -2, 4, 4, -1};
-      for (int i = 0; i < NUM_BLINKIES; ++i) 
-      {
-        blinky_x[i] += blinky_dx[i];
-        blinky_y[i] += blinky_dy[i];
-        if (blinky_x[i] > MAX_X) { blinky_x[i] = MAX_X;  blinky_dx[i] = -blinky_dx[i]; }
-        if (blinky_y[i] > MAX_Y) { blinky_y[i] = MAX_Y;  blinky_dy[i] = -blinky_dy[i]; }
-        if (blinky_x[i] < MIN_X ) { blinky_x[i] = MIN_X; blinky_dx[i] = -blinky_dx[i]; }
-        if (blinky_y[i] < MIN_Y ) { blinky_y[i] = MIN_Y; blinky_dy[i] = -blinky_dy[i]; }
-      }
-      for (int i = 0; i < NUM_BLINKIES; ++i)
-      {
-        if (NUM_BLINKIES - 1 == i) 
-        {
-          it.line(blinky_x[i], blinky_y[i], blinky_x[0], blinky_y[0], COLOR_ON);
-          break;
-        }
-        it.line(blinky_x[i], blinky_y[i], blinky_x[i + 1], blinky_y[i + 1], COLOR_ON);     
-      }
+      // updating full-screen images is pixel-by-pixel == slow, and results in esphome runtime warnings about the 
+      // display taking too long to update on esp8266 hardware.
+      static auto ani = id(animation_id);
+      it.image(0, 16, ani, COLOR_ON, COLOR_OFF);
+      
 
 
 # "All Device" baseline stuff here
