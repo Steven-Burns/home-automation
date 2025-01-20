@@ -1,5 +1,6 @@
 sensor:
   - platform: adc
+    # this needs to be an analog input pin
     pin: ${illuminance_pin}
     name: "Photoresistor 0"
     id: illuminance_id
