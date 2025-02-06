@@ -50,11 +50,7 @@ time:
     id: esptime
 
 debug:
-  update_interval: 63s
-
-# needed to supply "Free PSRAM" sensor value
-# Does not appear to work as of 04 Oct 2024
-# psram:
+  update_interval: 60s
 
 text_sensor:
   - platform: debug
@@ -72,12 +68,14 @@ text_sensor:
     name: "Crystal Freq MHz"
     entity_category: "diagnostic"
     lambda: return std::to_string(getXtalFrequencyMhz());
+    update_interval: 7 days
     internal: true
   - platform: template
     id: sys_esp_apb_bus_freq_id
     name: "APB Bus Speed MHz"
     entity_category: "diagnostic"
     lambda: return std::to_string(getApbFrequency() / 1000000);
+    update_interval: 7 days
     internal: true
 
 button:
@@ -125,6 +123,12 @@ sensor:
       entity_category: "diagnostic"
       filters:
         delta: 1
+    psram:
+      name: "PSRAM Free"
+      entity_category: "diagnostic"
+      state_class: measurement
+      device_class: data_size
+      internal: true
   - platform: template
     id: sys_esp_cpu_freq_id
     name: "CPU Speed"
@@ -134,19 +138,16 @@ sensor:
     filters:
       delta: 1
     lambda: return getCpuFrequencyMhz(); 
-
+    
 binary_sensor:
   - platform: status
     name: "Device Status"
     entity_category: "diagnostic"
 
-# Does not appear to work as of 4 Oct 2024
-    # psram:
-    #   name: "Free PSRAM"
-    #   entity_category: "diagnostic"
 # commenting this version of free heap as it is not as encapsulated 
-# and therefore platform agnostic as the debug component sensor, and 
-# the results appear to match.
+# and therefore not platform agnostic as is the debug component sensor, and 
+# the results appear to match between the two, making the debug component
+# preferred.
   # - platform: template
   #   id: sys_esp_memory_id
   #   icon: mdi:memory
