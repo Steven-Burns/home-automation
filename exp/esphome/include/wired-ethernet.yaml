@@ -9,6 +9,12 @@ ethernet:
   interrupt_pin: ${ethernet_interrupt_pin}
   reset_pin: ${ethernet_reset_pin}
   clock_speed: 26.67Mhz 
+  # manual_ip:
+  #   static_ip: 192.168.4.76
+  #   gateway: 192.168.1.1
+  #   subnet: 255.255.0.0
+  #   dns1: 192.168.1.1
+  #   dns2: 8.8.8.8
 
 text_sensor:
   - platform: ethernet_info
