@@ -28,6 +28,7 @@ display:
     update_interval: 0.1s
     contrast: 20%
     invert: false
+    rotation: 180
     # pages:
     #   - id: page_1_id
     #     lambda: |-
@@ -53,7 +54,7 @@ display:
           static auto small_font = id(small_font_id);
           static auto med_font = id(med_font_id);
           static const int char_height = 8;
-          int line = 0;
+          int line = 6;
 
           auto ip_addr = id(ip_address_id)->get_state();
           it.printf(width, ++line * char_height, tiny_font, TextAlign::BASELINE_RIGHT, "%s", App.get_name().c_str());
@@ -62,9 +63,9 @@ display:
           // blinky routine as an array of connected points.
           static const int NUM_BLINKIES = 3;
           static const int MIN_X = 0;
-          static const int MAX_X = 63;
-          static const int MIN_Y = 0;
-          static const int MAX_Y = 15;
+          static const int MAX_X = 64;
+          static const int MIN_Y = 64 - 16;
+          static const int MAX_Y = 64;
           static int blinky_x[] = {0, 30, 10, 75};
           static int blinky_y[] = {0, 5, 127, 30};
           static int blinky_dx[] = {1, 1, -2, -3};
@@ -100,11 +101,11 @@ display:
           bool relay_state = id(relay_0_id)->state;
           bool radar_target = id(radar_has_target_id)->state;
 
-          it.printf(0, 1 * char_height, tiny_font, TextAlign::BASELINE_LEFT, 
+          it.printf(0, 7 * char_height, tiny_font, TextAlign::BASELINE_LEFT, 
             "%s%s",
             "", //  button0_state ? "B" : " ",
             relay_state ? "R" : " ");
-          it.printf(0, 2 * char_height, tiny_font, TextAlign::BASELINE_LEFT, 
+          it.printf(0, 8 * char_height, tiny_font, TextAlign::BASELINE_LEFT, 
             "%s%s",
             "", //  button1_state ? "b" : " ",
             radar_target ? "T" : " ");
@@ -112,23 +113,23 @@ display:
           float temp = 0.0;
           temp = id(temperature_id)->state;
           temp = temp * 1.8 + 32;
-          it.printf(0, height, big_font, TextAlign::BASELINE_LEFT, "%2.0f", truncf(temp));
-          it.printf(57, 17, tiny_font, TextAlign::TOP_LEFT, "F");
+          it.printf(0, height - 16, big_font, TextAlign::BASELINE_LEFT, "%2.0f", truncf(temp));
+          it.printf(57, 0, tiny_font, TextAlign::TOP_LEFT, "F");
           // dunno if I like the decimal point...
-          it.filled_rectangle(54, height - 3, 3, 3, COLOR_ON); 
+          it.filled_rectangle(54, height - 16 - 3, 3, 3, COLOR_ON); 
           // or the fractional temp.
-          it.printf(57, height, small_font, TextAlign::BASELINE_LEFT, "%1d", (int)(temp * 10) % 10);
+          it.printf(57, height - 16, small_font, TextAlign::BASELINE_LEFT, "%1d", (int)(temp * 10) % 10);
 
           float hum = 0.0;
           hum = id(humidity_id)->state;
-          it.printf(width, 12, med_font, TextAlign::TOP_RIGHT, "%2.1f  ", hum);
-          it.printf(width, 24, tiny_font, TextAlign::TOP_RIGHT, "%%");
+          it.printf(width, (height - 16) / 2, med_font, TextAlign::BASELINE_RIGHT, "%2.1f  ", hum);
+          it.printf(width, 0, tiny_font, TextAlign::TOP_RIGHT, "%%");
 
           float lux = 0.0;
           lux = id(illuminance_id)->state;
-          it.printf(width, height, med_font, TextAlign::BASELINE_RIGHT, "%3.0f  ", lux);
-          it.printf(width, height - char_height, tiny_font, TextAlign::BASELINE_RIGHT, "l"); 
-          it.printf(width, height, tiny_font, TextAlign::BASELINE_RIGHT, "x"); 
+          it.printf(width, height - 16, med_font, TextAlign::BASELINE_RIGHT, "%3.0f  ", lux);
+          it.printf(width, height - 16 - char_height, tiny_font, TextAlign::BASELINE_RIGHT, "l"); 
+          it.printf(width, height - 16, tiny_font, TextAlign::BASELINE_RIGHT, "x"); 
 
 
 # Cycle through pages on a timer
