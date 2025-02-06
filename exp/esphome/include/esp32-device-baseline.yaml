@@ -72,13 +72,13 @@ text_sensor:
     name: "Crystal Freq MHz"
     entity_category: "diagnostic"
     lambda: return std::to_string(getXtalFrequencyMhz());
-    update_interval: 12h
+    internal: true
   - platform: template
     id: sys_esp_apb_bus_freq_id
     name: "APB Bus Speed MHz"
     entity_category: "diagnostic"
     lambda: return std::to_string(getApbFrequency() / 1000000);
-    update_interval: 12h
+    internal: true
 
 button:
   - platform: restart
@@ -109,6 +109,7 @@ sensor:
       unit_of_measurement: bytes
       state_class: measurement
       device_class: data_size
+      internal: true
       filters:
         delta: 100
     block:
@@ -116,6 +117,7 @@ sensor:
       entity_category: "diagnostic"
       unit_of_measurement: bytes
       device_class: data_size
+      internal: true
       filters:
         delta: 100
     loop_time:
@@ -132,6 +134,11 @@ sensor:
     filters:
       delta: 1
     lambda: return getCpuFrequencyMhz(); 
+
+binary_sensor:
+  - platform: status
+    name: "Device Status"
+    entity_category: "diagnostic"
 
 # Does not appear to work as of 4 Oct 2024
     # psram:
