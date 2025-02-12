@@ -24,29 +24,31 @@ wifi:
 
 sensor:
   - platform: wifi_signal 
-    name: RSSI
+    name: "WiFi RSSI"
     id: wifi_signal_db
     update_interval: 60s
     device_class: signal_strength
     entity_category: "diagnostic"
+    filters: 
+      delta: 1
 
 text_sensor:
   - platform: wifi_info
     ip_address:
       id: ip_address_id
-      name: WiFi IP Address
+      name: "WiFi IP Address"
       entity_category: "diagnostic"
     ssid:
-      name: Connected SSID
+      name: "WiFi SSID"
       entity_category: diagnostic
     bssid:
-      name: Connected BSSID
+      name: "WiFi BSSID"
       entity_category: diagnostic
     mac_address:
-      name: Wifi MAC Address
+      name: "WiFi MAC Address"
       entity_category: diagnostic
     dns_address:
-      name: WiFi DNS Addresses
+      name: "WiFi DNS Addresses"
       entity_category: diagnostic
 
 
