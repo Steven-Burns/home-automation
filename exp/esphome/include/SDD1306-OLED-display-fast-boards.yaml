@@ -63,9 +63,9 @@ display:
           // blinky routine as an array of connected points.
           static const int NUM_BLINKIES = 3;
           static const int MIN_X = 0;
-          static const int MAX_X = 64;
+          static const int MAX_X = 63;
           static const int MIN_Y = 64 - 16;
-          static const int MAX_Y = 64;
+          static const int MAX_Y = 63;
           static int blinky_x[] = {0, 30, 10, 75};
           static int blinky_y[] = {0, 5, 127, 30};
           static int blinky_dx[] = {1, 1, -2, -3};

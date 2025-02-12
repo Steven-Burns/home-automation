@@ -12,16 +12,21 @@ sensor:
       device_class: "temperature"
       state_class: "measurement"
       oversampling: 2x
+      accuracy_decimals: 1
       filters:
           # the offset appears to be applied once per sampling, so since we're 2x oversampling, 
           # we halve the offset (which was determined by comparison to a reference thermometer).
         - offset: 0.0 
+        - delta: 0.1
     pressure:
       name: "Air Pressure"
       oversampling: 16x
       device_class: atmospheric_pressure
       state_class: "measurement"
       icon: mdi:gauge
+      accuracy_decimals: 2
+      filters:
+        delta: 0.01
   - platform: aht10
     address: 0x38
     variant: aht20
@@ -32,7 +37,8 @@ sensor:
       device_class: "temperature"
       state_class: "measurement"
       accuracy_decimals: 1
-      # filters:
+      filters:
+        delta: 0.1
       # - filter_out: 0.0
       # - median:
       #     window_size: 3
@@ -43,7 +49,8 @@ sensor:
       id: humidity_id
       state_class: "measurement"
       accuracy_decimals: 1
-      # filters:
+      filters:
+        delta: 0.1
       # - filter_out: 0.0
       # - median:
       #     window_size: 3

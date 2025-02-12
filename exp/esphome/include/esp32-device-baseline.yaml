@@ -84,6 +84,8 @@ button:
     name: "Safely Restart Device"
     entity_category: diagnostic
 
+psram:
+
 sensor:
   - platform: template
     id: sys_esp_temperature_id
@@ -94,6 +96,8 @@ sensor:
     state_class: measurement
     update_interval: 60s
     entity_category: "diagnostic"
+    filters:
+      delta: 1.0
   - platform: uptime
     name: Uptime (approx)
     id: sys_uptime_id
@@ -126,9 +130,12 @@ sensor:
     psram:
       name: "PSRAM Free"
       entity_category: "diagnostic"
+      unit_of_measurement: bytes
       state_class: measurement
       device_class: data_size
       internal: true
+      filters:
+        delta: 100
   - platform: template
     id: sys_esp_cpu_freq_id
     name: "CPU Speed"
