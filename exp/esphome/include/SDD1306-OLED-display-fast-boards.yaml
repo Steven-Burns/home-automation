@@ -123,7 +123,7 @@ display:
           float hum = 0.0;
           hum = id(humidity_id)->state;
           it.printf(width, (height - 16) / 2, med_font, TextAlign::BASELINE_RIGHT, "%2.1f  ", hum);
-          it.printf(width, 0, tiny_font, TextAlign::TOP_RIGHT, "%%");
+          it.printf(width, 5, tiny_font, TextAlign::TOP_RIGHT, "%%");
 
           float lux = 0.0;
           lux = id(illuminance_id)->state;
