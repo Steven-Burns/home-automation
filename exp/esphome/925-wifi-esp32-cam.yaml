@@ -9,38 +9,38 @@ packages:
   wifi: !include  
     file: include/wifi.yaml
 
-api:
-  services:  # change camera parameters on-the-fly
-  - service: camera_set_param
-    variables:
-      name: string
-      value: int
-    then:
-      - lambda: |-
-          bool state_return = false;
-          if (("contrast" == name) && (value >= -2) && (value <= 2)) { id(espcam).set_contrast(value); state_return = true; }
-          if (("brightness" == name) && (value >= -2) && (value <= 2)) { id(espcam).set_brightness(value); state_return = true; }
-          if (("saturation" == name) && (value >= -2) && (value <= 2)) { id(espcam).set_saturation(value); state_return = true; }
-          if (("special_effect" == name) && (value >= 0U) && (value <= 6U)) { id(espcam).set_special_effect((esphome::esp32_camera::ESP32SpecialEffect)value); state_return = true; }
-          if (("aec_mode" == name) && (value >= 0U) && (value <= 1U)) { id(espcam).set_aec_mode((esphome::esp32_camera::ESP32GainControlMode)value); state_return = true; }
-          if (("aec2" == name) && (value >= 0U) && (value <= 1U)) { id(espcam).set_aec2(value); state_return = true; }
-          if (("ae_level" == name) && (value >= -2) && (value <= 2)) { id(espcam).set_ae_level(value); state_return = true; }
-          if (("aec_value" == name) && (value >= 0U) && (value <= 1200U)) { id(espcam).set_aec_value(value); state_return = true; }
-          if (("agc_mode" == name) && (value >= 0U) && (value <= 1U)) { id(espcam).set_agc_mode((esphome::esp32_camera::ESP32GainControlMode)value); state_return = true; }
-          if (("agc_value" == name) && (value >= 0U) && (value <= 30U)) { id(espcam).set_agc_value(value); state_return = true; }
-          if (("agc_gain_ceiling" == name) && (value >= 0U) && (value <= 6U)) { id(espcam).set_agc_gain_ceiling((esphome::esp32_camera::ESP32AgcGainCeiling)value); state_return = true; }
-          if (("wb_mode" == name) && (value >= 0U) && (value <= 4U)) { id(espcam).set_wb_mode((esphome::esp32_camera::ESP32WhiteBalanceMode)value); state_return = true; }
-          if (("test_pattern" == name) && (value >= 0U) && (value <= 1U)) { id(espcam).set_test_pattern(value); state_return = true; }
-          if (true == state_return) {
-            id(espcam).update_camera_parameters();
-          }
-          else {
-            ESP_LOGW("esp32_camera_set_param", "Error in name or data range");
-          }
+# api:
+#   services:  # change camera parameters on-the-fly
+#   - service: camera_set_param
+#     variables:
+#       name: string
+#       value: int
+#     then:
+#       - lambda: |-
+#           bool state_return = false;
+#           if (("contrast" == name) && (value >= -2) && (value <= 2)) { id(espcam).set_contrast(value); state_return = true; }
+#           if (("brightness" == name) && (value >= -2) && (value <= 2)) { id(espcam).set_brightness(value); state_return = true; }
+#           if (("saturation" == name) && (value >= -2) && (value <= 2)) { id(espcam).set_saturation(value); state_return = true; }
+#           if (("special_effect" == name) && (value >= 0U) && (value <= 6U)) { id(espcam).set_special_effect((esphome::esp32_camera::ESP32SpecialEffect)value); state_return = true; }
+#           if (("aec_mode" == name) && (value >= 0U) && (value <= 1U)) { id(espcam).set_aec_mode((esphome::esp32_camera::ESP32GainControlMode)value); state_return = true; }
+#           if (("aec2" == name) && (value >= 0U) && (value <= 1U)) { id(espcam).set_aec2(value); state_return = true; }
+#           if (("ae_level" == name) && (value >= -2) && (value <= 2)) { id(espcam).set_ae_level(value); state_return = true; }
+#           if (("aec_value" == name) && (value >= 0U) && (value <= 1200U)) { id(espcam).set_aec_value(value); state_return = true; }
+#           if (("agc_mode" == name) && (value >= 0U) && (value <= 1U)) { id(espcam).set_agc_mode((esphome::esp32_camera::ESP32GainControlMode)value); state_return = true; }
+#           if (("agc_value" == name) && (value >= 0U) && (value <= 30U)) { id(espcam).set_agc_value(value); state_return = true; }
+#           if (("agc_gain_ceiling" == name) && (value >= 0U) && (value <= 6U)) { id(espcam).set_agc_gain_ceiling((esphome::esp32_camera::ESP32AgcGainCeiling)value); state_return = true; }
+#           if (("wb_mode" == name) && (value >= 0U) && (value <= 4U)) { id(espcam).set_wb_mode((esphome::esp32_camera::ESP32WhiteBalanceMode)value); state_return = true; }
+#           if (("test_pattern" == name) && (value >= 0U) && (value <= 1U)) { id(espcam).set_test_pattern(value); state_return = true; }
+#           if (true == state_return) {
+#             id(espcam).update_camera_parameters();
+#           }
+#           else {
+#             ESP_LOGW("esp32_camera_set_param", "Error in name or data range");
+#           }
 
 esp32_camera: 
-  id: espcam 
-  name: esp-cam 
+  id: espcam_id 
+  name: ESP32-Cam 
   external_clock: 
     pin: GPIO0 
     frequency: 10MHz 
@@ -53,9 +53,9 @@ esp32_camera:
   pixel_clock_pin: GPIO22 
   power_down_pin: GPIO32 
   resolution: 800x600 
-  jpeg_quality: 10  # max. 63 
-  max_framerate: 1.0fps 
-  idle_framerate: 0.2fps 
+  jpeg_quality: 30  # 10 (best) to 63 (worst) 
+  max_framerate: 6.0fps 
+  idle_framerate: 0.1fps 
   vertical_flip: true 
   horizontal_mirror: false 
   brightness: 2 # -2 to 2 
@@ -72,23 +72,43 @@ esp32_camera:
   agc_value: 0 
   # white balance setting 
   wb_mode: auto 
+
+# experimentally determined with board 925, debug logging on, monitored thru web 
+# (point being tuning that might help)
+# res     jpeg    max framerate
+# 800x600 10      4
+# 800x600 20      4 
+# 800x600 30      6
+# 800x600 63      6 
+# 640x480 63      6
+# 320x240 63      12
+# 160x120 63      12
+
 output: 
-# white LED 
+# the bright white on-board LED 
   - platform: ledc 
     channel: 2 
     pin: GPIO4 
-    id: espCamLED 
+    id: esp32_cam_flash_led_id 
+
 light: 
   - platform: monochromatic 
-    output: espCamLED 
-    name: esp-cam light 
+    output: esp32_cam_flash_led_id 
+    name: Camera Flash Light 
 
+
+
+esp32_camera_web_server:
+  - port: 8080
+    mode: stream
+  - port: 8081
+    mode: snapshot  
 
 # "All Device" baseline stuff here
 
 <<: !include 
   file: include/esp32-device-baseline.yaml
   vars:
-    device_hostname: "925-esphome"
-    device_comment: "Baseline for board."
+    device_hostname: "925-esp32-cam"
+    device_comment: "Board 925 camera with WiFi."
 
