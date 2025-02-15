@@ -1,3 +1,6 @@
+substitutions:
+  temperature_offset: "0.0"
+  
 sensor:
     # https://community.home-assistant.io/t/aht20-bmp280-combined-sensor/366411
   - platform: bmp280_i2c
@@ -16,7 +19,7 @@ sensor:
       filters:
           # the offset appears to be applied once per sampling, so since we're 2x oversampling, 
           # we halve the offset (which was determined by comparison to a reference thermometer).
-        - offset: 0.0 
+        - offset: ${temperature_offset} 
         - delta: 0.1
     pressure:
       name: "Air Pressure"
