@@ -27,10 +27,10 @@ packages:
       i2c_freq: "420kHz"
   temp_humidity: !include
     file: include/BMP280-AHT20-temp-humidity.yaml
+    vars: 
+      temperature_offset: "-4.5"
   relay: !include
-    file: include/single-relay.yaml
-    vars:
-      relay_0_pin: "GPIO27"
+    file: include/single-flarp-relay.yaml
   display: !include
     file: include/SDD1306-OLED-display-fast-boards.yaml
   wifi: !include
@@ -63,5 +63,5 @@ binary_sensor:
 <<: !include 
   file: include/esp32-device-baseline.yaml
   vars:
-    device_hostname: "930-retro"
+    device_hostname: "layton-hallway-west"
     device_comment: "Retrofit sensor unit on board 930."
