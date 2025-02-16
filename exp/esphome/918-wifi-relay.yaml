@@ -1,5 +1,10 @@
 esp8266:
   board: esp01_1m
+# https://esphome.io/components/esp8266 "early_pin_init (Optional, boolean): Specifies
+# whether pins should be initialised as early as possible to known values. Recommended 
+# value is false where switches are involved, as these will toggle when updating the 
+# firmware or when restarting the device"
+  early_pin_init: false
 
 packages:
   blinky: !include
@@ -13,6 +18,7 @@ switch:
   - platform: gpio
     name: "Relay 0"
     id: relay_0_id
+    restore_mode: ALWAYS_OFF
     pin: 
       number: GPIO0
       inverted: true
