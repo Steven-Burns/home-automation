@@ -108,7 +108,7 @@ sensor:
     free:
       name: "Heap Free"
       entity_category: "diagnostic"
-      unit_of_measurement: bytes
+      unit_of_measurement: B
       state_class: measurement
       device_class: data_size
       internal: true
@@ -117,7 +117,7 @@ sensor:
     block:
       name: "Heap Max Block"
       entity_category: "diagnostic"
-      unit_of_measurement: bytes
+      unit_of_measurement: B
       device_class: data_size
       internal: true
       filters:
@@ -130,7 +130,7 @@ sensor:
     psram:
       name: "PSRAM Free"
       entity_category: "diagnostic"
-      unit_of_measurement: bytes
+      unit_of_measurement: B
       state_class: measurement
       device_class: data_size
       internal: true
