@@ -28,7 +28,7 @@ packages:
   temp_humidity: !include
     file: include/BMP280-AHT20-temp-humidity.yaml
     vars: 
-      temperature_offset: "-4.5"
+      temperature_offset: "-7.77"
   relay: !include
     file: include/single-relay.yaml
     vars:

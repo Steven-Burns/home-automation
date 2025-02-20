@@ -17,9 +17,8 @@ sensor:
       oversampling: 2x
       accuracy_decimals: 1
       filters:
-          # the offset appears to be applied once per sampling, so since we're 2x oversampling, 
-          # we halve the offset (which was determined by comparison to a reference thermometer).
-        - offset: ${temperature_offset} 
+          # the offset should be specified in deg centigrade. 
+        - offset:  ${temperature_offset} 
         - delta: 0.1
     pressure:
       name: "Air Pressure"
