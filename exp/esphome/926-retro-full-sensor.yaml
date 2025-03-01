@@ -22,6 +22,7 @@ packages:
     file: include/i2c.yaml
     vars:
       # datasheet says 21 and 22 are I2C0
+      #
       i2c_sda_pin: "GPIO21"
       i2c_scl_pin: "GPIO22"
       i2c_freq: "420kHz"
@@ -29,15 +30,14 @@ packages:
     file: include/BMP280-AHT20-temp-humidity.yaml
     vars: 
       temperature_offset: "-7.77"
-  relay: !include
-    file: include/single-relay.yaml
-    vars:
-      relay_0_pin: "GPIO27"
   display: !include
     file: include/SDD1306-OLED-display-fast-boards.yaml
   wifi: !include
     file: include/wifi.yaml
-
+  relay: !include
+      file: include/single-relay.yaml
+      vars:
+        relay_0_pin: "GPIO27"
 
 
 
