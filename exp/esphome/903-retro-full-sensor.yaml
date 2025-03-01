@@ -6,70 +6,105 @@ packages:
     file: include/interval-blinky.yaml
     vars:
       builtin_led_pin: "GPIO2"
-  wifi: !include
-    file: include/wifi.yaml
   illuminance: !include
-    file: include/TEMT6000-illuminance.yaml
+    file: include/photoresistor-illuminance.yaml
     vars:
-      illuminance_pin: "GPIO36"
+      illuminance_pin: "GPIO39"
   radar_motion: !include
     file: include/HLK-LD2410-radar-motion.yaml
     vars:
       # GPIO1 and 3 are labeled as UART0, but that conflicts with logging
-      # so let's try 17 and 16
+      # 9 andd 10 are labeled as UART1, but that results in a warning that 
+      # those pins might be hooked to flash.  So let's try 17 and 16
       uart_2_tx_pin: "GPIO17"
       uart_2_rx_pin: "GPIO16"
   i2c: !include
     file: include/i2c.yaml
     vars:
-      i2c_sda_pin: "GPIO33"
-      i2c_scl_pin: "GPIO25"
+      # the pinouts for this board say nothing about I2C,
+      # but other boards with the same MCU chip use 21 and 22
+      i2c_sda_pin: "GPIO21"
+      i2c_scl_pin: "GPIO22"
       i2c_freq: "420kHz"
   temp_humidity: !include
     file: include/BMP280-AHT20-temp-humidity.yaml
-  relay: !include
-    file: include/single-relay.yaml
-    vars:
-      relay_0_pin: "GPIO27"
+    vars: 
+      temperature_offset: "-5.50"    
   display: !include
     file: include/SDD1306-OLED-display-fast-boards.yaml
+  wifi: !include
+    file: include/wifi.yaml
+  relay: !include
+    file: include/single-flarp-relay.yaml
+
+
+
+
+
+
+
+
+
+select:
+  - platform: template
+    id: lighting_selector_id
+    name: "Lighting Scene Selector"
+    optimistic: true
+    options:
+      - "ActivateToggle"
+      - "ActivateScene01"
+      - "ActivateScene02"
+      - "ActivateScene03"
+      - "ActivateScene04"
+      - "ActivateScene05"
+      - "ActivateScene06"
+      - "ActivateScene07"
+      - "ActivateScene08"
+      - "ActivateScene09"
+      - "ActivateLastScene"
+    initial_option: "ActivateScene01"
+    # set_action:
+    #   - logger.log:
+    #       format: "Chosen option: %s"
+    #       args: ["x.c_str()"]    
+
+    # If you don’t set a lambda and optimistic is false (default), updates to the select component state will need to be taken care of as part of your set_action using id(my_select).publish_state(x); (in a lambda). Do not use select.set Action here, as this would generate a loop. Also, don’t use id(my_select).state = x as this won’t have the desired effect (e.g. HA won’t update with the change).
+    # publish_state?  I wonder if that can be used to force a state update even when the value is unchanged.
 
 binary_sensor:
   - platform: gpio
-    name: "Relay Toggle Button"
+    name: "Lighting Button"
     id: button_0_id
     pin:
       number: GPIO15
       mode:
         input: true
         pulldown: true
-    on_click:
-      min_length: 10ms
-      max_length: 1500ms
+    on_multi_click:
+    - timing:
+        - ON for at most 0.75s
+        - OFF for at least 0.1s
       then:
+        - logger.log: "Single Short Click"
         - switch.toggle: relay_0_id
-
-sensor:
-  - platform: sht3xd
-    temperature:
-      name: "Air Temperature (SHT3X)"
-      device_class: "temperature"
-      state_class: "measurement"
-    humidity:
-      name: "Humidity (SHT3X)"
-      state_class: "measurement"
-      accuracy_decimals: 1
-    address: 0x44
-    update_interval: 60s
-  - platform: adc
-    pin: GPIO39
-    name: "Photoresistor 0"
-    id: illuminance_1_id
-    attenuation: auto
-    update_interval: 60s
-    filters:
-      - multiply: 100
-      - delta: 5.0
+        - select.first: lighting_selector_id
+    - timing:
+        - ON for at most 0.75s
+        - OFF for at least 0.1s
+        - ON for at most 0.75s
+        - OFF for at least 0.1s
+      then:
+        - logger.log: "Double Click"
+        - select.next:
+            id: lighting_selector_id
+            cycle: true
+    - timing:
+        - ON for 1.0s to 3s
+        - OFF for at least 0.1s
+      then:
+        - logger.log: "Single Long Click"
+        - select.last: lighting_selector_id
+      invalid_cooldown: 1s
 
 
 # "All Device" baseline stuff here
