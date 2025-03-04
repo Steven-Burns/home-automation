@@ -27,11 +27,14 @@ logger:
 
 # Enable Home Assistant API
 api:
-  password: ""
+  password: !secret api_password
   # reboot_timeout set to 0s will keep the board running even when networking (connection to the home asst api)
   # is lost, even if lost forever. 
   # reboot_timeout: 0s
+  # encryption:
+  #   key: !secret api_password
 
+# Enable over-the-air flashing
 ota:
   - platform: esphome
     password: !secret ota_password
