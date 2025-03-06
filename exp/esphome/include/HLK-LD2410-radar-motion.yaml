@@ -6,7 +6,7 @@ uart:
   rx_pin: ${uart_2_rx_pin}
   # the LD2410 app says that 256000 is the factory default. Some sources of 
   # this module have changed that.
-  baud_rate: 57600 
+  baud_rate: 256000 
   parity: NONE
   stop_bits: 1
 
