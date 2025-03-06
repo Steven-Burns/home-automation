@@ -1,0 +1,90 @@
+esp32:
+  board: nodemcu-32s
+
+# found unofficial LD2410S support from here: 
+# https://community.home-assistant.io/t/esphome-how-to-use-the-hlk-ld2410s/736597/14
+external_components:
+  source:
+    type: git
+    url: https://github.com/MrUndead1996/ld2410s-esphome/
+    ref: main
+
+packages:
+  radar_motion: !include
+    file: include/HLK-LD2410S-radar-motion.yaml
+    vars:
+      # GPIO1 and 3 are labeled as UART0, but that conflicts with logging
+      # so let's try 17 and 16
+      uart_2_tx_pin: "GPIO17"
+      uart_2_rx_pin: "GPIO16"
+  wifi: !include
+    file: include/wifi.yaml
+
+
+
+
+
+
+  
+
+# binary_sensor:
+#   - platform: ld2410s
+#     has_target:
+#       name: Presence
+#     has_threshold_update:
+#       name: Threshold update running
+
+# sensor:
+#   - platform: ld2410s
+#     target_distance:
+#       name : Target Distance
+#     threshold_update: 
+#       name: Threshold update progress
+
+# number:
+#   - platform: ld2410s
+#     max_distance:
+#       name: Max detect distance
+#     min_distance:
+#       name: Min detect distance
+#     no_delay:
+#       name: No detect report delay
+#     status_reporting_frequency:
+#       name: Status reporting frequency
+#     distance_reporting_frequency:
+#       name: Distance reporting frequency
+
+# button:
+#   # - platform: template
+#   #   name: Enter sleep mode
+#   #   entity_category: CONFIG
+#   #   on_press:
+#   #     - deep_sleep.enter: {}
+#   - platform: ld2410s
+#     enable_config:
+#       name: Enable config mode
+#     disable_config:
+#       name: Disable config mode
+#     apply_config:
+#       name: Apply config changes
+#     auto_threshold:
+#       name: Start auto threshold update
+
+# select:
+#   - platform: ld2410s
+#     response_speed:
+#       name: Response speed
+
+# text_sensor:
+#   - platform: ld2410s
+#     fw_version:
+#       name: Firmware version
+
+
+
+# "All Device" baseline stuff
+<<: !include 
+  file: include/esp32-device-baseline.yaml
+  vars:
+    device_hostname: "904-esphome"
+    device_comment: "Radar-only sensor unit on board 904."
