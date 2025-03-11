@@ -70,5 +70,5 @@ binary_sensor:
 <<: !include 
   file: include/esp32-device-baseline.yaml
   vars:
-    device_hostname: "layton-hallway-east"
+    device_hostname: "923-esphome"
     device_comment: "Retrofit sensor unit on board 923."
