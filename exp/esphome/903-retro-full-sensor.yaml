@@ -84,13 +84,6 @@ binary_sensor:
     - timing:
         - ON for at most 0.75s
         - OFF for at least 0.1s
-      then:
-        - logger.log: "Single Short Click"
-        - switch.toggle: relay_0_id
-        - select.first: lighting_selector_id
-    - timing:
-        - ON for at most 0.75s
-        - OFF for at least 0.1s
         - ON for at most 0.75s
         - OFF for at least 0.1s
       then:
@@ -99,10 +92,17 @@ binary_sensor:
             id: lighting_selector_id
             cycle: true
     - timing:
-        - ON for 1.0s to 3s
+        - ON for at most 0.75s
         - OFF for at least 0.1s
       then:
-        - logger.log: "Single Long Click"
+        - logger.log: "Single Click"
+        - switch.toggle: relay_0_id
+        - select.first: lighting_selector_id
+    - timing:
+        - ON for 1.5s to 3s
+        - OFF for at least 0.1s
+      then:
+        - logger.log: "Long Click"
         - select.last: lighting_selector_id
       invalid_cooldown: 1s
 
