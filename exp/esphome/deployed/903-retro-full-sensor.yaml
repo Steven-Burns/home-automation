@@ -83,28 +83,33 @@ binary_sensor:
     on_multi_click:
     - timing:
         - ON for at most 0.75s
-        - OFF for at least 0.1s
+        - OFF for at most 0.3s
         - ON for at most 0.75s
         - OFF for at least 0.1s
       then:
-        - logger.log: "Double Click"
+        - logger.log: "Double Clicked"
         - select.next:
             id: lighting_selector_id
             cycle: true
     - timing:
-        - ON for at most 0.75s
+        - ON for 0.75s to 3s
         - OFF for at least 0.1s
       then:
-        - logger.log: "Single Click"
+        - logger.log: "Single Long Clicked"
+        - select.last: lighting_selector_id
+    - timing:
+        - ON for at most 1s
+        - OFF for at least 0.2s
+      then:
+        - logger.log: "Single Short Clicked"
         - switch.toggle: relay_0_id
         - select.first: lighting_selector_id
-    - timing:
-        - ON for 1.5s to 3s
-        - OFF for at least 0.1s
-      then:
-        - logger.log: "Long Click"
-        - select.last: lighting_selector_id
-      invalid_cooldown: 1s
+      invalid_cooldown: 0.5s
+
+
+
+
+
 
 
 # "All Device" baseline stuff here
@@ -112,5 +117,5 @@ binary_sensor:
 <<: !include 
   file: include/esp32-device-baseline.yaml
   vars:
-    device_hostname: "903-esphome"
+    device_hostname: "m-dng-01da50_903"
     device_comment: "Retrofit sensor unit on board 903."
