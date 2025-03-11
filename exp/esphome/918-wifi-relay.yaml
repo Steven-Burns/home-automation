@@ -4,6 +4,8 @@ esp8266:
 # whether pins should be initialised as early as possible to known values. Recommended 
 # value is false where switches are involved, as these will toggle when updating the 
 # firmware or when restarting the device"
+# setting this to false seems to prevent the gadget from triggering the relay on boot.
+# that's good: we don't want the garage door to open/close on boot.
   early_pin_init: false
 
 packages:
@@ -24,6 +26,15 @@ switch:
       inverted: true
       mode:
         output: true
+    on_turn_on:
+      # the action here is to "pulse" the switch -- turn it off 
+      # after it has been turned on.
+      lambda: |-
+        delay(50);
+        auto r = id(relay_0_id);
+        r->turn_off();
+        r->publish_state(false);
+
 
 
 
@@ -32,7 +43,7 @@ switch:
 <<: !include 
   file: include/esp8266-device-baseline.yaml
   vars:
-    device_hostname: "918-esphome"
+    device_hostname: "workshop-opener"
     device_comment: "Board 918 esp8266 ESP-01S with relay."
 
 
