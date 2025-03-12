@@ -10,11 +10,11 @@ esp8266:
 
 packages:
   blinky: !include
-    file: include/interval-blinky.yaml
+    file: ../include/interval-blinky.yaml
     vars:
       builtin_led_pin: "GPIO2"
   wifi: !include
-    file: include/wifi.yaml
+    file: ../include/wifi.yaml
 
 switch:
   - platform: gpio
@@ -41,9 +41,9 @@ switch:
 # "All Device" baseline stuff here
 
 <<: !include 
-  file: include/esp8266-device-baseline.yaml
+  file: ../include/esp8266-device-baseline.yaml
   vars:
-    device_hostname: "workshop-opener"
+    device_hostname: "m-wrk-opener_5e28db_918"
     device_comment: "Board 918 esp8266 ESP-01S with relay."
 
 

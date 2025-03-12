@@ -3,15 +3,15 @@ esp32:
 
 packages:
   blinky: !include
-    file: include/interval-blinky.yaml
+    file: ../include/interval-blinky.yaml
     vars:
       builtin_led_pin: "GPIO2"
   illuminance: !include
-    file: include/photoresistor-illuminance.yaml
+    file: ../include/photoresistor-illuminance.yaml
     vars:
       illuminance_pin: "GPIO39"
   radar_motion: !include
-    file: include/HLK-LD2410-radar-motion.yaml
+    file: ../include/HLK-LD2410-radar-motion.yaml
     vars:
       # GPIO1 and 3 are labeled as UART0, but that conflicts with logging
       # 9 andd 10 are labeled as UART1, but that results in a warning that 
@@ -19,7 +19,7 @@ packages:
       uart_2_tx_pin: "GPIO17" 
       uart_2_rx_pin: "GPIO16" 
   i2c: !include
-    file: include/i2c.yaml
+    file: ../include/i2c.yaml
     vars:
       # datasheet says 21 and 22 are I2C0
       #
@@ -27,15 +27,15 @@ packages:
       i2c_scl_pin: "GPIO22"
       i2c_freq: "420kHz"
   temp_humidity: !include
-    file: include/BMP280-AHT20-temp-humidity.yaml
+    file: ../include/BMP280-AHT20-temp-humidity.yaml
     vars: 
       temperature_offset: "-5.25"
   display: !include
-    file: include/SDD1306-OLED-display-fast-boards.yaml
+    file: ../include/SDD1306-OLED-display-fast-boards.yaml
   wifi: !include
-    file: include/wifi.yaml
+    file: ../include/wifi.yaml
   relay: !include
-    file: include/single-flarp-relay.yaml
+    file: ../include/single-flarp-relay.yaml
 
 
 
@@ -63,7 +63,7 @@ binary_sensor:
 # "All Device" baseline stuff here
 
 <<: !include 
-  file: include/esp32-device-baseline.yaml
+  file: ../include/esp32-device-baseline.yaml
   vars:
-    device_hostname: "layton-hallway-west"
+    device_hostname: "m-hal-w_f1b1a8_930"
     device_comment: "Retrofit sensor unit on board 930."

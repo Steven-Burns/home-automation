@@ -4,11 +4,11 @@ esp32:
 
 packages:
   blinky: !include
-    file: include/interval-blinky.yaml
+    file: ../include/interval-blinky.yaml
     vars:
       builtin_led_pin: "GPIO2"
   wifi: !include  
-    file: include/wifi.yaml
+    file: ../include/wifi.yaml
 
 switch:
   - platform: gpio
@@ -24,8 +24,8 @@ switch:
 # "All Device" baseline stuff here
 
 <<: !include 
-  file: include/esp32-device-baseline.yaml
+  file: ../include/esp32-device-baseline.yaml
   vars:
-    device_hostname: "906-a-b-stereo-switch"
+    device_hostname: "m-liv-a-b-switch_aa91d4_906"
     device_comment: "A-B selector for stereo speaker input."
 

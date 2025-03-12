@@ -3,18 +3,21 @@ esp8266:
 
 packages:
   wifi: !include
-    file: include/wifi.yaml
+    file: ../include/wifi.yaml
+    filex: ${device_name}
+
   relay: !include 
-    file: include/single-relay.yaml
+    file: ../include/single-relay.yaml
     vars: 
       relay_0_pin: "GPIO2"
 
-# "All Device" baseline stuff here
+# # "All Device" baseline stuff here
 
 <<: !include 
-  file: include/esp8266-device-baseline.yaml
+  file: ../include/esp8266-device-baseline.yaml
   vars:
-    device_hostname: "805-esphome-lava-lamp"
+    device_hostname: "m-gym-lmp_1_0ed71c_805"
     device_comment: "esp8266 ESP-01 with relay built into lava lamp cord."
+    area: "Gym"
 
 
