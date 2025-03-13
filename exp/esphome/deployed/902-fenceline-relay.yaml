@@ -32,7 +32,7 @@ binary_sensor:
 <<: !include 
   file: ../include/esp32-device-baseline.yaml
   vars:
-    device_hostname: "m-pat-fence_aaeed4_902"
+    device_hostname: "m-pat-fence-aaeed4-902"
     device_friendly_name: "Fenceline Lights"
     device_comment: "Single relay with override button. Installed at outdoor kitchen to control fenceline lights."
 

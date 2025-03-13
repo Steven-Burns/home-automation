@@ -16,7 +16,7 @@ packages:
 <<: !include 
   file: ../include/esp8266-device-baseline.yaml
   vars:
-    device_hostname: "m-gym-lmp_1_0ed71c_805"
+    device_hostname: "m-gym-lmp-1-0ed71c-805"
     device_friendly_name: "Lava Lamp"
     device_comment: "esp8266 ESP-01 with relay built into lava lamp cord."
     area: "Gym"

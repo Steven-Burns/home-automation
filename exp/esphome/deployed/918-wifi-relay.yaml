@@ -28,13 +28,9 @@ switch:
         output: true
     on_turn_on:
       # the action here is to "pulse" the switch -- turn it off 
-      # after it has been turned on.
-      lambda: |-
-        delay(50);
-        auto r = id(relay_0_id);
-        r->turn_off();
-        r->publish_state(false);
-
+      # after it has been turned on for 250ms.
+      - delay: 250ms
+      - switch.turn_off: relay_0_id
 
 
 
@@ -43,7 +39,7 @@ switch:
 <<: !include 
   file: ../include/esp8266-device-baseline.yaml
   vars:
-    device_hostname: "m-wrk-opener_5e28db_918"
+    device_hostname: "m-wrk-opener-5e28db-918"
     device_friendly_name: "Workshop Garage Door Opener"
     device_comment: "Board 918 esp8266 ESP-01S with relay."
 

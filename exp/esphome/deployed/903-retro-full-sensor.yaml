@@ -117,6 +117,6 @@ binary_sensor:
 <<: !include 
   file: ../include/esp32-device-baseline.yaml
   vars:
-    device_hostname: "m-dng-01da50_903"
+    device_hostname: "m-dng-01da50-903"
     device_comment: "Retrofit sensor unit on board 903."
     device_friendly_name: "Dining Room Sensor Unit"
