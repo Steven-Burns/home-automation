@@ -119,3 +119,4 @@ binary_sensor:
   vars:
     device_hostname: "m-dng-01da50_903"
     device_comment: "Retrofit sensor unit on board 903."
+    device_friendly_name: "Dining Room Sensor Unit"

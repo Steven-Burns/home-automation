@@ -44,6 +44,7 @@ switch:
   file: ../include/esp8266-device-baseline.yaml
   vars:
     device_hostname: "m-wrk-opener_5e28db_918"
+    device_friendly_name: "Workshop Garage Door Opener"
     device_comment: "Board 918 esp8266 ESP-01S with relay."
 
 

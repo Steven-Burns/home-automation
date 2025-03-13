@@ -3,7 +3,7 @@ substitutions:
 
 esphome:
   name: ${device_hostname}
-  friendly_name: ${device_hostname} 
+  friendly_name: ${device_friendly_name} 
   comment: ${device_comment}
   name_add_mac_suffix: false
   project:

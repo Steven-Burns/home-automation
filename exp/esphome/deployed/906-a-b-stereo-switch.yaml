@@ -27,5 +27,6 @@ switch:
   file: ../include/esp32-device-baseline.yaml
   vars:
     device_hostname: "m-liv-a-b-switch_aa91d4_906"
+    device_friendly_name: "Living Room Amp A-B switch"
     device_comment: "A-B selector for stereo speaker input."
 
