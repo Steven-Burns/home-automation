@@ -4,6 +4,10 @@ esp32:
 packages:
   wifi: !include
     file: ./../include/wifi.yaml
+  blinky: !include
+    file: ./../include/interval-blinky.yaml
+    vars:
+      builtin_led_pin: "GPIO2"
 
 binary_sensor:
   - platform: gpio
@@ -14,7 +18,7 @@ binary_sensor:
       number: GPIO4
       mode:
         input: true
-        pulldown: true
+        pulldown: false
 
 # "All Device" baseline stuff here
 
