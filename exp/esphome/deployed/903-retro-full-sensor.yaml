@@ -36,81 +36,19 @@ packages:
     file: ../include/wifi.yaml
   relay: !include
     file: ../include/single-flarp-relay.yaml
-
-
-
-
-
-
-
-
-
-select:
-  - platform: template
-    id: lighting_selector_id
-    name: "Lighting Scene Selector"
-    optimistic: true
-    options:
-      - "ActivateToggle"
-      - "ActivateScene01"
-      - "ActivateScene02"
-      - "ActivateScene03"
-      - "ActivateScene04"
-      - "ActivateScene05"
-      - "ActivateScene06"
-      - "ActivateScene07"
-      - "ActivateScene08"
-      - "ActivateScene09"
-      - "ActivateLastScene"
-    initial_option: "ActivateScene01"
-    # set_action:
-    #   - logger.log:
-    #       format: "Chosen option: %s"
-    #       args: ["x.c_str()"]    
-
-    # If you don’t set a lambda and optimistic is false (default), updates to the select component state will need to be taken care of as part of your set_action using id(my_select).publish_state(x); (in a lambda). Do not use select.set Action here, as this would generate a loop. Also, don’t use id(my_select).state = x as this won’t have the desired effect (e.g. HA won’t update with the change).
-    # publish_state?  I wonder if that can be used to force a state update even when the value is unchanged.
-
-binary_sensor:
-  - platform: gpio
-    name: "Lighting Button"
-    id: button_0_id
-    pin:
-      number: GPIO15
-      mode:
-        input: true
-        pulldown: true
-    on_multi_click:
-    - timing:
-        - ON for at most 0.75s
-        - OFF for at most 0.3s
-        - ON for at most 0.75s
-        - OFF for at least 0.1s
-      then:
-        - logger.log: "Double Clicked"
-        - select.next:
-            id: lighting_selector_id
-            cycle: true
-    - timing:
-        - ON for 0.75s to 3s
-        - OFF for at least 0.1s
-      then:
-        - logger.log: "Single Long Clicked"
-        - select.last: lighting_selector_id
-    - timing:
-        - ON for at most 1s
-        - OFF for at least 0.2s
-      then:
-        - logger.log: "Single Short Clicked"
-        - switch.toggle: relay_0_id
-        - select.first: lighting_selector_id
-      invalid_cooldown: 0.5s
-
-
-
-
-
-
+  button_selector: !include
+    file: ../include/scene-selector-button.yaml
+    vars:
+      button_pin: "GPIO15"
+      scene00: "dining_all_off"
+      scene01: "dining_1_percent"
+      scene02: "dining_25_percent"
+      scene03: "dinner_party_sitting"
+      scene04: "dining_100_percent"
+      scene05: "dining_tv_mode"
+      scene06: creepy_dining_room
+      scene07: dining_nitelite_mode
+      scene10: bright_dining
 
 # "All Device" baseline stuff here
 
