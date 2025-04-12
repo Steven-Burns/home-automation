@@ -66,5 +66,5 @@ binary_sensor:
   file: ../include/esp32-device-baseline.yaml
   vars:
     device_hostname: "m-hal-w-f1b1a8-930"
-    device_friendly_name: "Gym Hallway East Sensor Unit"
+    device_friendly_name: "Gym Hallway West Sensor Unit"
     device_comment: "Retrofit sensor unit on board 930."
