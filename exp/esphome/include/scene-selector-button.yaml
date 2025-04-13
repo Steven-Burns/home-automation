@@ -50,8 +50,10 @@ select:
 
 # There is an argument to be made that the below is Bad Architecture: that the division of labor should be that the device 
 # simply reports events ("stimuli") and that the server Home Assistant decides how that stimuli should be interpreted.
-# In that latter design, HA would have a list of scenes and the logic to switch between them, the device only says that a click or 
-# long click has been detected. 
+# In that latter design, HA would have a list of scenes, a selector acting as a cursor into that list, and the logic to decide 
+# when to switch between them, the device only says that a click or long click has been detected. 
+# That puts the policy of environmental change only in the server.  This makes for some cool capabilities, such as a server-side 
+# global lock that prevents scene changes during a dinner party by naughty children, for instance.
 
 binary_sensor:
   - platform: gpio
