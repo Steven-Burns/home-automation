@@ -44,6 +44,10 @@ packages:
       scene02: "ActivateScene01"
       scene03: "ActivateScene03"
       scene10: "ActivateMaxBriteScene"
+  tone_player: !include
+    file: ../include/rtttl-player.yaml
+    vars:
+      buzzer_pin: "GPIO13"
 
 
 
