@@ -49,7 +49,19 @@ packages:
     vars:
       buzzer_pin: "GPIO13"
 
-
+text_sensor:
+  - platform: homeassistant
+    name: "RingtoneRTTTL"
+    id: ringtone_input_id
+    internal: true
+    entity_id: input_text.buzzer_ringtone
+    on_value:
+      then:
+        - logger.log:
+            format: "Playing %s"
+            args: ["x.c_str()"]
+        - rtttl.play: !lambda |-
+            return x.c_str();
 
 # "All Device" baseline stuff here
 
