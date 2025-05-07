@@ -1,0 +1,104 @@
+esp32:
+  # board: nodemcu-32s This also works.
+  board: wemos_d1_mini32
+
+packages:
+  blinky: !include
+    file: ./../include/interval-blinky.yaml
+    vars:
+      builtin_led_pin: "GPIO2"
+  wifi: !include  
+    file: ./../include/wifi.yaml
+  i2c: !include
+    file: ./../include/i2c.yaml
+    vars:
+      # datasheet says 21 and 22 are I2C0
+      i2c_sda_pin: "GPIO21"
+      i2c_scl_pin: "GPIO22"
+      i2c_freq: "420kHz"
+
+# https://esphome.io/components/pcf8574.html#pcf8574-i-o-expander
+
+pcf8574:
+  - id: pcf8574_0_id
+    address: 0x20
+    pcf8575: false
+
+binary_sensor:
+  - platform: gpio
+    name: "PCF8574 Pin #0"
+    pin:
+      pcf8574: pcf8574_0_id
+      number: 0
+      inverted: false
+      mode: 
+        input: true
+  - platform: gpio
+    name: "PCF8574 Pin #1"
+    pin:
+      pcf8574: pcf8574_0_id
+      number: 1
+      inverted: false
+      mode:
+        input: true
+  - platform: gpio
+    name: "PCF8574 Pin #2"
+    pin:
+      pcf8574: pcf8574_0_id
+      number: 2
+      inverted: false
+      mode:
+        input: true
+  - platform: gpio
+    name: "PCF8574 Pin #3"
+    pin:
+      pcf8574: pcf8574_0_id
+      number: 3
+      inverted: false
+      mode: 
+        input: true
+  - platform: gpio
+    name: "PCF8574 Pin #4"
+    pin:
+      pcf8574: pcf8574_0_id
+      number: 4
+      inverted: false
+      mode:
+        input: true
+  - platform: gpio
+    name: "PCF8574 Pin #5"
+    pin:
+      pcf8574: pcf8574_0_id
+      number: 5
+      inverted: false
+      mode:
+        input: true
+  - platform: gpio
+    name: "PCF8574 Pin #6"
+    pin:
+      pcf8574: pcf8574_0_id
+      number: 6
+      inverted: false
+      mode:
+        input: true
+  - platform: gpio
+    name: "PCF8574 Pin #7"
+    pin:
+      pcf8574: pcf8574_0_id
+      number: 7
+      inverted: false
+      mode:
+        input: true
+      
+        
+# https://esphome.io/components/mcp230xx.html#mcp230xx-i-o-expander
+
+# "All Device" baseline stuff here
+
+<<: !include 
+  file: ./../include/esp32-device-baseline.yaml
+  vars:
+    device_hostname: "923-esphome"
+    device_friendly_name: "923-esphome"
+    device_comment: "PCF 8574 experiment"
+
