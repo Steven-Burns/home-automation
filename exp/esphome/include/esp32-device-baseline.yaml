@@ -88,8 +88,6 @@ button:
     name: "Safely Restart Device"
     entity_category: diagnostic
 
-psram:
-
 sensor:
   - platform: template
     id: sys_esp_temperature_id
@@ -131,15 +129,15 @@ sensor:
       entity_category: "diagnostic"
       filters:
         delta: 1
-    psram:
-      name: "PSRAM Free"
-      entity_category: "diagnostic"
-      unit_of_measurement: B
-      state_class: measurement
-      device_class: data_size
-      internal: true
-      filters:
-        delta: 100
+    # psram:
+    #   name: "PSRAM Free"
+    #   entity_category: "diagnostic"
+    #   unit_of_measurement: B
+    #   state_class: measurement
+    #   device_class: data_size
+    #   internal: true
+    #   filters:
+    #     delta: 100
   - platform: template
     id: sys_esp_cpu_freq_id
     name: "CPU Speed"
