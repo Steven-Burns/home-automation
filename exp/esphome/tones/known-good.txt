@@ -29,12 +29,12 @@ JamesBond:d=4,o=6,b=112:16c.5,32d.5,32d.5,16d.5,8d.5,16c.5,16c.5,16c.5,16c.5,32d
 JamesBond2:d=4,o=6,b=56:16c#5,16e5,32c,8b5,32e5,32g.5,g#5,32e.5,32f#5,32e5,8d#5,32g#4,32c#.5,a#4,16c#5,16e5,32c,8b5,32e5,32g.5,g#5,32e.5,32f#5,32e5,8d#5,32g#4,32c.5,c#.5
 
 
-
+CamptownRaces:d=4,o=6,b=150:8d,8d,8b5,8d,8e,8d,b5,8b5,a.5,8b5,a.5,8d,8d,8b5,8d,8e,8d,b5,8b5,8a5,8b5,8a5,2g5,g5,8b5,8d,2g,e,8g,8e,8d,p,8d,8d,8b5,8d,8e,8d,b5,8a5,8b5,16c,8b5,8a5,2g5
 
 Phrases
 
 JamesBond:d=4,o=6,b=56:16c#5,16e5,32c5,8b5,32e5,32g.5,g#5 
-ImperialMarch:d=16,o=5,b=200:4e,4e,4e,8c,p,g,4e,8c,p,g,4e
+ImperialMarch:d=16,o=5,b=250:4e,4e,4e,8c,p,g,4e,8c,p,g,4e
 missionImp:d=16,o=6,b=95:32d,32d#,32d,32d#,32d,32d#,32d,32d#,32d,32d,32d#,32e,32f,32f#,g
 ItchyAndScratch:d=4,o=5,b=160:8c6,8a,p,8c6,8a6,p,8c6,8a,8c6,8a,8c6,8a6
 ItchyAndScratch:d=4,o=5,b=160:8d6,8c6,d6,8f6,a#6,a6,b#6
