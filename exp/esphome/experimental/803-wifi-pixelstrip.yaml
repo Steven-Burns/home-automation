@@ -3,7 +3,7 @@ esp32:
 
 packages:
   wifi: !include  
-    file: include/wifi.yaml
+    file: ../include/wifi.yaml
 
 # seeed studio LED stick 10-ws2813 mini
 
@@ -170,9 +170,10 @@ light:
 # "All Device" baseline stuff here
 
 <<: !include 
-  file: include/esp32-device-baseline.yaml
+  file: ../include/esp32-device-baseline.yaml
   vars:
     device_hostname: "803-esphome"
+    device_friendly_name: "803-esphome"
     device_comment: "Wifi and pixels on board 803."
 
 
