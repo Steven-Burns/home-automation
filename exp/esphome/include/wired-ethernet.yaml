@@ -22,6 +22,7 @@ text_sensor:
       name: Wired IP Address
       id: ip_address_id
       entity_category: diagnostic
+      icon: "mdi:information-box"
       # address_0:
       #   name: Wired IP Address 0
       # address_1:
@@ -35,7 +36,10 @@ text_sensor:
     dns_address:
       name: Wired DNS Addresses
       entity_category: diagnostic
+      icon: "mdi:information-box"
     mac_address:
       name: Wired MAC Address
       entity_category: diagnostic
+      icon: "mdi:information-box"
 
+      

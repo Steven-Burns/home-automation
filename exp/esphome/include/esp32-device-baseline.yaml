@@ -7,22 +7,13 @@ esphome:
   comment: ${device_comment}
   name_add_mac_suffix: false
   project:
-    name: "arkadiahouse.home_automation"
+    name: "Arkadia House.Home Automation"
     version: "0.1.1"
-  # if one were to want to bake the CPU clock freq at build time, the below 
-  # stanza will do it.
-  # platformio_options:
-  #     board_build.f_cpu: 160000000L
-
-
-esp32:
-  framework:
-    type: arduino
 
 # Enable logging
 logger:
   level: DEBUG
-  # baud_rate = 0 will disable serial logging (API access should still work, tho)
+  # baud_rate = 0 will disable serial logging (API access to logs should still work, tho)
   baud_rate: ${logger_baud_rate} 
 
 # Enable Home Assistant API
@@ -34,6 +25,10 @@ api:
   # reboot_timeout: 0s
   encryption:
      key: !secret api_encryption_key
+  on_client_connected:
+    - logger.log:
+        format: "Client %s connected to API with IP %s"
+        args: ["client_info.c_str()", "client_address.c_str()"]     
 
 # Enable over-the-air flashing
 ota:
@@ -48,122 +43,14 @@ web_server:
   ota: false 
   local: true
 
-# this component sync the local gadget to the time of the Home Asst server
+# this component syncs the local gadget to the time of the Home Asst server
 time:
   - platform: homeassistant
     id: esptime
-
-debug:
-  update_interval: 60s
-
-text_sensor:
-  - platform: debug
-    device:
-      name: "Device Info"
-      entity_category: "diagnostic"
-    reset_reason:
-      name: "Reset Reason"
-      entity_category: "diagnostic"
-  - platform: version
-    name: "Device Firmware Version"
-    entity_category: "diagnostic"
-  - platform: template
-    id: sys_esp_xtal_freq_id
-    name: "Crystal Freq MHz"
-    entity_category: "diagnostic"
-    lambda: return std::to_string(getXtalFrequencyMhz());
-    update_interval: 7 days
-    internal: true
-  - platform: template
-    id: sys_esp_apb_bus_freq_id
-    name: "APB Bus Speed MHz"
-    entity_category: "diagnostic"
-    lambda: return std::to_string(getApbFrequency() / 1000000);
-    update_interval: 7 days
-    internal: true
 
 button:
   - platform: restart
     icon: mdi:power-cycle
     name: "Safely Restart Device"
     entity_category: diagnostic
-
-sensor:
-  - platform: template
-    id: sys_esp_temperature_id
-    name: CPU Temperature
-    lambda: return temperatureRead();
-    unit_of_measurement: °C
-    device_class: temperature
-    state_class: measurement
-    update_interval: 60s
-    entity_category: "diagnostic"
-    filters:
-      delta: 1.0
-  - platform: uptime
-    name: Uptime (approx)
-    id: sys_uptime_id
-    state_class: total_increasing
-    update_interval: 60s
-    entity_category: "diagnostic"
-  - platform: debug
-    free:
-      name: "Heap Free"
-      entity_category: "diagnostic"
-      unit_of_measurement: B
-      state_class: measurement
-      device_class: data_size
-      internal: true
-      filters:
-        delta: 100
-    block:
-      name: "Heap Max Block"
-      entity_category: "diagnostic"
-      unit_of_measurement: B
-      device_class: data_size
-      internal: true
-      filters:
-        delta: 100
-    loop_time:
-      name: "Loop Time"
-      entity_category: "diagnostic"
-      filters:
-        delta: 1
-    # psram:
-    #   name: "PSRAM Free"
-    #   entity_category: "diagnostic"
-    #   unit_of_measurement: B
-    #   state_class: measurement
-    #   device_class: data_size
-    #   internal: true
-    #   filters:
-    #     delta: 100
-  - platform: template
-    id: sys_esp_cpu_freq_id
-    name: "CPU Speed"
-    unit_of_measurement: MHz
-    state_class: measurement
-    entity_category: "diagnostic"
-    filters:
-      delta: 1
-    lambda: return getCpuFrequencyMhz(); 
-    
-binary_sensor:
-  - platform: status
-    name: "Device Status"
-    entity_category: "diagnostic"
-
-# commenting this version of free heap as it is not as encapsulated 
-# and therefore not platform agnostic as is the debug component sensor, and 
-# the results appear to match between the two, making the debug component
-# preferred.
-  # - platform: template
-  #   id: sys_esp_memory_id
-  #   icon: mdi:memory
-  #   name: Free Heap
-  #   lambda: return heap_caps_get_free_size(MALLOC_CAP_INTERNAL) / 1024;
-  #   unit_of_measurement: 'kB'
-  #   state_class: measurement
-  #   entity_category: "diagnostic"
-  #   update_interval: 60s
 

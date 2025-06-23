@@ -1,8 +1,6 @@
 substitutions:
+  # this pin must be wired to a passive buzzer
   buzzer_pin: "GPIO13"
-
-
-# this pin must be wired to a passive buzzer
 
 output:
   - platform: ledc
