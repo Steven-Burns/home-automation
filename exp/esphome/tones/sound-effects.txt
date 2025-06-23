@@ -4,7 +4,8 @@ mario_death:d=4,o=5,b=100:32c6,32c6,32c6,8p,16b,16f6,16p,16f6,16f.6,16e.6,16d6,1
 ThreeLongBeeps:d=4,o=5,b=110:f,8p,f,8p,f,8p,f
 FourMediumBeeps:d=4,o=5,b=180:a,8p,a,8p,a,8p,a
 FastBaBeep:d=64,o=5,b=120:g4,p,g5
-James Bond:d=4,o=6,b=212:16b.5,2a#5,16g.5,16f.5,2g.5
-Star Trek:d=4,o=5,b=163:8f.,16a#,d#.6,8d6,16a#.,16g.,16c.6,f6
-warble:d=32,o=7,b=180:d#,e,g,d#,g,d#,f#,e,f,2p,d#,e,g,d#,g,d#,f#,e,f,2p,d#,e,g,d#,g,d#,f#,e,f
+warble:d=32,o=7,b=180:d#,e,g,d#,g,d#,f#,e,f
+triplewarble:d=32,o=7,b=180:d#,e,g,d#,g,d#,f#,e,f,2p,d#,e,g,d#,g,d#,f#,e,f,2p,d#,e,g,d#,g,d#,f#,e,f
 StarTrekBosun:d=32,o=7,b=225:16c#,d,d#,4e.,d#,d,8c#
+BatmanTrill:d=8,o=5,b=160:16a,16g#,16g,16f#,16f,16f#,16g,16g#,4a.
+StarTrek:d=32,o=7,b=180:d#,e,g,d#,g,d#,f#,e,f,2p,d#,e,g,d#,g,d#,f#,e,f,2p,d#,e,g,d#,g,d#,f#,e,f
