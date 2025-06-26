@@ -102,7 +102,7 @@ display:
           bool button1_state = id(button_1_binary_sensor_id)->state;
           */
           bool relay_state = id(relay_0_id)->state;
-          bool radar_target = id(radar_has_target_id)->state;
+          bool radar_target0 = id(ld2410_0_target_detected);
 
           it.printf(0, 7 * char_height, tiny_font, TextAlign::BASELINE_LEFT, 
             "%s%s",
@@ -111,7 +111,7 @@ display:
           it.printf(0, 8 * char_height, tiny_font, TextAlign::BASELINE_LEFT, 
             "%s%s",
             "", //  button1_state ? "b" : " ",
-            radar_target ? "T" : " ");
+            radar_target0 ? "T" : " ");
 
           float temp = 0.0;
           temp = id(temperature_id)->state;

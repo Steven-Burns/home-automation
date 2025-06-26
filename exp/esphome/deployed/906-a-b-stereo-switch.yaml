@@ -1,8 +1,13 @@
 esp32:
-  # esp32-WROOM-32.  Waaay overkill for this application...
   board: nodemcu-32s
+  cpu_frequency: 240MHZ
+  framework:
+    type: arduino
+
 
 packages:
+  diagnostics: !include 
+    file: ../include/diagnostics.yaml
   blinky: !include
     file: ../include/interval-blinky.yaml
     vars:

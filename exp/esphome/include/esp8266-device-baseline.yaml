@@ -5,7 +5,7 @@ esphome:
   area: ${area}
   name_add_mac_suffix: false
   project:
-    name: arkadiahouse.home_automation 
+    name: Arkadia House.Home Automation 
     version: "0.1.1"
 
 # Enable logging

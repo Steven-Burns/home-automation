@@ -1,7 +1,12 @@
 esp32:
   board: nodemcu-32s
+  cpu_frequency: 240MHZ
+  framework:
+    type: arduino
 
 packages:
+  diagnostics: !include 
+    file: ../include/diagnostics.yaml
   blinky: !include
     file: ../include/interval-blinky.yaml
     vars:
@@ -10,14 +15,13 @@ packages:
     file: ../include/photoresistor-illuminance.yaml
     vars:
       illuminance_pin: "GPIO39"
-  radar_motion: !include
+  radar_0: !include
     file: ../include/HLK-LD2410-radar-motion.yaml
     vars:
-      # GPIO1 and 3 are labeled as UART0, but that conflicts with logging
-      # 9 andd 10 are labeled as UART1, but that results in a warning that 
-      # those pins might be hooked to flash.  So let's try 17 and 16
-      uart_2_tx_pin: "GPIO17"
-      uart_2_rx_pin: "GPIO16"
+      uart_id: "uart_1"
+      radar_id: "ld2410_0"
+      uart_tx_pin: "GPIO17" 
+      uart_rx_pin: "GPIO16" 
   i2c: !include
     file: ../include/i2c.yaml
     vars:
@@ -49,8 +53,6 @@ packages:
       scene06: creepy_dining_room
       scene07: dining_nitelite_mode
       scene10: bright_dining
-
-# "All Device" baseline stuff here
 
 <<: !include 
   file: ../include/esp32-device-baseline.yaml

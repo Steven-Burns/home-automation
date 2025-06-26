@@ -1,7 +1,12 @@
 esp32:
   board: nodemcu-32s
+  cpu_frequency: 240MHZ
+  framework:
+    type: arduino
 
 packages:
+  diagnostics: !include 
+    file: ../include/diagnostics.yaml
   wifi: !include
     file: ./../include/wifi.yaml
   blinky: !include
