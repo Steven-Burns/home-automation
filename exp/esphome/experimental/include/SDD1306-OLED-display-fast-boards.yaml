@@ -1,0 +1,179 @@
+font:
+  - file: "../fonts/spleen-5x8.bdf"
+    id: tiny_font_id
+  - file: "../fonts/Bahnschrift/bahnschrift.condensedsemibold.ttf"
+    id: large_font_id
+    size: 68
+  # - file: "fonts/BebasNeue-Regular.ttf"
+  #   id: large_font_id
+  #   size: 68
+  - file: "../fonts/Bahnschrift/bahnschrift.condensedsemibold.ttf"
+    id: small_font_id
+    size: 36
+  - file: "../fonts/Bahnschrift/bahnschrift.condensedsemibold.ttf"
+    id: med_font_id
+    size: 28
+
+# image:
+#   - file: "images/person-standing-still-icon.png"
+#     id: standing_still_icon_id
+#     type: BINARY
+
+# animation:
+#   - file: "images/falling-head.gif"
+#     id: motion_detected_animation_id
+#     type: BINARY
+
+display:
+  - platform: ssd1306_i2c
+    id: ssd1306_id
+    model: "SSD1306_128x64"
+    update_interval: 0.1s
+    contrast: 20%
+    invert: false
+    rotation: 180
+    # pages:
+    #   - id: page_1_id
+    #     lambda: |-
+    #       static auto width = it.get_width();
+    #       static auto height = it.get_height();
+    #       static auto tiny_font = id(tiny_font_id);
+    #       static auto big_font = id(large_font_id);
+    #       static auto small_font = id(small_font_id);
+    #       static auto med_font = id(med_font_id);
+    #       static const int char_height = 8;
+    #       int line = 0;
+
+          # it.printf(width, ++line * char_height, tiny_font, TextAlign::BASELINE_RIGHT, "Arkadia House");
+          # it.printf(width, ++line * char_height, tiny_font, TextAlign::BASELINE_RIGHT, "((something here))");
+          
+    #   - id: page_2_id       
+    #     lambda: |-
+    lambda: |-
+          static auto width = it.get_width();
+          static auto height = it.get_height();
+          static auto tiny_font = id(tiny_font_id);
+          static auto big_font = id(large_font_id);
+          static auto small_font = id(small_font_id);
+          static auto med_font = id(med_font_id);
+          static const int char_height = 8;
+          int line = 6;
+
+          auto ip_addr = id(ip_address_id)->get_state();
+          it.printf(width, ++line * char_height, tiny_font, TextAlign::BASELINE_RIGHT, "%s", App.get_name().c_str());
+          it.printf(width, ++line * char_height, tiny_font, TextAlign::BASELINE_RIGHT, "%s", ip_addr.c_str());
+
+          // blinky routine as an array of connected points.
+          static const int NUM_BLINKIES = 3;
+          static const int MIN_X = 0;
+          static const int MAX_X = 63;
+          static const int MIN_Y = 64 - 16;
+          static const int MAX_Y = 63;
+          static int blinky_x[] = {0, 30, 10, 75};
+          static int blinky_y[] = {0, 5, 127, 30};
+          static int blinky_dx[] = {1, 1, -2, -3};
+          static int blinky_dy[] = {1, -2, 1, 1};
+          for (int i = 0; i < NUM_BLINKIES; ++i) 
+          {
+            blinky_x[i] += blinky_dx[i];
+            blinky_y[i] += blinky_dy[i];
+            if (blinky_x[i] > MAX_X) { blinky_x[i] = MAX_X;  blinky_dx[i] = -blinky_dx[i]; }
+            if (blinky_y[i] > MAX_Y) { blinky_y[i] = MAX_Y;  blinky_dy[i] = -blinky_dy[i]; }
+            if (blinky_x[i] < MIN_X ) { blinky_x[i] = MIN_X; blinky_dx[i] = -blinky_dx[i]; }
+            if (blinky_y[i] < MIN_Y ) { blinky_y[i] = MIN_Y; blinky_dy[i] = -blinky_dy[i]; }
+          }
+          for (int i = 0; i < NUM_BLINKIES; ++i)
+          {
+          
+            if (NUM_BLINKIES - 1 == i) 
+            {
+              it.line(blinky_x[i], blinky_y[i], blinky_x[0], blinky_y[0], COLOR_ON);
+              break;
+            }
+            it.line(blinky_x[i], blinky_y[i], blinky_x[i + 1], blinky_y[i + 1], COLOR_ON);
+          
+          //  it.draw_pixel_at(blinky_x[i], blinky_y[i], COLOR_ON);
+          }
+
+          /*
+          bool button0_state = false;
+          bool button1_state = false;
+          bool button0_state = id(button_0_id)->state;
+          bool button1_state = id(button_1_binary_sensor_id)->state;
+          */
+          bool relay_state = id(relay_0_id)->state;
+          bool radar_target0 = id(ld2410_0_target_detected);
+
+          it.printf(0, 7 * char_height, tiny_font, TextAlign::BASELINE_LEFT, 
+            "%s%s",
+            "", //  button0_state ? "B" : " ",
+            relay_state ? "R" : " ");
+          it.printf(0, 8 * char_height, tiny_font, TextAlign::BASELINE_LEFT, 
+            "%s%s",
+            "", //  button1_state ? "b" : " ",
+            radar_target0 ? "T" : " ");
+
+          float temp = 0.0;
+          temp = id(temperature_id)->state;
+          temp = temp * 1.8 + 32;
+          it.printf(0, height - 16, big_font, TextAlign::BASELINE_LEFT, "%2.0f", truncf(temp));
+          it.printf(57, 0, tiny_font, TextAlign::TOP_LEFT, "F");
+          // dunno if I like the decimal point...
+          it.filled_rectangle(54, height - 16 - 3, 3, 3, COLOR_ON); 
+          // or the fractional temp.
+          it.printf(57, height - 16, small_font, TextAlign::BASELINE_LEFT, "%1d", (int)(temp * 10) % 10);
+
+          float hum = 0.0;
+          hum = id(humidity_id)->state;
+          it.printf(width, (height - 16) / 2, med_font, TextAlign::BASELINE_RIGHT, "%2.1f  ", hum);
+          it.printf(width, 5, tiny_font, TextAlign::TOP_RIGHT, "%%");
+
+          float lux = 0.0;
+          lux = id(illuminance_id)->state;
+          it.printf(width, height - 16, med_font, TextAlign::BASELINE_RIGHT, "%3.0f  ", lux);
+          it.printf(width, height - 16 - char_height, tiny_font, TextAlign::BASELINE_RIGHT, "l"); 
+          it.printf(width, height - 16, tiny_font, TextAlign::BASELINE_RIGHT, "x"); 
+
+
+# Cycle through pages on a timer
+# interval:
+#   - interval: 5s
+#     then:
+#       - display.page.show_next: ssd1306_id
+#       - component.update: ssd1306_id
+
+
+# // en lieu of a hardware blinky light, toggle a software light every time the display is updated
+# static bool blinky_is_lit = true;
+# static int blinky_x = 0;
+# static int blinky_y = 0;
+# static int dx = 1;
+# static int dy = 1;
+# // auto radar_target = id(ld2410_0_moving_target_binary_sensor);
+# if (radar_moving)
+# {
+#   /*
+#   // motion detected: play the current animation frame and advance the frame
+#   auto ani = id(motion_detected_animation_id);
+#   it.image(0, 44, ani, COLOR_ON, COLOR_OFF);
+#   ani->next_frame();
+#   */
+
+#   // move the blinky.
+#   blinky_is_lit = true;
+#   blinky_x += dx; blinky_y += dy;
+#   if (blinky_x < 0) { blinky_x = 0; dx = -dx; }
+#   if (blinky_x > 16) { blinky_x = 16; dx = -dx; }
+#   if (blinky_y < 0) { blinky_y = 0; dy = -dy; }
+#   if (blinky_y > 12) { blinky_y = 12; dy = -dy; }
+# }
+# else 
+# {
+#   /*
+#   // no motion detected: show the standing still icon
+#   it.image(0, 44, id(standing_still_icon_id)); 
+#   */
+#   blinky_is_lit = !blinky_is_lit;
+
+# }
+# it.filled_rectangle(blinky_x, blinky_y, 2, 2, blinky_is_lit ? COLOR_ON : COLOR_OFF);

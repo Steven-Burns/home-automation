@@ -1,0 +1,61 @@
+substitutions:
+  temperature_offset: "0.0"
+  
+sensor:
+    # https://community.home-assistant.io/t/aht20-bmp280-combined-sensor/366411
+  - platform: bmp280_i2c
+    address: 0x77
+    # update_interval: 60s
+    # the irr_filter supposedly lowers noise at the expense of power consumption.
+    # We don't care about power consumption (for wired devices), so max out the filter.
+    iir_filter: 16x
+    temperature:
+      name: "Air Temperature (BMP280)"
+      id: temperature_id
+      device_class: "temperature"
+      state_class: "measurement"
+      oversampling: 2x
+      accuracy_decimals: 1
+      filters:
+          # the offset should be specified in deg centigrade. 
+        - offset:  ${temperature_offset} 
+        - delta: 0.1
+    pressure:
+      name: "Air Pressure"
+      oversampling: 16x
+      device_class: atmospheric_pressure
+      state_class: "measurement"
+      icon: mdi:gauge
+      accuracy_decimals: 2
+      filters:
+        delta: 0.01
+  - platform: aht10
+    address: 0x38
+    variant: aht20
+    # update_interval: 60s
+    temperature:
+      name: "Air Temperature (AHT20)"
+      id: aht20_temp
+      device_class: "temperature"
+      state_class: "measurement"
+      accuracy_decimals: 1
+      filters:
+        delta: 0.1
+      # - filter_out: 0.0
+      # - median:
+      #     window_size: 3
+      #     send_every: 3
+      #     send_first_at: 1
+    humidity:
+      name: "Humidity"
+      id: humidity_id
+      state_class: "measurement"
+      accuracy_decimals: 1
+      filters:
+        delta: 0.1
+      # - filter_out: 0.0
+      # - median:
+      #     window_size: 3
+      #     send_every: 3
+      #     send_first_at: 1
+

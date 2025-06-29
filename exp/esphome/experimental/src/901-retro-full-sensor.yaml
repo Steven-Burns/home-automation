@@ -1,28 +1,52 @@
 esp32:
   board: nodemcu-32s
+  cpu_frequency: 240MHZ
+  framework:
+    type: arduino
 
 packages:
+  diagnostics: !include 
+    file: ../include/diagnostics.yaml
   blinky: !include
     file: ../include/interval-blinky.yaml
     vars:
       builtin_led_pin: "GPIO2"
+  wifi: !include
+    file: ../include/wifi.yaml
+
+
+
+
+
+
+
+  tone_player: !include
+    file: ../include/rtttl-player.yaml
+    vars:
+      buzzer_pin: "GPIO33"
+  ha_chime: !include
+    file: ../include/home-asst-tone-player.yaml
   illuminance: !include
     file: ../include/photoresistor-illuminance.yaml
     vars:
       illuminance_pin: "GPIO39"
-  radar_motion: !include
+  radar_0: !include
     file: ../include/HLK-LD2410-radar-motion.yaml
     vars:
-      # GPIO1 and 3 are labeled as UART0, but that conflicts with logging
-      # so let's try 17 and 16
-      #
-      uart_2_tx_pin: "GPIO17"
-      uart_2_rx_pin: "GPIO16"
+      uart_id: "uart_1"
+      radar_id: "ld2410_0"
+      uart_tx_pin: "GPIO17" 
+      uart_rx_pin: "GPIO16" 
+
+
+
+
+
+
+
   i2c: !include
     file: ../include/i2c.yaml
     vars:
-      #
-      #
       i2c_sda_pin: "GPIO21"
       i2c_scl_pin: "GPIO22"
       i2c_freq: "420kHz"
@@ -32,10 +56,6 @@ packages:
       temperature_offset: "0"    
   display: !include
     file: ../include/SDD1306-OLED-display-fast-boards.yaml
-  wifi: !include
-    file: ../include/wifi.yaml
-  relay: !include
-    file: ../include/single-flarp-relay.yaml
   button_selector: !include
     file: ../include/scene-selector-button.yaml
     vars:
@@ -44,26 +64,6 @@ packages:
       scene02: "ActivateScene01"
       scene03: "ActivateScene03"
       scene10: "ActivateMaxBriteScene"
-  tone_player: !include
-    file: ../include/rtttl-player.yaml
-    vars:
-      buzzer_pin: "GPIO13"
-
-text_sensor:
-  - platform: homeassistant
-    name: "RingtoneRTTTL"
-    id: ringtone_input_id
-    internal: true
-    entity_id: input_text.buzzer_ringtone
-    on_value:
-      then:
-        - logger.log:
-            format: "Playing %s"
-            args: ["x.c_str()"]
-        - rtttl.play: !lambda |-
-            return x.c_str();
-
-# "All Device" baseline stuff here
 
 <<: !include 
   file: ../include/esp32-device-baseline.yaml

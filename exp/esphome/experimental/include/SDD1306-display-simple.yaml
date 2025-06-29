@@ -1,0 +1,66 @@
+font:
+  - file: "fonts/spleen-5x8.bdf"
+    id: tiny_font_id
+  - file: "fonts/BebasNeue-Regular.ttf"
+    id: large_font_id
+    size: 68
+  - file: "fonts/BebasNeue-Regular.ttf"
+    id: small_font_id
+    size: 36
+  - file: "fonts/BebasNeue-Regular.ttf"
+    id: med_font_id
+    size: 28
+
+display:
+  - platform: ssd1306_i2c
+    id: ssd1306_id
+    model: "SSD1306_128x64"
+    update_interval: 0.1s
+    contrast: 20%
+    invert: false
+    lambda: |-
+          static auto width = it.get_width();
+          static auto height = it.get_height();
+          static auto tiny_font = id(tiny_font_id);
+          static auto big_font = id(large_font_id);
+          static auto small_font = id(small_font_id);
+          static auto med_font = id(med_font_id);
+          static const int char_height = 8;
+          int line = 0;
+
+          auto ip_addr = id(ip_address_id)->get_state();
+          it.printf(width, ++line * char_height, tiny_font, TextAlign::BASELINE_RIGHT, "%s", App.get_name().c_str());
+          it.printf(width, ++line * char_height, tiny_font, TextAlign::BASELINE_RIGHT, "%s", ip_addr.c_str());
+
+          // blinky routine as an array of connected points.
+          static const int NUM_BLINKIES = 3;
+          static const int MIN_X = 0;
+          static const int MAX_X = 63;
+          static const int MIN_Y = 0;
+          static const int MAX_Y = 15;
+          static int blinky_x[] = {0, 30, 10, 75};
+          static int blinky_y[] = {0, 5, 127, 30};
+          static int blinky_dx[] = {1, 1, -2, -3};
+          static int blinky_dy[] = {1, -2, 1, 1};
+          for (int i = 0; i < NUM_BLINKIES; ++i) 
+          {
+            blinky_x[i] += blinky_dx[i];
+            blinky_y[i] += blinky_dy[i];
+            if (blinky_x[i] > MAX_X) { blinky_x[i] = MAX_X;  blinky_dx[i] = -blinky_dx[i]; }
+            if (blinky_y[i] > MAX_Y) { blinky_y[i] = MAX_Y;  blinky_dy[i] = -blinky_dy[i]; }
+            if (blinky_x[i] < MIN_X ) { blinky_x[i] = MIN_X; blinky_dx[i] = -blinky_dx[i]; }
+            if (blinky_y[i] < MIN_Y ) { blinky_y[i] = MIN_Y; blinky_dy[i] = -blinky_dy[i]; }
+          }
+          for (int i = 0; i < NUM_BLINKIES; ++i)
+          {
+          
+            if (NUM_BLINKIES - 1 == i) 
+            {
+              it.line(blinky_x[i], blinky_y[i], blinky_x[0], blinky_y[0], COLOR_ON);
+              break;
+            }
+            it.line(blinky_x[i], blinky_y[i], blinky_x[i + 1], blinky_y[i + 1], COLOR_ON);
+          
+          //  it.draw_pixel_at(blinky_x[i], blinky_y[i], COLOR_ON);
+          }
+

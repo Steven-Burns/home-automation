@@ -1,0 +1,15 @@
+substitutions:
+  door_sensor_id: "not set"
+  sensor_pin: "not set"
+
+binary_sensor:
+  - platform: gpio
+    name: ${door_sensor_id}
+    id: ${door_sensor_id}
+    device_class: door
+    pin:
+      number: ${sensor_pin}
+      mode:
+        input: true
+# see if we can get away with not pulling down as pins 34..39 do not support that
+#        pulldown: true

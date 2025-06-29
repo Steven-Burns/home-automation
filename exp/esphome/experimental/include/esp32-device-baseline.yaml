@@ -1,0 +1,56 @@
+substitutions:
+  logger_baud_rate: "115200"
+
+esphome:
+  name: ${device_hostname}
+  friendly_name: ${device_friendly_name} 
+  comment: ${device_comment}
+  name_add_mac_suffix: false
+  project:
+    name: "Arkadia House.Home Automation"
+    version: "0.1.1"
+
+# Enable logging
+logger:
+  level: DEBUG
+  # baud_rate = 0 will disable serial logging (API access to logs should still work, tho)
+  baud_rate: ${logger_baud_rate} 
+
+# Enable Home Assistant API
+api:
+  # password is deprecated in favor of encryption key
+  # password: !secret api_password
+  # reboot_timeout set to 0s will keep the board running even when networking (connection to the home asst api)
+  # is lost, even if lost forever. 
+  # reboot_timeout: 0s
+  encryption:
+     key: !secret api_encryption_key
+  on_client_connected:
+    - logger.log:
+        format: "Client %s connected to API with IP %s"
+        args: ["client_info.c_str()", "client_address.c_str()"]     
+
+# Enable over-the-air flashing
+ota:
+  - platform: esphome
+    password: !secret ota_password
+      
+web_server:
+  port: 80
+  version: 3
+  include_internal: true
+  log: true
+  ota: false 
+  local: true
+
+# this component syncs the local gadget to the time of the Home Asst server
+time:
+  - platform: homeassistant
+    id: esptime
+
+button:
+  - platform: restart
+    icon: mdi:power-cycle
+    name: "Safely Restart Device"
+    entity_category: diagnostic
+

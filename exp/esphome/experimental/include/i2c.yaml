@@ -1,0 +1,9 @@
+substitutions:
+  i2c_freq: "420kHz"
+
+i2c:
+  id: i2cbus_0_id
+  sda: ${i2c_sda_pin}
+  scl: ${i2c_scl_pin}
+  frequency: ${i2c_freq}
+  scan: true
