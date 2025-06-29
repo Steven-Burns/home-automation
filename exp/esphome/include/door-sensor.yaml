@@ -4,6 +4,7 @@ substitutions:
 
 binary_sensor:
   - platform: gpio
+    name: ${door_sensor_id}
     id: ${door_sensor_id}
     device_class: door
     pin:
