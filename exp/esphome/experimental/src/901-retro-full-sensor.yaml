@@ -23,7 +23,7 @@ packages:
   tone_player: !include
     file: ../include/rtttl-player.yaml
     vars:
-      buzzer_pin: "GPIO33"
+      buzzer_pin: "GPIO13"
   ha_chime: !include
     file: ../include/home-asst-tone-player.yaml
   illuminance: !include
@@ -55,15 +55,9 @@ packages:
     vars: 
       temperature_offset: "0"    
   display: !include
-    file: ../include/SDD1306-OLED-display-fast-boards.yaml
-  button_selector: !include
-    file: ../include/scene-selector-button.yaml
-    vars:
-      button_pin: "GPIO15"
-      scene01: "ActivateAllOffScene"
-      scene02: "ActivateScene01"
-      scene03: "ActivateScene03"
-      scene10: "ActivateMaxBriteScene"
+    file: ../include/SDD1306-display-arkadia.yaml
+  keypad: !include
+    file: ../include/10-key-keypad.yaml
 
 <<: !include 
   file: ../include/esp32-device-baseline.yaml

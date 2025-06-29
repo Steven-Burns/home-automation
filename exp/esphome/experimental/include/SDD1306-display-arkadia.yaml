@@ -1,13 +1,13 @@
 font:
-  - file: "../fonts/spleen-5x8.bdf"
+  - file: "../../fonts/spleen-5x8.bdf"
     id: tiny_font_id
-  - file: "../fonts/Bahnschrift/bahnschrift.condensedsemibold.ttf"
+  - file: "../../fonts/Bahnschrift/bahnschrift.condensedsemibold.ttf"
     id: large_font_id
     size: 48
-  - file: "../fonts/Bahnschrift/bahnschrift.condensedsemibold.ttf"
+  - file: "../../fonts/Bahnschrift/bahnschrift.condensedsemibold.ttf"
     id: small_font_id
     size: 36
-  - file: "../fonts/Bahnschrift/bahnschrift.condensedsemibold.ttf"
+  - file: "../../fonts/Bahnschrift/bahnschrift.condensedsemibold.ttf"
     id: med_font_id
     size: 28
 
@@ -44,6 +44,16 @@ display:
           int yellow_line = 0;
           int blue_line = 0;
 
+          // it.printf(blue_width, blue_line, tiny_font, TextAlign::BASELINE_RIGHT, "%s", App.get_name().c_str());
+
+          std::string ip_addr = id(ip_address_id)->get_state();
+          std::string last_octet = "nan";
+          if (ip_addr.size() > 2) 
+          {
+            last_octet = ip_addr.substr(ip_addr.size() - 3, 3);
+          }
+          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, "%s", last_octet.c_str());
+
           float lux = 0.0;
           lux = id(illuminance_id)->state;
           it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, "%3.0f", lux);
@@ -61,7 +71,7 @@ display:
           it.print(blue_width, blue_line, tiny_font, TextAlign::BOTTOM_RIGHT, "F");
 
           bool radar_target0 = id(ld2410_0_target_detected);
-          bool radar_target1 = id(ld2410_1_target_detected);
+          bool radar_target1 = false; //id(ld2410_1_target_detected);
 
           it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, 
             "R%s%s",

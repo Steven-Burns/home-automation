@@ -1,16 +1,16 @@
 font:
-  - file: "../fonts/spleen-5x8.bdf"
+  - file: "../../fonts/spleen-5x8.bdf"
     id: tiny_font_id
-  - file: "../fonts/Bahnschrift/bahnschrift.condensedsemibold.ttf"
+  - file: "../../fonts/Bahnschrift/bahnschrift.condensedsemibold.ttf"
     id: large_font_id
     size: 68
   # - file: "fonts/BebasNeue-Regular.ttf"
   #   id: large_font_id
   #   size: 68
-  - file: "../fonts/Bahnschrift/bahnschrift.condensedsemibold.ttf"
+  - file: "../../fonts/Bahnschrift/bahnschrift.condensedsemibold.ttf"
     id: small_font_id
     size: 36
-  - file: "../fonts/Bahnschrift/bahnschrift.condensedsemibold.ttf"
+  - file: "../../fonts/Bahnschrift/bahnschrift.condensedsemibold.ttf"
     id: med_font_id
     size: 28
 
