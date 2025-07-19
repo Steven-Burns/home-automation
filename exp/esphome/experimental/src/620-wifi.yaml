@@ -1,6 +1,9 @@
 esp32:
   # board: nodemcu-32s This also works.
   board: wemos_d1_mini32
+  cpu_frequency: 240MHZ
+  framework:
+    type: arduino
 
 packages:
   diagnostics: !include 
