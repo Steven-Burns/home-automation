@@ -9,3 +9,9 @@ triplewarble:d=32,o=7,b=180:d#,e,g,d#,g,d#,f#,e,f,2p,d#,e,g,d#,g,d#,f#,e,f,2p,d#
 StarTrekBosun:d=32,o=7,b=225:16c#,d,d#,4e.,d#,d,8c#
 BatmanTrill:d=8,o=5,b=160:16a,16g#,16g,16f#,16f,16f#,16g,16g#,4a.
 StarTrek:d=32,o=7,b=180:d#,e,g,d#,g,d#,f#,e,f,2p,d#,e,g,d#,g,d#,f#,e,f,2p,d#,e,g,d#,g,d#,f#,e,f
+Double:d=16,o=5,b=200:c6,f6,c7,c6,f6,c7,c6,f6,c7,8p,c,f,c6,c,f,c6,c,f,c6
+RingRing:d=4,o=5,b=100:32b,32d6,32g6,32g6,32g6,8p,32b,32d6,32g6,32g6,32g6,2p,32b,32d6,32g6,32g6,32g6,8p,32b,32d6,32g6,32g6,32g6,2p,32b,32d6,32g6,32g6,32g6,8p,32b,32d6,32g6,32g6,32g6
+Urgent:d=8,o=6,b=500:c,e,d7,c,e,a#,c,e,a,c,e,g,c,e,a,c,e,a#,c,e,d7
+Sos:d=16,o=6,b=160:g,p,g,p,g,4p,8g.,p,8g.,p,8g.,4p,g,p,g,p,g,1p,g,p,g,p,g,4p,8g.,p,8g.,p,8g.,4p,g,p,g,p,g
+Triple:d=8,o=5,b=635:c,e,g,c,e,g,c,e,g,c6,e6,g6,c6,e6,g6,c6,e6,g6,c7,e7,g7,c7,e7,g7,c7,e7,g7
+DeskPhon:d=8,o=5,b=500:c#,f,c#,f,c#,f,c#,f,c#,f,4p.,c#,f,c#,f,c#,f,c#,f,c#,f,1p.,c#,f,c#,f,c#,f,c#,f,c#,f,4p.,c#,f,c#,f,c#,f,c#,f,c#,f
