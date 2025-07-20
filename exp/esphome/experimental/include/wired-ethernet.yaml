@@ -20,6 +20,8 @@ text_sensor:
   - platform: ethernet_info
     ip_address:
       name: Wired IP Address
+      # This ID is significant and also defined for WiFi ethernet, so that whether the
+      # devide is wired or wireless, there is a single sensor ID for the IP address.
       id: ip_address_id
       entity_category: diagnostic
       icon: "mdi:information-box"

@@ -12,11 +12,21 @@ text_sensor:
       entity_category: "diagnostic"
       icon: "mdi:information-box"
   - platform: version
-    name: "Device Firmware Version"
+    name: Firmware Version
     entity_category: "diagnostic"
     icon: "mdi:information-box"
     internal: true
-  # device fw version is build timestamp and esphome ver
+  # the ESPHome version is the first chunk of the Firmware Version; commenting 
+  # this out as it is redundant
+  # - platform: version
+  #   id: esphome_version
+  #   name: ESPHome Version
+  #   hide_timestamp: true
+  #   entity_category: diagnostic
+  #   internal: true
+
+  # device fw version is build timestamp and esphome ver, so this timestamp info
+  # is redundant. Commenting in case someday I think I need just the timestamp.
   # - platform: template
   #   name: "Firmware Build Timestamp"
   #   entity_category: "diagnostic"

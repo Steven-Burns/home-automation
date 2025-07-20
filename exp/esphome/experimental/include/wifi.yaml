@@ -35,6 +35,8 @@ sensor:
 text_sensor:
   - platform: wifi_info
     ip_address:
+      # This ID is significant and also defined for wired ethernet, so that whether the
+      # devide is wired or wireless, there is a single sensor ID for the IP address.
       id: ip_address_id
       name: "WiFi IP Address"
       entity_category: "diagnostic"
