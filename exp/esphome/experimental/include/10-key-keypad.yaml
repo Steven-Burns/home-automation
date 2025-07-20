@@ -7,6 +7,11 @@ mcp23017:
   - id: 'mcp23017_0'
     address: 0x20
 
+globals:
+   - id: keypad_key_states
+     type: int[10]
+     restore_value: no
+
 binary_sensor:
   - platform: gpio
     name: "KSW 0"
@@ -18,6 +23,10 @@ binary_sensor:
       mode:
         input: true
         pullup: true
+    on_state:
+      then:
+        lambda: |-
+          id(keypad_key_states)[0] = x;        
   - platform: gpio
     name: "KSW 1"
     id: keypad_button_1
@@ -28,6 +37,10 @@ binary_sensor:
       mode:
         input: true
         pullup: true
+    on_state:
+      then:
+        lambda: |-
+          id(keypad_key_states)[1] = x;        
   - platform: gpio
     name: "KSW 2"
     id: keypad_button_2
@@ -38,6 +51,10 @@ binary_sensor:
       mode:
         input: true
         pullup: true
+    on_state:
+      then:
+        lambda: |-
+          id(keypad_key_states)[2] = x;        
   - platform: gpio
     name: "KSW 3"
     id: keypad_button_3
@@ -48,6 +65,10 @@ binary_sensor:
       mode: 
         input: true
         pullup: true
+    on_state:
+      then:
+        lambda: |-
+          id(keypad_key_states)[3] = x;        
   - platform: gpio
     name: "KSW 4"
     id: keypad_button_4
@@ -58,6 +79,10 @@ binary_sensor:
       mode:
         input: true
         pullup: true
+    on_state:
+      then:
+        lambda: |-
+          id(keypad_key_states)[4] = x;        
   - platform: gpio
     name: "KSW 5"
     id: keypad_button_5
@@ -68,6 +93,10 @@ binary_sensor:
       mode:
         input: true
         pullup: true
+    on_state:
+      then:
+        lambda: |-
+          id(keypad_key_states)[5] = x;        
   - platform: gpio
     name: "KSW 6"
     id: keypad_button_6
@@ -78,6 +107,10 @@ binary_sensor:
       mode:
         input: true
         pullup: true
+    on_state:
+      then:
+        lambda: |-
+          id(keypad_key_states)[6] = x;        
   - platform: gpio
     name: "KSW 7"
     id: keypad_button_7
@@ -88,6 +121,10 @@ binary_sensor:
       mode:
         input: true
         pullup: true
+    on_state:
+      then:
+        lambda: |-
+          id(keypad_key_states)[7] = x;        
   - platform: gpio
     name: "KSW 8"
     id: keypad_button_8
@@ -98,6 +135,10 @@ binary_sensor:
       mode:
         input: true
         pullup: true
+    on_state:
+      then:
+        lambda: |-
+          id(keypad_key_states)[8] = x;        
   - platform: gpio
     name: "KSW 9"
     id: keypad_button_9
@@ -108,3 +149,7 @@ binary_sensor:
       mode:
         input: true
         pullup: true
+    on_state:
+      then:
+        lambda: |-
+          id(keypad_key_states)[9] = x;        
