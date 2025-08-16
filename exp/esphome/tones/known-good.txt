@@ -77,11 +77,11 @@ ATeamP7:d=4,o=5,b=125:a#,a,8f,g.,f
 TetrisP1:d=4,o=5,b=160:e6,8b,8c6,8d6,16e6,16d6,8c6,8b,a
 TheMuppets:d=4,o=5,b=250:c6,c6,a,b,8a,b,g
 sesamestreet:d=4,o=5,b=200:8g,8a,a#,a,8g,8c,8c,1c
-IndianaJones:d=4,o=5,b=250:e,8p,8f,8g,8p,2c.6,8p
+IndianaJones:d=4,o=5,b=250:e,8p,8f,8g,8p,2c.6
 Star Trek:d=4,o=5,b=163:8f.,16a#,d#.6,8d6,16a#.,16g.,16c.6,f6
 PacManP1:d=16,o=6,b=140:b5,b,f#,d#,8b,8d#
 PacManP2:d=16,o=6,b=140:c,c7,g,f,8c7,8e
 PacManP3:d=16,o=6,b=140:32d#,32e,f,32f,32f#,g,32g,32g#,a,8b
 GhostbustersP1:d=4,o=5,b=125:16c#,16p,8c#,16e,16f,16g#,16p,8b,8p,8a#.
 InspectorGadget:d=4,o=5,b=140:16d,16e,16f,16g,8a,8d6,c#
-
+Mahnahmanah:d=8,o=5,b=250:e,p,4g,p,a,f#,d
