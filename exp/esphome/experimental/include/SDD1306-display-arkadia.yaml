@@ -54,8 +54,11 @@ display:
           lux = id(illuminance_id)->state;
           it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, "%3.0f", lux);
 
+          // the encapsulation of data is ... not, as here we start to read all sorts of global data with 
+          // 'well-known' names...
+
           bool radar_target0 = id(ld2410_0_target_detected);
-          bool radar_target1 = false; //id(ld2410_1_target_detected);
+          bool radar_target1 = id(ld2410_1_target_detected);
 
           it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, 
             "R%s%s",
@@ -71,12 +74,28 @@ display:
             key_states[i+1] ? std::to_string(i+1).c_str() : "-");
           }
 
-          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, "---");
-          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, "---");
-          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, "---");
-          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, "---");
-          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, "---");
-          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, "---");
+          bool is_door_lock_0_sensor_opened = id(door_lock_0_sensor).state;
+          bool is_door_lock_1_sensor_opened = id(door_lock_1_sensor).state;
+          bool is_door_0_sensor_opened = id(door_sensor_0).state;
+          bool is_door_1_sensor_opened = id(door_sensor_1).state;
+
+          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, "D0%s", 
+            is_door_lock_0_sensor_opened ? "a" : "C");
+          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, "D1%s", 
+            is_door_lock_1_sensor_opened ? "a" : "C");
+          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, "d0%s", 
+            is_door_0_sensor_opened ? "a" : "C");
+          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, "d1%s", 
+            is_door_1_sensor_opened ? "a" : "C");
+
+          int door_lock_0_state = id(door_lock_0).state;
+          int door_lock_1_state = id(door_lock_1).state;
+
+          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, "L0%s",
+            (door_lock_0_state == 1) ? "L" : "U");
+          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, "L1%s",
+            (door_lock_1_state == 1) ? "L" : "U");
+
 
           // blinky routine as an array of connected points.
           static const int NUM_BLINKIES = 3;

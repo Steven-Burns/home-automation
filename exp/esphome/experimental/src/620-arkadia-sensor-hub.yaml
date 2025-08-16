@@ -37,13 +37,13 @@ packages:
       radar_id: "ld2410_0"
       uart_tx_pin: "GPIO17" 
       uart_rx_pin: "GPIO16" 
-  # radar_1: !include
-  #   file: ../include/HLK-LD2410-radar-motion.yaml
-  #   vars:
-  #     uart_id: "uart_0"
-  #     radar_id: "ld2410_1"
-  #     uart_tx_pin: "GPIO1" 
-  #     uart_rx_pin: "GPIO3" 
+  radar_1: !include
+    file: ../include/HLK-LD2410-radar-motion.yaml
+    vars:
+      uart_id: "uart_0"
+      radar_id: "ld2410_1"
+      uart_tx_pin: "GPIO1" 
+      uart_rx_pin: "GPIO3" 
   i2c: !include
     file: ../include/i2c.yaml
     vars:
@@ -87,7 +87,7 @@ packages:
   file: ../include/esp32-device-baseline.yaml
   vars:
     # turn off UART0 logging so that we can use it for radar1
-#    logger_baud_rate: "0"
+    logger_baud_rate: "0"
     device_hostname: "620-esphome"
     device_friendly_name: "Arkadia House Sensor Hub (620)"
     device_comment: "Wherever you go, there you are."
