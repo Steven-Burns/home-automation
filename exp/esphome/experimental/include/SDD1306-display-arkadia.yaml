@@ -65,6 +65,26 @@ display:
             radar_target0 ? "0" : "-",
             radar_target1 ? "1" : "-");
 
+          bool is_door_lock_0_sensor_opened = id(door_lock_0_sensor).state;
+          bool is_door_lock_1_sensor_opened = id(door_lock_1_sensor).state;
+          bool is_door_0_sensor_opened = id(door_sensor_0).state;
+          bool is_door_1_sensor_opened = id(door_sensor_1).state;
+          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, 
+            "D%s%s", 
+            is_door_lock_0_sensor_opened ? "a" : "C",
+            is_door_lock_1_sensor_opened ? "a" : "C");
+          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, 
+            "d%s%s", 
+            is_door_0_sensor_opened ? "a" : "C",
+            is_door_1_sensor_opened ? "a" : "C");
+
+          int door_lock_0_state = id(door_lock_0).state;
+          int door_lock_1_state = id(door_lock_1).state;
+          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, 
+            "L%s%s",
+            (door_lock_0_state == 1) ? "L" : "U",
+            (door_lock_1_state == 1) ? "L" : "U");
+
           auto key_states = id(keypad_key_states); 
           for (int i = 0; i < 10; i += 2)
           {
@@ -73,29 +93,6 @@ display:
             key_states[i] ? std::to_string(i).c_str() : "-",
             key_states[i+1] ? std::to_string(i+1).c_str() : "-");
           }
-
-          bool is_door_lock_0_sensor_opened = id(door_lock_0_sensor).state;
-          bool is_door_lock_1_sensor_opened = id(door_lock_1_sensor).state;
-          bool is_door_0_sensor_opened = id(door_sensor_0).state;
-          bool is_door_1_sensor_opened = id(door_sensor_1).state;
-
-          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, "D0%s", 
-            is_door_lock_0_sensor_opened ? "a" : "C");
-          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, "D1%s", 
-            is_door_lock_1_sensor_opened ? "a" : "C");
-          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, "d0%s", 
-            is_door_0_sensor_opened ? "a" : "C");
-          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, "d1%s", 
-            is_door_1_sensor_opened ? "a" : "C");
-
-          int door_lock_0_state = id(door_lock_0).state;
-          int door_lock_1_state = id(door_lock_1).state;
-
-          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, "L0%s",
-            (door_lock_0_state == 1) ? "L" : "U");
-          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, "L1%s",
-            (door_lock_1_state == 1) ? "L" : "U");
-
 
           // blinky routine as an array of connected points.
           static const int NUM_BLINKIES = 3;
@@ -137,7 +134,7 @@ display:
           float hum = 0.0;
           hum = id(humidity_id)->state;
           it.printf(blue_width, blue_line += med_char_height, med_font, TextAlign::BASELINE_RIGHT, "%2.1f ", hum);
-          it.print(blue_width, blue_line, tiny_font, TextAlign::BOTTOM_RIGHT, "%%");
+          it.print(blue_width, blue_line, tiny_font, TextAlign::BOTTOM_RIGHT, "%");
 
           float temp = 0.0;
           temp = id(temperature_id)->state;
