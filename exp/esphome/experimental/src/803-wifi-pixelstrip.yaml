@@ -5,167 +5,196 @@ packages:
   wifi: !include  
     file: ../include/wifi.yaml
 
-# seeed studio LED stick 10-ws2813 mini
+# working configurations:
+# light:
+#   - platform: esp32_rmt_led_strip
+#     id: light_1_id
+#     name: "RMT 2-node metal daisychain WS2811 24V"
+#     rgb_order: RGB
+#     pin: GPIO7
+#     num_leds: 2
+#     rmt_channel: 0
+#     chipset: ws2811
+#     is_wrgb: false
+#     default_transition_length: 0.25s
 
+# This also works
 light:
-  - platform: esp32_rmt_led_strip
-    pin: GPIO10
-    rgb_order: RGB
-    is_wrgb: true
-    num_leds: 1
-    rmt_channel: 1
-    chipset: ws2811
-    name: "Short Strip"
-    effects:
-      - addressable_random_twinkle:
-      - addressable_fireworks:
-      - addressable_twinkle:
-      - addressable_scan:
-      - addressable_rainbow:
-      - strobe:
-      - pulse:
-  - platform: esp32_rmt_led_strip
-    pin: GPIO09
-    rgb_order: RGB
-    is_wrgb: true
-    num_leds: 9
-    rmt_channel: 0
-    chipset: ws2811
-    name: "Long Strip"
+  - platform: neopixelbus
     id: my_light
+    name: "NeoPixel 2-node metal daisychain WS2811 24V"
+    type: RGB
+    variant: WS2811
+    pin: GPIO7
+    num_leds: 2
+    default_transition_length: 0.25s
+    # on_turn_on:
+    #   then:
+    #     - light.turn_on:
+    #         id: my_light
+    #         brightness: 20%
+    #         red: 0%
+    #         green: 100%
+    #         blue: 0%    
     effects:
-      - lambda:
-          name: "Custom 1"
-          update_interval: 2s
-          lambda: |-
-            static int state = 0;
-            auto call = id(my_light).turn_on();
-            // Transition of 1000ms = 1s
-            call.set_transition_length(1000);
-            if (state == 0) {
-              call.set_rgb(1.0, 1.0, 1.0);
-            } else if (state == 1) {
-              call.set_rgb(1.0, 0.0, 1.0);
-            } else if (state == 2) {
-              call.set_rgb(0.0, 0.0, 1.0);
-            } else {
-              call.set_rgb(1.0, 0.0, 0.0);
-            }
-            call.perform();
-            state += 1;
-            if (state == 4)
-              state = 0;
       - addressable_random_twinkle:
-          name: Random Twinkle Effect With Custom Values
-          twinkle_probability: 5%
-          progress_interval: 32ms
-      - addressable_lambda:
-          name: "Custom 2"
-          update_interval: 1s
-          lambda: |-
-            // it.size() - Number of LEDs
-            // it[num] - Access the LED at index num.
-            // Set the LED at num to the given r, g, b values
-            // it[num] = Color(r, g, b);
-            // Get the color at index num (Color instance)
-            // it[num].get();
-
-            // Example: Simple color wipe
-            for (int i = it.size() - 1; i > 0; i--) {
-              it[i] = it[i - 1].get();
-            }
-            it[0] = Color::random_color();
-
-            // Bonus: use .range() and .all() to set many LEDs without having to write a loop.
-            //it.range(0, 50) = Color::BLACK;
-            //it.all().fade_to_black(10);
-      - addressable_flicker:
-      - addressable_flicker:
-          name: Adddressable Flicker Effect With Custom Values
-          update_interval: 16ms
-          intensity: 5%
       - addressable_fireworks:
-      - addressable_fireworks:
-          name: Fireworks Effect With Custom Values
-          update_interval: 32ms
-          spark_probability: 10%
-          use_random_color: false
-          fade_out_rate: 120
       - addressable_twinkle:
-      - addressable_twinkle:
-          name: Twinkle Effect With Custom Values
-          twinkle_probability: 5%
-          progress_interval: 4ms
       - addressable_scan:
-      - addressable_scan:
-          name: Scan Effect With Custom Values
-          move_interval: 50ms
-          scan_width: 1
-      - addressable_color_wipe:
-      - addressable_color_wipe:
-          name: Color Wipe Effect With Custom Values
-          colors:
-            - red: 50%
-              green: 50%
-              blue: 50%
-              num_leds: 1
-              gradient: true
-            - red: 25%
-              green: 25%
-              blue: 0%
-              num_leds: 1
-          add_led_interval: 100ms
-          reverse: false
       - addressable_rainbow:
-      - addressable_rainbow:
-          name: Rainbow Effect With Custom Values
-          speed: 10
-          width: 50
-      - flicker:
-      - flicker:
-          name: Flicker Effect With Custom Values
-          alpha: 95%
-          intensity: 1.5%
       - strobe:
-      - strobe:
-          name: Strobe Effect With Custom Values
-          colors:
-            - state: true
-              brightness: 100%
-              red: 100%
-              green: 90%
-              blue: 0%
-              duration: 500ms
-            - state: false
-              duration: 250ms
-            - state: true
-              brightness: 100%
-              red: 0%
-              green: 100%
-              blue: 0%
-              duration: 500ms                                                                                
+      - pulse:
+      - addressable_color_wipe:
       - random:
-      - random:
-          name: Random Effect With Custom Values
-          transition_length: 5s
-          update_interval: 7s
-      - pulse:
-      - pulse:
-          name: "Fast Pulse"
-          transition_length: 0.5s
-          update_interval: 0.5s
-          min_brightness: 0%
-          max_brightness: 100%
-      - pulse:
-          name: "Slow Pulse"
-          # transition_length: 1s      # defaults to 1s
-          update_interval: 2s
-      - pulse:
-          name: "Asymmetrical Pulse"
-          transition_length:
-            on_length: 1s
-            off_length: 500ms
-          update_interval: 1.5s          
+      - flicker:
+      - addressable_flicker:
+      - automation:
+          name: Custom Automation Effect
+          sequence:
+            - light.addressable_set:
+                id: my_light
+                red: 10%
+                green: 10%
+                blue: 10%
+            - delay: 400ms
+            - light.addressable_set:
+                id: my_light
+                range_from: 0
+                range_to: 0
+                red: 33%
+                green: 0%
+                blue: 0%
+            - delay: 250ms
+            - light.addressable_set:
+                id: my_light
+                range_from: 1
+                range_to: 1
+                red: 0%
+                green: 0%
+                blue: 33%
+            - delay: 250ms
+#       - addressable_lambda:
+#           name: "My Custom Lambda 1"
+#           update_interval: 16ms
+#           lambda: |-
+#             // it.size() - Number of LEDs
+#             // it[num] - Access the LED at index num.
+#             // Set the LED at num to the given r, g, b values
+#             // it[num] = Color(r, g, b);
+#             // Get the color at index num (Color instance)
+#             // it[num].get();
+
+#             // Example: Simple color wipe
+#             for (int i = it.size() - 1; i > 0; i--) {
+#               it[i] = it[i - 1].get();
+#             }
+#             it[0] = Color::random_color();
+
+#             // Bonus: use .range() and .all() to set many LEDs without having to write a loop.
+#             it.range(0, 50) = Color::BLACK;
+#             it.all().fade_to_black(10);          
+#       - addressable_lambda:
+#           name: "My Custom Lamba 2"
+#           update_interval: 100ms
+#           lambda: |-
+#             // Static variables keep their value even when
+#             // stopping and starting the effect again
+#             static uint16_t progress = 0;
+
+#             // normal variables lose their value after each
+#             // execution - basically after each update_interval
+#             uint16_t changes = 0;
+
+#             // To reset static when stopping and starting the effect
+#             // again you can use the initial_run variables
+#             if (initial_run) {
+#               progress = 0;
+#               it.all() = Color::BLACK;
+#               // optionally do a return so nothing happens until the next update_interval
+#               return;
+#             }                    
+
+
+
+
+
+
+
+
+
+
+
+
+# does not work  
+# light:
+#   - platform: esp32_rmt_led_strip
+#     pin: GPIO07
+#     rgb_order: RGB
+#     is_wrgb: true
+#     num_leds: 1
+#     rmt_channel: 0
+#     chipset: SK6812
+#     name: "WS2814C 1 segment 24V"
+
+# does not work
+# light:
+#   - platform: esp32_rmt_led_strip
+#     pin: GPIO07
+#     rgb_order: RGB
+#     is_wrgb: true
+#     num_leds: 9
+#     rmt_channel: 0
+#     chipset: ws2811
+#     name: "WS2814C 9 segment strip 24V"
+
+# light:
+# couldn't get this working.
+  # - platform: neopixelbus
+  #   type: GRBW
+  #   # ws2813 -- no worky
+  #   # ws2812 -- no worky, but controls matched capabilities of strip
+  #   # ws2811 -- no worky, but controls matched capabilities of strip
+  #   # sk6812 -- no worky.
+  #   variant: SK6812
+  #   pin: GPIO7
+  #   num_leds: 9
+  #   name: "WS2814C 9 segment strip 24V"
+
+# light:
+#   - platform: fastled_clockless
+#     chipset: SK6812
+#     pin: GPIO07
+#     num_leds: 9
+#     rgb_order: BRG
+#     name: "WS2814C 9 segment strip 24V"
+
+  # - platform: beken_spi_led_strip
+  #   pin: GPIO7
+  #   rgb_order: RGB
+  #   is_wrgb: true
+  #   num_leds: 9
+  #   rmt_channel: 0
+  #   chipset: SK6812
+  #   name: "WS2814C 9 segment strip 24V"
+
+  # - platform: esp32_rmt_led_strip
+  #   pin: GPIO7
+  #   rgb_order: RGB
+  #   is_wrgb: true
+  #   num_leds: 9
+  #   rmt_channel: 0
+  #   chipset: SK6812
+  #   name: "WS2814C 9 segment strip 24V"
+
+
+
+
+  
+  
+
+
+
+
 
 # "All Device" baseline stuff here
 
