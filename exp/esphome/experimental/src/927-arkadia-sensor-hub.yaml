@@ -50,10 +50,12 @@ packages:
       i2c_sda_pin: "GPIO21"
       i2c_scl_pin: "GPIO22"
       i2c_freq: "420kHz"
-  temp_humidity: !include
-    file: ../include/BMP280-AHT20-temp-humidity.yaml
-    vars: 
-      temperature_offset: "0"      
+# This needs to get updated to be something that remotely reads the data points from a given set of sensors in Home Assistant
+# which are in turn updated by a separate MCU in the 6.0 iteration of this thingy.
+  # temp_humidity: !include
+  #   file: ../include/BMP280-AHT20-temp-humidity.yaml
+  #   vars: 
+  #     temperature_offset: "0"      
   display: !include
     file: ../include/SDD1306-display-arkadia.yaml
   keypad: !include

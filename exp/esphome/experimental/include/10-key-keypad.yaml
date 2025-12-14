@@ -12,6 +12,29 @@ globals:
      type: int[10]
      restore_value: no
 
+
+# # Example usage in an automation
+# on_press:
+#     then:
+#     ######################################################
+#     # Must be turned on before setting frequency & level
+#     ######################################################
+#     - output.turn_on: buzzer_0_id
+#     ######################################################
+#     # Frequency sets the wave size
+#     ######################################################
+#     - output.ledc.set_frequency:
+#         id: buzzer_0_id
+#         frequency: "1000Hz"
+#     ######################################################
+#     # level sets the %age time the PWM is on
+#     ######################################################
+#     - output.set_level:
+#         id: buzzer_0_id
+#         level: "50%"
+
+# id(light_1).set_level(0.5);
+
 binary_sensor:
   - platform: gpio
     name: "KSW 0"
@@ -26,7 +49,11 @@ binary_sensor:
     on_state:
       then:
         lambda: |-
-          id(keypad_key_states)[0] = x;        
+          id(keypad_key_states)[0] = x;    
+          var b = id(buzzer_0_id); 
+          b.turn_on();
+          b.set_frequency(1000.0);
+          b.set_level(0.5);
   - platform: gpio
     name: "KSW 1"
     id: keypad_button_1
