@@ -1,0 +1,182 @@
+substitutions:
+
+# 10-key keypad using mcp23017 io expander
+# https://esphome.io/components/mcp230xx.html#mcp230xx-i-o-expander
+
+mcp23017:
+  - id: 'mcp23017_0'
+    address: 0x20
+
+globals:
+   - id: keypad_key_states
+     type: int[10]
+     restore_value: no
+
+
+# # Example usage in an automation
+# on_press:
+#     then:
+#     ######################################################
+#     # Must be turned on before setting frequency & level
+#     ######################################################
+#     - output.turn_on: buzzer_0_id
+#     ######################################################
+#     # Frequency sets the wave size
+#     ######################################################
+#     - output.ledc.set_frequency:
+#         id: buzzer_0_id
+#         frequency: "1000Hz"
+#     ######################################################
+#     # level sets the %age time the PWM is on
+#     ######################################################
+#     - output.set_level:
+#         id: buzzer_0_id
+#         level: "50%"
+
+# id(light_1).set_level(0.5);
+
+binary_sensor:
+  - platform: gpio
+    name: "KSW 0"
+    id: keypad_button_0
+    pin:
+      mcp23xxx: mcp23017_0
+      number: 0
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    on_state:
+      then:
+        lambda: |-
+          id(keypad_key_states)[0] = x;    
+          var b = id(buzzer_0_id); 
+          b.turn_on();
+          b.set_frequency(1000.0);
+          b.set_level(0.5);
+  - platform: gpio
+    name: "KSW 1"
+    id: keypad_button_1
+    pin:
+      mcp23xxx: mcp23017_0
+      number: 1
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    on_state:
+      then:
+        lambda: |-
+          id(keypad_key_states)[1] = x;        
+  - platform: gpio
+    name: "KSW 2"
+    id: keypad_button_2
+    pin:
+      mcp23xxx: mcp23017_0
+      number: 2
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    on_state:
+      then:
+        lambda: |-
+          id(keypad_key_states)[2] = x;        
+  - platform: gpio
+    name: "KSW 3"
+    id: keypad_button_3
+    pin:
+      mcp23xxx: mcp23017_0
+      number: 3
+      inverted: true
+      mode: 
+        input: true
+        pullup: true
+    on_state:
+      then:
+        lambda: |-
+          id(keypad_key_states)[3] = x;        
+  - platform: gpio
+    name: "KSW 4"
+    id: keypad_button_4
+    pin:
+      mcp23xxx: mcp23017_0
+      number: 4
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    on_state:
+      then:
+        lambda: |-
+          id(keypad_key_states)[4] = x;        
+  - platform: gpio
+    name: "KSW 5"
+    id: keypad_button_5
+    pin:
+      mcp23xxx: mcp23017_0
+      number: 5
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    on_state:
+      then:
+        lambda: |-
+          id(keypad_key_states)[5] = x;        
+  - platform: gpio
+    name: "KSW 6"
+    id: keypad_button_6
+    pin:
+      mcp23xxx: mcp23017_0
+      number: 6
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    on_state:
+      then:
+        lambda: |-
+          id(keypad_key_states)[6] = x;        
+  - platform: gpio
+    name: "KSW 7"
+    id: keypad_button_7
+    pin:
+      mcp23xxx: mcp23017_0
+      number: 7
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    on_state:
+      then:
+        lambda: |-
+          id(keypad_key_states)[7] = x;        
+  - platform: gpio
+    name: "KSW 8"
+    id: keypad_button_8
+    pin:
+      mcp23xxx: mcp23017_0
+      number: 8
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    on_state:
+      then:
+        lambda: |-
+          id(keypad_key_states)[8] = x;        
+  - platform: gpio
+    name: "KSW 9"
+    id: keypad_button_9
+    pin:
+      mcp23xxx: mcp23017_0
+      number: 9
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    on_state:
+      then:
+        lambda: |-
+          id(keypad_key_states)[9] = x;        

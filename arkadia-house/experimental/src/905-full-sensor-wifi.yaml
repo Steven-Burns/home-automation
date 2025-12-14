@@ -1,0 +1,51 @@
+esp32:
+# this is from the LilyGo github project:
+# https://github.com/Xinyuan-LilyGO/LilyGO-T-ETH-Series/blob/master/platformio.ini
+  board: esp32s3box
+
+packages:
+  wifi: !include  
+    file: include/wifi.yaml
+  illuminance: !include
+    file: include/TEMT6000-illuminance.yaml
+    vars:
+      illuminance_pin: "GPIO3"
+  radar_motion: !include
+    file: include/HLK-LD2420-radar-motion.yaml
+    vars:
+      # UART 1
+      uart_2_tx_pin: "GPIO17"
+      uart_2_rx_pin: "GPIO18"
+  i2c: !include
+    file: include/i2c.yaml
+    vars:
+      i2c_sda_pin: "GPIO47"
+      i2c_scl_pin: "GPIO48"
+        # goose up the i2c bus frequency so that we don't get runtime warnings about the display component
+        # taking too long to update.
+      i2c_freq: 420kHz
+  temp_humidity: !include
+    file: include/BMP280-AHT20-temp-humidity.yaml
+  buttons: !include
+    file: include/buttons.yaml
+    vars:
+      button_0_pin: "GPIO8"
+      button_1_pin: "GPIO19"
+  relay: !include
+    file: include/single-relay.yaml
+    vars:
+      relay_0_pin: "GPIO4"
+  display: !include
+    file: include/SDD1306-OLED-display-fast-boards.yaml
+  # cpu_speed_selector: !include 
+  #   file: include/cpu_speed_selector.yaml
+
+# "All Device" baseline stuff here
+
+<<: !include 
+  file: include/esp32-device-baseline.yaml
+  vars:
+    device_hostname: "905-esphome"
+    device_comment: "Full sensor array with wifi on board 905."
+
+

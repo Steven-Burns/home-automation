@@ -1,0 +1,105 @@
+
+uart:
+  id: uart_2_id
+  tx_pin: ${uart_2_tx_pin}
+  rx_pin: ${uart_2_rx_pin}
+  baud_rate: 115200 
+  parity: NONE
+  stop_bits: 1
+
+ld2410s:
+  uart_id: uart_2_id
+  id: ld2410s_0_id
+
+# binary_sensor:
+#   - platform: ld2410
+#     ld2410_id: ld2410_0_id
+#     has_target:
+#       id: radar_has_target_id
+#       name: "Radar Target Detected"
+#       device_class: occupancy
+#       icon: mdi:motion-sensor
+#     has_moving_target:
+#       # this changes immediately on motion detection.
+#       id: ld2410_0_moving_target_binary_sensor
+#       name: "Moving Target Detected (LD2410)"
+#       device_class: motion
+#       icon: mdi:motion-sensor
+#       # made internal -- very noisy.
+#       internal: true
+#     has_still_target:
+#       # "If true a still target is detected"
+#       id: ld2410_0_still_target_binary_sensor
+#       name: "Motionless Target Detected (LD2410)"
+#       device_class: motion
+#       icon: mdi:motion-sensor
+#       internal: true
+
+# sensor:
+#   - platform: ld2410
+#     # The light level only works when the radar is in "engineering mode," which it 
+#     # usually is not -- so this is not a useful sensor.
+#     # light:
+#     #  name: Radar Light
+#     moving_distance:
+#       id: radar_moving_distance_id
+#       name: Radar Moving Distance
+#       internal: true      
+#       filters:
+#         - delta: 30
+#     still_distance:
+#       name: "Motionless Distance (LD2410)"
+#       internal: true
+#       filters:
+#         - delta: 30
+#     moving_energy:
+#       name: "Movement Energy (LD2410)"
+#       internal: true
+#       filters:
+#         - delta: 10
+#     still_energy:
+#       name: "Stillness Energy (LD2410)"
+#       internal: true
+#       filters:
+#         - delta: 10
+#     detection_distance:
+#       name: "Motion Detection Distance (LD2410)"
+#       internal: true
+#       filters:
+#         - delta: 30
+
+# button:
+#   - platform: ld2410
+#     ld2410_id: ld2410_0_id
+#     factory_reset:
+#       name: "Radar Factory Reset"
+#       entity_category: diagnostic
+#     restart:
+#       name: "Radar Restart Module"
+#       entity_category: diagnostic
+#     query_params:
+#       name: "Radar Query Params (LD2410)"
+#       entity_category: diagnostic
+
+
+
+# text_sensor:
+#   - platform: ld2410
+#     ld2410_id: ld2410_0_id
+#     version:
+#       name: "Radar Firmware Version"
+#       entity_category: diagnostic
+#     mac_address:
+#       name: "Radar BT MAC Address (LD2410)"
+#       entity_category: diagnostic
+
+# switch:
+#   - platform: ld2410
+#     ld2410_id: ld2410_0_id
+#     engineering_mode:
+#       name: "Radar Enable Engineering Mode (LD2410)"
+#       entity_category: diagnostic
+#     bluetooth:
+#       name: "Radar Enable Bluetooth (LD2410)"
+#       entity_category: diagnostic
+

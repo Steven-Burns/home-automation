@@ -1,0 +1,20 @@
+esp32:
+  # board: nodemcu-32s This also works.
+  board: wemos_d1_mini32
+
+packages:
+  blinky: !include
+    file: include/interval-blinky.yaml
+    vars:
+      builtin_led_pin: "GPIO2"
+  wifi: !include  
+    file: include/wifi.yaml
+
+# "All Device" baseline stuff here
+
+<<: !include 
+  file: include/esp32-device-baseline.yaml
+  vars:
+    device_hostname: "932-esphome"
+    device_comment: "Baseline for board."
+

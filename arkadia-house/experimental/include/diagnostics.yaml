@@ -1,0 +1,155 @@
+debug:
+  update_interval: 60s
+
+text_sensor:
+  - platform: debug
+    device:
+      name: "Device Info"
+      entity_category: "diagnostic"
+      icon: "mdi:information-box"
+    reset_reason:
+      name: "Previous Reset Reason"
+      entity_category: "diagnostic"
+      icon: "mdi:information-box"
+  - platform: version
+    name: Firmware Version
+    entity_category: "diagnostic"
+    icon: "mdi:information-box"
+    internal: true
+  # the ESPHome version is the first chunk of the Firmware Version; commenting 
+  # this out as it is redundant
+  # - platform: version
+  #   id: esphome_version
+  #   name: ESPHome Version
+  #   hide_timestamp: true
+  #   entity_category: diagnostic
+  #   internal: true
+
+  # device fw version is build timestamp and esphome ver, so this timestamp info
+  # is redundant. Commenting in case someday I think I need just the timestamp.
+  # - platform: template
+  #   name: "Firmware Build Timestamp"
+  #   entity_category: "diagnostic"
+  #   internal: true
+  #   lambda: return { __DATE__ " " __TIME__ };
+  #
+  # this is not super useful, and just creates update noise because template
+  # platform text sensors don't have good controls on when to update
+  # - platform: template
+  #   name: "Project"
+  #   id: esphome_project_name
+  #   icon: "mdi:information-box"
+  #   entity_category: "diagnostic"
+  #   internal: true
+  #   lambda: return { ESPHOME_PROJECT_NAME " " ESPHOME_PROJECT_VERSION };
+
+sensor:
+  - platform: template
+    id: sys_esp_xtal_freq
+    name: "Crystal Freq MHz"
+    entity_category: "diagnostic"
+    icon: "mdi:information-box"
+    unit_of_measurement: MHz
+    state_class: measurement
+    lambda: return getXtalFrequencyMhz();
+    internal: true 
+    filters:
+      delta: 1
+  - platform: template
+    id: sys_esp_apb_bus_freq
+    name: "APB Bus Speed MHz"
+    entity_category: "diagnostic"
+    icon: "mdi:information-box"
+    unit_of_measurement: MHz
+    state_class: measurement
+    lambda: return getApbFrequency() / 1000000;
+    internal: true
+    filters:
+      delta: 1
+  - platform: template
+    id: sys_esp_temperature
+    name: CPU Temperature
+    lambda: return temperatureRead();
+    unit_of_measurement: °C
+    device_class: temperature
+    state_class: measurement
+    update_interval: 60s
+    entity_category: "diagnostic"
+    icon: "mdi:information-box"
+    filters:
+      delta: 1.0
+  - platform: template
+    id: sys_esp_cpu_freq
+    name: "CPU Speed"
+    unit_of_measurement: MHz
+    state_class: measurement
+    entity_category: "diagnostic"
+    icon: "mdi:information-box"
+    internal: true
+    filters:
+      delta: 1
+    lambda: return getCpuFrequencyMhz(); 
+  - platform: uptime
+    name: Uptime (approx)
+    id: sys_uptime_id
+    state_class: total_increasing
+    update_interval: 60s
+    entity_category: "diagnostic"
+    icon: "mdi:information-box"
+  - platform: debug
+    free:
+      name: "Heap Free"
+      entity_category: "diagnostic"
+      icon: "mdi:information-box"
+      unit_of_measurement: B
+      state_class: measurement
+      device_class: data_size
+      internal: true
+      filters:
+        delta: 100
+    block:
+      name: "Heap Max Block"
+      entity_category: "diagnostic"
+      icon: "mdi:information-box"
+      unit_of_measurement: B
+      device_class: data_size
+      internal: true
+      filters:
+        delta: 100
+    loop_time:
+      name: "Loop Time"
+      entity_category: "diagnostic"
+      icon: "mdi:information-box"
+      filters:
+        delta: 5
+    # this stat is not avail on hardware that does not have PSRAM.
+    # psram:
+    #   name: "PSRAM Free"
+    #   entity_category: "diagnostic"
+    #   unit_of_measurement: B
+    #   state_class: measurement
+    #   device_class: data_size
+    #   internal: true
+    #   filters:
+    #     delta: 100
+    
+binary_sensor:
+  - platform: status
+    name: "Is Device Online"
+    entity_category: "diagnostic"
+    icon: "mdi:information-box"
+
+# commenting this version of free heap as it is not as encapsulated 
+# and therefore not platform agnostic as is the debug component sensor, and 
+# the results appear to match between the two, making the debug component
+# preferred.
+  # - platform: template
+  #   id: sys_esp_memory_id
+  #   icon: mdi:memory
+  #   name: Free Heap
+  #   lambda: return heap_caps_get_free_size(MALLOC_CAP_INTERNAL) / 1024;
+  #   unit_of_measurement: 'kB'
+  #   state_class: measurement
+  #   entity_category: "diagnostic"
+  #   update_interval: 60s
+

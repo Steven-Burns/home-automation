@@ -1,0 +1,32 @@
+esp8266:
+  board: esp01_1m
+
+packages:
+  blinky: !include
+    file: include/interval-blinky.yaml
+    vars:
+      builtin_led_pin: "GPIO2"
+  wifi: !include
+    file: include/wifi.yaml
+
+switch:
+  - platform: gpio
+    name: "Relay 0"
+    id: relay_0_id
+    pin: 
+      number: GPIO0
+      inverted: true
+      mode:
+        output: true
+
+
+
+# "All Device" baseline stuff here
+
+<<: !include 
+  file: include/esp8266-device-baseline.yaml
+  vars:
+    device_hostname: "920-esphome"
+    device_comment: "Board 920 esp8266 ESP-01S with relay."
+
+

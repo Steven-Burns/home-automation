@@ -1,0 +1,14 @@
+# This is a "fake" component for those sensor boards that don't have an 
+# actual relay. The idea being that this "logical" relay device can be 
+# programmed against like a physical device; in the case of these devices,
+# that programming is typically to forward an action to another device
+# that has a real relay.
+# Use case: two light switches at opposite ends of a room that operate the
+# same light fixtures.  Only one actually needs a physical switch. In this 
+# use case, the flarp relay of one device is programmed to toggle the real
+# relay of the other device.
+switch:
+  - platform: template
+    name: "Relay 0"
+    id: relay_0_id
+    optimistic: true

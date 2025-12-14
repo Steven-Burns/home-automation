@@ -1,0 +1,17 @@
+# a string value settable in home assistant that when 
+# changed, plays on the local buzzer.  Requires rttl-player.yaml 
+
+text_sensor:
+  - platform: homeassistant
+    name: "Home Assistant Ringtone"
+    id: ha_ringtone
+    internal: true
+    entity_id: input_text.buzzer_ringtone
+    on_value:
+      then:
+        - logger.log:
+            format: "Playing %s"
+            args: ["x.c_str()"]
+        - rtttl.play: !lambda |-
+            return x.c_str();
+

@@ -1,0 +1,217 @@
+esp32:
+  board: seeed_xiao_esp32c3
+
+packages:
+  wifi: !include  
+    file: ../include/wifi.yaml
+
+# working configurations:
+# light:
+#   - platform: esp32_rmt_led_strip
+#     id: light_1_id
+#     name: "RMT 2-node metal daisychain WS2811 24V"
+#     rgb_order: RGB
+#     pin: GPIO7
+#     num_leds: 2
+#     rmt_channel: 0
+#     chipset: ws2811
+#     is_wrgb: false
+#     default_transition_length: 0.25s
+
+# This also works
+# light:
+#   - platform: neopixelbus
+#     id: my_light
+#     name: "NeoPixel 2-node metal daisychain WS2811 24V"
+#     type: RGB
+#     variant: WS2811
+#     pin: GPIO7
+#     num_leds: 2
+#     default_transition_length: 0.25s
+#     # on_turn_on:
+#     #   then:
+#     #     - light.turn_on:
+#     #         id: my_light
+#     #         brightness: 20%
+#     #         red: 0%
+#     #         green: 100%
+#     #         blue: 0%    
+#     effects:
+#       - addressable_random_twinkle:
+#       - addressable_fireworks:
+#       - addressable_twinkle:
+#       - addressable_scan:
+#       - addressable_rainbow:
+#       - strobe:
+#       - pulse:
+#       - addressable_color_wipe:
+#       - random:
+#       - flicker:
+#       - addressable_flicker:
+#       - automation:
+#           name: Custom Automation Effect
+#           sequence:
+#             - light.addressable_set:
+#                 id: my_light
+#                 red: 10%
+#                 green: 10%
+#                 blue: 10%
+#             - delay: 400ms
+#             - light.addressable_set:
+#                 id: my_light
+#                 range_from: 0
+#                 range_to: 0
+#                 red: 33%
+#                 green: 0%
+#                 blue: 0%
+#             - delay: 250ms
+#             - light.addressable_set:
+#                 id: my_light
+#                 range_from: 1
+#                 range_to: 1
+#                 red: 0%
+#                 green: 0%
+#                 blue: 33%
+#             - delay: 250ms
+# #       - addressable_lambda:
+# #           name: "My Custom Lambda 1"
+# #           update_interval: 16ms
+# #           lambda: |-
+# #             // it.size() - Number of LEDs
+# #             // it[num] - Access the LED at index num.
+# #             // Set the LED at num to the given r, g, b values
+# #             // it[num] = Color(r, g, b);
+# #             // Get the color at index num (Color instance)
+# #             // it[num].get();
+
+# #             // Example: Simple color wipe
+# #             for (int i = it.size() - 1; i > 0; i--) {
+# #               it[i] = it[i - 1].get();
+# #             }
+# #             it[0] = Color::random_color();
+
+# #             // Bonus: use .range() and .all() to set many LEDs without having to write a loop.
+# #             it.range(0, 50) = Color::BLACK;
+# #             it.all().fade_to_black(10);          
+# #       - addressable_lambda:
+# #           name: "My Custom Lamba 2"
+# #           update_interval: 100ms
+# #           lambda: |-
+# #             // Static variables keep their value even when
+# #             // stopping and starting the effect again
+# #             static uint16_t progress = 0;
+
+# #             // normal variables lose their value after each
+# #             // execution - basically after each update_interval
+# #             uint16_t changes = 0;
+
+# #             // To reset static when stopping and starting the effect
+# #             // again you can use the initial_run variables
+# #             if (initial_run) {
+# #               progress = 0;
+# #               it.all() = Color::BLACK;
+# #               // optionally do a return so nothing happens until the next update_interval
+# #               return;
+# #             }                    
+
+
+
+
+
+
+
+
+light:
+  - platform: esp32_rmt_led_strip
+    pin: GPIO07
+    rgb_order: RGB
+    is_wrgb: true
+    num_leds: 1
+    rmt_channel: 0
+    chipset: SK6812
+    name: "WS2814C 1 segment 24V"
+
+
+
+
+# does not work  
+# light:
+#   - platform: esp32_rmt_led_strip
+#     pin: GPIO07
+#     rgb_order: RGB
+#     is_wrgb: true
+#     num_leds: 1
+#     rmt_channel: 0
+#     chipset: SK6812
+#     name: "WS2814C 1 segment 24V"
+
+# does not work
+# light:
+#   - platform: esp32_rmt_led_strip
+#     pin: GPIO07
+#     rgb_order: RGB
+#     is_wrgb: true
+#     num_leds: 9
+#     rmt_channel: 0
+#     chipset: ws2811
+#     name: "WS2814C 9 segment strip 24V"
+
+# light:
+# couldn't get this working.
+  # - platform: neopixelbus
+  #   type: GRBW
+  #   # ws2813 -- no worky
+  #   # ws2812 -- no worky, but controls matched capabilities of strip
+  #   # ws2811 -- no worky, but controls matched capabilities of strip
+  #   # sk6812 -- no worky.
+  #   variant: SK6812
+  #   pin: GPIO7
+  #   num_leds: 9
+  #   name: "WS2814C 9 segment strip 24V"
+
+# light:
+#   - platform: fastled_clockless
+#     chipset: SK6812
+#     pin: GPIO07
+#     num_leds: 9
+#     rgb_order: BRG
+#     name: "WS2814C 9 segment strip 24V"
+
+  # - platform: beken_spi_led_strip
+  #   pin: GPIO7
+  #   rgb_order: RGB
+  #   is_wrgb: true
+  #   num_leds: 9
+  #   rmt_channel: 0
+  #   chipset: SK6812
+  #   name: "WS2814C 9 segment strip 24V"
+
+  # - platform: esp32_rmt_led_strip
+  #   pin: GPIO7
+  #   rgb_order: RGB
+  #   is_wrgb: true
+  #   num_leds: 9
+  #   rmt_channel: 0
+  #   chipset: SK6812
+  #   name: "WS2814C 9 segment strip 24V"
+
+
+
+
+  
+  
+
+
+
+
+
+# "All Device" baseline stuff here
+
+<<: !include 
+  file: ../include/esp32-device-baseline.yaml
+  vars:
+    device_hostname: "803-esphome"
+    device_friendly_name: "803-esphome"
+    device_comment: "Wifi and pixels on board 803."
+
+

@@ -1,0 +1,119 @@
+esp32:
+  board: nodemcu-32s
+
+packages:
+  blinky: !include
+    file: include/interval-blinky.yaml
+    vars:
+      builtin_led_pin: "GPIO2"
+  wifi: !include  
+    file: include/wifi.yaml
+
+color:
+  - id: my_red
+    red: 100%
+    green: 3%
+    blue: 5%
+
+spi:
+  interface: hardware
+  clk_pin: GPIO18
+  mosi_pin: GPIO23
+  miso_pin: GPIO19
+
+# display D106
+display:
+  - platform: ili9xxx
+    id: display_0_id
+    model: ili9341
+    dc_pin: GPIO25
+    reset_pin: GPIO26
+    cs_pin: GPIO21
+    data_rate: 80MHz
+    invert_colors: false
+    color_palette: NONE
+    color_order: bgr
+    rotation: 180
+    # show_test_card: true
+    update_interval: 0.1s
+    lambda: |-
+      static int width = it.get_width();
+      static int height = it.get_height();
+      static auto color = id(my_red);
+      auto touch = id(touchscreen_0_id)->get_touch();
+      if (touch) 
+      {
+        it.filled_circle(touch.value().x, touch.value().y, 10, color);
+      }
+
+      static const int NUM_BLINKIES = 3;
+      static const int MIN_X = 0;
+      static const int MAX_X = width;
+      static const int MIN_Y = 0;
+      static const int MAX_Y = height;
+      static int blinky_x[] = {0, 30, 10, 75};
+      static int blinky_y[] = {0, 5, 127, 30};
+      static int blinky_dx[] = {1, 1, -2, -3};
+      static int blinky_dy[] = {1, -2, 1, 1};
+      for (int i = 0; i < NUM_BLINKIES; ++i) 
+      {
+        blinky_x[i] += blinky_dx[i];
+        blinky_y[i] += blinky_dy[i];
+        if (blinky_x[i] > MAX_X) { blinky_x[i] = MAX_X;  blinky_dx[i] = -blinky_dx[i]; }
+        if (blinky_y[i] > MAX_Y) { blinky_y[i] = MAX_Y;  blinky_dy[i] = -blinky_dy[i]; }
+        if (blinky_x[i] < MIN_X ) { blinky_x[i] = MIN_X; blinky_dx[i] = -blinky_dx[i]; }
+        if (blinky_y[i] < MIN_Y ) { blinky_y[i] = MIN_Y; blinky_dy[i] = -blinky_dy[i]; }
+      }
+      for (int i = 0; i < NUM_BLINKIES; ++i)
+      {
+
+        if (NUM_BLINKIES - 1 == i) 
+        {
+          it.line(blinky_x[i], blinky_y[i], blinky_x[0], blinky_y[0], color);
+          break;
+        }
+        it.line(blinky_x[i], blinky_y[i], blinky_x[i + 1], blinky_y[i + 1], color);
+
+      //  it.draw_pixel_at(blinky_x[i], blinky_y[i], COLOR_ON);
+      }
+
+touchscreen:
+  platform: xpt2046
+  id: touchscreen_0_id
+  display: display_0_id 
+  cs_pin: GPIO5
+  interrupt_pin: GPIO17
+  calibration:
+    x_min: 380
+    x_max: 3780
+    y_min: 240
+    y_max: 3680
+  transform:
+    swap_xy: false
+    mirror_x: false
+    mirror_y: true
+  on_touch:
+      - lambda: |-
+            ESP_LOGI("cal", "x=%d, y=%d, x_raw=%d, y_raw=%0d",
+                touch.x,
+                touch.y,
+                touch.x_raw,
+                touch.y_raw
+                );
+
+# "All Device" baseline stuff here
+
+<<: !include 
+  file: include/esp32-device-baseline.yaml
+  vars:
+    device_hostname: "903-esphome"
+    device_comment: "Board 903 connected on WiFi."
+    # logger_baud_rate: "0"
+
+# turn down the warning logging from ESPHome that complains that the display 
+# component takes a long time.  A null lambda takes 60+ ms, and the warning fires
+# for times > 25ms or so.
+logger:
+ level: DEBUG
+ logs:
+   component: ERROR

@@ -1,0 +1,121 @@
+substitutions:
+  uart_id: "not set"
+  radar_id: "not set"
+  uart_tx_pin: "not set"
+  uart_rx_pin: "not set"
+
+# https://wiki.dfrobot.com/SKU_SEN0557_24GHz_Human_Presence_Sensing_Module
+
+uart:
+  - id: ${uart_id}
+    tx_pin: ${uart_tx_pin}
+    rx_pin: ${uart_rx_pin}
+    # the LD2410 app says that 256000 is the factory default. Some sources of 
+    # this module have changed that.
+    baud_rate: 256000 
+    parity: NONE
+    stop_bits: 1
+
+ld2410:
+  - id: ${radar_id}
+    uart_id: ${uart_id}
+
+globals:
+   - id: ${radar_id}_target_detected
+     type: bool
+     restore_value: no
+     initial_value: "false"
+
+binary_sensor:
+  - platform: ld2410
+    ld2410_id: ${radar_id}
+    has_target:
+      name: ${radar_id} Target Detected
+      device_class: occupancy
+      icon: mdi:motion-sensor
+      on_state:
+        then:
+          - globals.set:
+              id: ${radar_id}_target_detected
+              value: !lambda |-
+                return x;
+    has_moving_target:
+      # this changes immediately on motion detection.
+      name: ${radar_id} Moving Target Detected
+      device_class: motion
+      icon: mdi:motion-sensor
+      # made internal -- very noisy.
+      internal: true
+    has_still_target:
+      # "If true a still target is detected"
+      name: ${radar_id} Motionless Target Detected
+      device_class: motion
+      icon: mdi:motion-sensor
+      internal: true
+
+sensor:
+  - platform: ld2410
+    ld2410_id: ${radar_id}
+    # The light level only works when the radar is in "engineering mode," which it 
+    # usually is not -- so this is not a useful sensor.
+    # light:
+    #  name: Radar Light
+    moving_distance:
+      name: ${radar_id} Moving Distance
+      internal: true      
+      filters:
+        - delta: 10
+    still_distance:
+      name: ${radar_id} Motionless Distance
+      internal: true
+      filters:
+        - delta: 10
+    moving_energy:
+      name: ${radar_id} Movement Energy
+      internal: true
+      filters:
+        - delta: 10
+    still_energy:
+      name: ${radar_id} Stillness Energy
+      internal: true
+      filters:
+        - delta: 10
+    detection_distance:
+      name: ${radar_id} Motion Detection Distance
+      internal: true
+      filters:
+        - delta: 10
+
+button:
+  - platform: ld2410
+    ld2410_id: ${radar_id}
+    factory_reset:
+      name: ${radar_id} Factory Reset
+      entity_category: diagnostic
+    restart:
+      name: ${radar_id} Restart Module
+      entity_category: diagnostic
+    query_params:
+      name: ${radar_id} Query Params
+      entity_category: diagnostic
+
+text_sensor:
+  - platform: ld2410
+    ld2410_id: ${radar_id}
+    version:
+      name: ${radar_id} Firmware Version
+      entity_category: diagnostic
+    mac_address:
+      name: ${radar_id} BT MAC Address
+      entity_category: diagnostic
+
+switch:
+  - platform: ld2410
+    ld2410_id: ${radar_id}
+    engineering_mode:
+      name: ${radar_id} Enable Engineering Mode
+      entity_category: diagnostic
+    bluetooth:
+      name: ${radar_id} Enable Bluetooth
+      entity_category: diagnostic
+

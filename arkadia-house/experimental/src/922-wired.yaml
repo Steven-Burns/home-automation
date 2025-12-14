@@ -1,0 +1,25 @@
+esp32:
+  board: wemos_d1_mini32
+
+packages:
+  blinky: !include
+    file: include/interval-blinky.yaml
+    vars:
+      builtin_led_pin: "GPIO2"
+  wired_ethernet: !include
+    file: include/wired-ethernet.yaml
+    vars:
+      ethernet_clk_pin: "GPIO18"  
+      ethernet_mosi_pin: "GPIO23" 
+      ethernet_miso_pin: "GPIO19" 
+      ethernet_cs_pin: "GPIO5" 
+      ethernet_interrupt_pin: "GPIO26" 
+      ethernet_reset_pin: "GPIO17"
+
+# "All Device" baseline stuff here
+
+<<: !include 
+  file: include/esp32-device-baseline.yaml
+  vars:
+    device_hostname: "922-esphome"
+    device_comment: "Wired baseline for board."

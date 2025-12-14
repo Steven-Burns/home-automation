@@ -1,0 +1,18 @@
+esp32:
+  board: nodemcu-32s
+
+packages:
+  wifi: !include
+    file: include/wifi.yaml
+  relay: !include 
+    file: include/single-relay.yaml
+    vars: 
+      relay_0_pin: "GPIO4"
+
+# "All Device" baseline stuff here
+
+<<: !include 
+  file: include/esp32-device-baseline.yaml
+  vars:
+    device_hostname: "904-esphome"
+    device_comment: "Single relay controlled by Board 904 connected on wifi."

@@ -1,0 +1,70 @@
+esp32:
+  board: wemos_d1_mini32
+
+packages:
+  blinky: !include
+    file: ../include/interval-blinky.yaml
+    vars:
+      builtin_led_pin: "GPIO2"
+  wired_ethernet: !include
+    file: ../include/wired-ethernet.yaml
+    vars:
+      ethernet_clk_pin: "GPIO18"  
+      ethernet_mosi_pin: "GPIO23" 
+      ethernet_miso_pin: "GPIO19" 
+      ethernet_cs_pin: "GPIO5" 
+      ethernet_interrupt_pin: "GPIO26" 
+      ethernet_reset_pin: "GPIO4"
+  tone_player: !include
+    file: ../include/rtttl-player.yaml
+    vars:
+      buzzer_pin: "GPIO33"
+
+
+text_sensor:
+  - platform: homeassistant
+    name: "RingtoneRTTTL"
+    id: ringtone_input_id
+    internal: true
+    entity_id: input_text.buzzer_ringtone
+    on_value:
+      then:
+        - logger.log:
+            format: "Playing %s"
+            args: ["x.c_str()"]
+        - rtttl.play: !lambda |-
+            return x.c_str();
+
+
+
+
+binary_sensor:
+  - platform: gpio
+    name: "Door Open Sensor 0"
+    id: door_sensor_0_id
+    device_class: door
+    pin:
+      # silkscreened as "TDI" on the chip module
+      number: GPIO12
+      mode:
+        input: true
+        pulldown: true
+  - platform: gpio
+    name: "Door Open Sensor 1"
+    id: door_sensor_1_id
+    device_class: door
+    pin:
+      #silkscreened as "TCK" on the chip module
+      number: GPIO13
+      mode:
+        input: true
+        pulldown: true
+
+# "All Device" baseline stuff here
+
+<<: !include 
+  file: ../include/esp32-device-baseline.yaml
+  vars:
+    device_hostname: "921-esphome"
+    device_friendly_name: "Arkadia House proto keypad"
+    device_comment: "Wired baseline for board."

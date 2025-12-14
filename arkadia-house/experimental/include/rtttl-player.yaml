@@ -1,0 +1,38 @@
+substitutions:
+  # this pin must be wired to a passive buzzer
+  buzzer_pin: "GPIO13"
+
+output:
+  - platform: ledc
+    pin: ${buzzer_pin}
+    id: buzzer_0_id
+
+rtttl:
+  output: buzzer_0_id
+  id: rtttl_id
+  gain: 60%
+  on_finished_playback:
+    - logger.log: 'Song ended!'
+
+# # Example usage in an automation
+# on_press:
+#     then:
+#     ######################################################
+#     # Must be turned on before setting frequency & level
+#     ######################################################
+#     - output.turn_on: buzzer_0_id
+#     ######################################################
+#     # Frequency sets the wave size
+#     ######################################################
+#     - output.ledc.set_frequency:
+#         id: buzzer_0_id
+#         frequency: "1000Hz"
+#     ######################################################
+#     # level sets the %age time the PWM is on
+#     ######################################################
+#     - output.set_level:
+#         id: buzzer_0_id
+#         level: "50%"
+
+
+

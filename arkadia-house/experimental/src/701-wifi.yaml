@@ -1,0 +1,17 @@
+esp32:
+  board: wt32-eth01
+
+packages:
+  wifi: !include  
+    file: ../include/wifi.yaml
+
+# "All Device" baseline stuff here
+
+<<: !include 
+  file: ../include/esp32-device-baseline.yaml
+  vars:
+    device_hostname: "701-esphome"
+    device_comment: "Basic config for board 701 connected on WiFi."
+
+
+

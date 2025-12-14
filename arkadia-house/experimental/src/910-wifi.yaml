@@ -1,0 +1,20 @@
+esp32:
+  board: lolin_s2_mini
+  variant: ESP32S2
+
+packages:
+  blinky: !include
+    file: include/interval-blinky.yaml
+    vars:
+      builtin_led_pin: "GPIO15"
+  wifi: !include  
+    file: include/wifi.yaml
+
+# "All Device" baseline stuff here
+
+<<: !include 
+  file: include/esp32-device-baseline.yaml
+  vars:
+    device_hostname: "910-esphome"
+    device_comment: "Baseline for board 910."
+

@@ -1,0 +1,150 @@
+esphome:
+  name: ${device_name}
+  friendly_name: ${device_name} 
+  comment: ${device_comment}
+  name_add_mac_suffix: false
+  project:
+    name: "arkadiahouse.home_automation"
+    version: "0.1.1"
+  # if one were to want to bake the CPU clock freq at build time, the below 
+  # stanza will do it.
+  # platformio_options:
+  #     board_build.f_cpu: 160000000L
+
+
+rp2040:
+  # framework:
+  #   platform_version: https://github.com/maxgerhardt/platform-raspberrypi.git
+
+# Enable logging
+# logger:
+#   level: DEBUG
+#   # this will disable serial logging (API access should still work, tho)
+#   # baud_rate:0 
+
+# Enable Home Assistant API
+# api:
+#   password: ""
+  # reboot_timeout set to 0s will keep the board running even when networking (connection to the home asst api)
+  # is lost, even if lost forever. 
+  # reboot_timeout: 0s
+
+# ota:
+#   - platform: esphome
+#     password: !secret ota_password
+
+# 12 Oct 2024 not avail on rp2040    
+# web_server:
+#   port: 80
+#   version: 3
+#   include_internal: true
+#   log: true
+#   ota: false 
+#   local: true
+
+# this component sync the local gadget to the time of the Home Asst server
+# time:
+#   - platform: homeassistant
+#     id: esptime
+
+# debug:
+#   update_interval: 63s
+
+# needed to supply "Free PSRAM" sensor value
+# Does not appear to work as of 04 Oct 2024
+# psram:
+
+# text_sensor:
+#   - platform: debug
+#     device:
+#       name: "Device Info"
+#       entity_category: "diagnostic"
+#     reset_reason:
+#       name: "Reset Reason"
+#       entity_category: "diagnostic"
+#   - platform: version
+#     name: "Device Firmware Version"
+#     entity_category: "diagnostic"
+#   - platform: template
+#     id: sys_esp_xtal_freq_id
+#     name: "Crystal Speed MHz"
+#     entity_category: "diagnostic"
+#     lambda: return std::to_string(getXtalFrequencyMhz());
+#     update_interval: 12h
+#   - platform: template
+#     id: sys_esp_apb_bus_freq_id
+#     name: "APB Bus Speed MHz"
+#     entity_category: "diagnostic"
+#     lambda: return std::to_string(getApbFrequency() / 1000000);
+#     update_interval: 12h
+
+# button:
+#   - platform: restart
+#     icon: mdi:power-cycle
+#     name: "Safely Restart Device"
+#     entity_category: diagnostic
+
+# sensor:
+#   - platform: template
+#     id: sys_esp_temperature_id
+#     name: CPU Temperature
+#     lambda: return temperatureRead();
+#     unit_of_measurement: °C
+#     device_class: temperature
+#     state_class: measurement
+#     update_interval: 60s
+#     entity_category: "diagnostic"
+#   - platform: uptime
+#     name: Uptime (approx)
+#     id: sys_uptime_id
+#     state_class: total_increasing
+#     update_interval: 60s
+#     entity_category: "diagnostic"
+#   - platform: debug
+#     free:
+#       name: "Heap Free"
+#       entity_category: "diagnostic"
+#       unit_of_measurement: B
+#       state_class: measurement
+#       device_class: data_size
+#       filters:
+#         delta: 100
+#     block:
+#       name: "Heap Max Block"
+#       entity_category: "diagnostic"
+#       unit_of_measurement: B
+#       device_class: data_size
+#       filters:
+#         delta: 100
+#     loop_time:
+#       name: "Loop Time"
+#       entity_category: "diagnostic"
+#       filters:
+#         delta: 1
+#   - platform: template
+#     id: sys_esp_cpu_freq_id
+#     name: "CPU Speed"
+#     unit_of_measurement: MHz
+#     state_class: measurement
+#     entity_category: "diagnostic"
+#     filters:
+#       delta: 1
+#     lambda: return getCpuFrequencyMhz(); 
+
+# Does not appear to work as of 4 Oct 2024
+    # psram:
+    #   name: "Free PSRAM"
+    #   entity_category: "diagnostic"
+# commenting this version of free heap as it is not as encapsulated 
+# and therefore platform agnostic as the debug component sensor, and 
+# the results appear to match.
+  # - platform: template
+  #   id: sys_esp_memory_id
+  #   icon: mdi:memory
+  #   name: Free Heap
+  #   lambda: return heap_caps_get_free_size(MALLOC_CAP_INTERNAL) / 1024;
+  #   unit_of_measurement: 'kB'
+  #   state_class: measurement
+  #   entity_category: "diagnostic"
+  #   update_interval: 60s
+

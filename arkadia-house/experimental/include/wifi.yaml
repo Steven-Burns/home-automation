@@ -1,0 +1,56 @@
+wifi:
+  id: wifi_id
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  domain: .localdomain
+  fast_connect: on
+  # Operate at full blast, as we expect wired power supply
+  # output_power: 20.5dB
+  power_save_mode: none
+
+  # manual_ip:
+  #   static_ip: 192.168.4.76
+  #   gateway: 192.168.1.1
+  #   subnet: 255.255.0.0
+  #   dns1: 192.168.1.1
+  #   dns2: 8.8.8.8
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  # ap:
+  #   ssid: "Fallback Hotspot"
+  #   password: !secret fallback_hotspot_password
+
+# captive_portal:
+
+sensor:
+  - platform: wifi_signal 
+    name: "WiFi RSSI"
+    id: wifi_signal_db
+    update_interval: 60s
+    device_class: signal_strength
+    entity_category: "diagnostic"
+    filters: 
+      delta: 1
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      # This ID is significant and also defined for wired ethernet, so that whether the
+      # devide is wired or wireless, there is a single sensor ID for the IP address.
+      id: ip_address_id
+      name: "WiFi IP Address"
+      entity_category: "diagnostic"
+    ssid:
+      name: "WiFi SSID"
+      entity_category: diagnostic
+    bssid:
+      name: "WiFi BSSID"
+      entity_category: diagnostic
+    mac_address:
+      name: "WiFi MAC Address"
+      entity_category: diagnostic
+    dns_address:
+      name: "WiFi DNS Addresses"
+      entity_category: diagnostic
+
+

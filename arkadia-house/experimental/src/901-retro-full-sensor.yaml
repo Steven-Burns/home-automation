@@ -1,0 +1,67 @@
+esp32:
+  board: nodemcu-32s
+  cpu_frequency: 240MHZ
+  framework:
+    type: arduino
+
+packages:
+  diagnostics: !include 
+    file: ../include/diagnostics.yaml
+  blinky: !include
+    file: ../include/interval-blinky.yaml
+    vars:
+      builtin_led_pin: "GPIO2"
+  wifi: !include
+    file: ../include/wifi.yaml
+
+
+
+
+
+
+
+  tone_player: !include
+    file: ../include/rtttl-player.yaml
+    vars:
+      buzzer_pin: "GPIO13"
+  ha_chime: !include
+    file: ../include/home-asst-tone-player.yaml
+  illuminance: !include
+    file: ../include/photoresistor-illuminance.yaml
+    vars:
+      illuminance_pin: "GPIO39"
+  radar_0: !include
+    file: ../include/HLK-LD2410-radar-motion.yaml
+    vars:
+      uart_id: "uart_1"
+      radar_id: "ld2410_0"
+      uart_tx_pin: "GPIO17" 
+      uart_rx_pin: "GPIO16" 
+
+
+
+
+
+
+
+  i2c: !include
+    file: ../include/i2c.yaml
+    vars:
+      i2c_sda_pin: "GPIO21"
+      i2c_scl_pin: "GPIO22"
+      i2c_freq: "420kHz"
+  temp_humidity: !include
+    file: ../include/BMP280-AHT20-temp-humidity.yaml
+    vars: 
+      temperature_offset: "0"    
+  display: !include
+    file: ../include/SDD1306-display-arkadia.yaml
+  keypad: !include
+    file: ../include/10-key-keypad.yaml
+
+<<: !include 
+  file: ../include/esp32-device-baseline.yaml
+  vars:
+    device_hostname: "901-esphome"
+    device_friendly_name: "Desk Test Sensor Unit"
+    device_comment: "Retrofit sensor unit on board 901."

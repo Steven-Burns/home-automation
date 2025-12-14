@@ -1,0 +1,68 @@
+esp32:
+  board: wemos_d1_mini32
+
+packages:
+  blinky: !include
+    file: include/interval-blinky.yaml
+    vars:
+      builtin_led_pin: "GPIO2"
+  illuminance: !include 
+    file: include/photoresistor-illuminance.yaml
+    vars:
+        illuminance_pin: "GPIO39"    
+  radar_motion: !include
+    file: include/HLK-LD2410-radar-motion.yaml
+    vars:
+      # GPIO1 and 3 are labeled as UART0, but that conflicts with logging
+      # 9 andd 10 are labeled as UART1, but that results in a warning that 
+      # those pins might be hooked to flash.  So let's try 17 and 16
+      uart_2_tx_pin: "GPIO17"
+      uart_2_rx_pin: "GPIO16"
+  i2c: !include
+    file: include/i2c.yaml
+    vars:
+      # datasheet says 21 and 22 are I2C0
+      i2c_sda_pin: "GPIO21"
+      i2c_scl_pin: "GPIO22"
+      i2c_freq: "420kHz"
+  temp_humidity: !include
+    file: include/BMP280-AHT20-temp-humidity.yaml
+  relay: !include
+    file: include/single-relay.yaml
+    vars:
+      relay_0_pin: "GPIO27"
+  display: !include
+    file: include/SDD1306-OLED-display-fast-boards.yaml
+  wired_ethernet: !include
+    file: include/wired-ethernet.yaml
+    vars:
+      ethernet_clk_pin: "GPIO18"  
+      ethernet_mosi_pin: "GPIO23" 
+      ethernet_miso_pin: "GPIO19" 
+      ethernet_cs_pin: "GPIO5" 
+      ethernet_interrupt_pin: "GPIO26" 
+      ethernet_reset_pin: "GPIO4" 
+
+binary_sensor:
+  - platform: gpio
+    name: "Relay Toggle Button"
+    id: button_0_id
+    pin:
+      number: GPIO15
+      mode:
+        input: true
+        pulldown: true
+    on_click:
+      min_length: 10ms
+      max_length: 1500ms
+      then:
+        - switch.toggle: relay_0_id
+
+# "All Device" baseline stuff here
+
+<<: !include 
+  file: include/esp32-device-baseline.yaml
+  vars:
+    device_hostname: "922-esphome"
+    device_comment: "Full sensor unit on board 922."
+

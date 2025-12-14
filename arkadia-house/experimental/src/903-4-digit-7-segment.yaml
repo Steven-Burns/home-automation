@@ -1,0 +1,84 @@
+esp32:
+  board: nodemcu-32s
+
+packages:
+  blinky: !include
+    file: include/interval-blinky.yaml
+    vars:
+      builtin_led_pin: "GPIO2"
+  wifi: !include  
+    file: include/wifi.yaml
+
+# this markup serves to set each of the named pins to OUTPUT
+output:
+  - platform: gpio
+    pin: GPIO14
+    id: gpio14_id
+  - platform: gpio
+    pin: GPIO27
+    id: gpio27_id
+  - platform: gpio
+    pin: GPIO26
+    id: gpio26_id
+
+interval:
+  id: four_digit_display_0_id
+  interval: 1s
+  then:
+    lambda: |-
+      // adapted from elegoo arduino demo code for 
+      // a single digit and a 4-digit 7 segment display.
+
+      // define the LED digit patterns, from 0 - 9
+      // 1 = LED on, 0 = LED off, in this order:
+      // 74HC595 pin  Q0,Q1,Q2,Q3,Q4,Q5,Q6,Q7 
+      // Mapping to   a,b,c,d,e,f,g,dp of Seven-Segment LED
+      static const byte seven_seg_digits[16] = { 
+      // abcdefgdp    
+        B11111100,  // = 0
+        B01100000,  // = 1
+        B11011010,  // = 2
+        B11110010,  // = 3
+        B01100110,  // = 4
+        B10110110,  // = 5
+        B10111110,  // = 6
+        B11100000,  // = 7
+        B11111110,  // = 8
+        B11100110,  // = 9
+        B11101110,  // = A
+        B00111110,  // = b
+        B10011100,  // = C
+        B01111010,  // = d
+        B10011110,  // = E
+        B10001110,  // = F
+      }; 
+
+      // additional pins on the 4-digit component 5641AS select which 
+      // digit is to be set -- this selection is not used here as I have
+      // concluded that the number of pins and complexity of the logic 
+      // to use this little display is not worth the effort -- if one wants
+      // a multi-digit 7-seg display, better to buy a higher-level module.
+
+      static const int DATA_PIN = 14;
+      static const int LATCH_PIN = 27;
+      static const int CLOCK_PIN = 26;
+      static int i = 0;
+
+      digitalWrite(LATCH_PIN, LOW);
+      shiftOut(DATA_PIN, CLOCK_PIN, LSBFIRST, seven_seg_digits[i]);
+      digitalWrite(LATCH_PIN, HIGH);
+      ++i;
+      if (i >= 16) { i = 0;}
+
+# "All Device" baseline stuff here
+
+<<: !include 
+  file: include/esp32-device-baseline.yaml
+  vars:
+    device_hostname: "903-esphome"
+    device_comment: "experiment with 7-seg display module."
+
+
+
+
+

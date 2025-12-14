@@ -1,0 +1,48 @@
+substitutions:
+  door_lock_id: "not set"
+  sensor_pin: "not set"
+  motor_pin_1: "not set"
+  motor_pin_2: "not set"
+
+binary_sensor:
+  - platform: gpio
+    name: ${door_lock_id} Sensor
+    id: ${door_lock_id}_sensor
+    device_class: door
+    pin:
+      number: ${sensor_pin}
+      mode:
+        input: true
+# see if we can get away with not pulling down as pins 34..39 do not support that
+#        pulldown: true
+
+output:
+  - platform: gpio
+    pin: ${motor_pin_1}
+    id: ${door_lock_id}_motor_pin_1
+  - platform: gpio
+    pin: ${motor_pin_2}
+    id: ${door_lock_id}_motor_pin_2
+
+lock:
+  - platform: template
+    id: ${door_lock_id}
+    lock_action:
+      - output.turn_off: ${door_lock_id}_motor_pin_1
+      - output.turn_on: ${door_lock_id}_motor_pin_2
+      - lock.template.publish:
+          id: ${door_lock_id}
+          state: LOCKED
+    unlock_action:
+      - output.turn_on: ${door_lock_id}_motor_pin_1
+      - output.turn_off: ${door_lock_id}_motor_pin_2
+      - lock.template.publish:
+          id: ${door_lock_id}
+          state: UNLOCKED
+    open_action:
+      - output.turn_on: ${door_lock_id}_motor_pin_1
+      - output.turn_off: ${door_lock_id}_motor_pin_2
+      - lock.template.publish:
+          id: ${door_lock_id}
+          state: UNLOCKED
+

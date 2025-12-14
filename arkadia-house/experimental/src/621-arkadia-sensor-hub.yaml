@@ -1,0 +1,95 @@
+esp32:
+  board: wemos_d1_mini32
+  cpu_frequency: 240MHZ
+  framework:
+    type: arduino
+
+packages:
+  diagnostics: !include 
+    file: ../include/diagnostics.yaml
+  blinky: !include
+    file: ../include/interval-blinky.yaml
+    vars:
+      builtin_led_pin: "GPIO2"
+  wired_ethernet: !include
+    file: ../include/wired-ethernet.yaml
+    vars:
+      ethernet_clk_pin: "GPIO18"  
+      ethernet_mosi_pin: "GPIO23" 
+      ethernet_miso_pin: "GPIO19" 
+      ethernet_cs_pin: "GPIO05" 
+      ethernet_interrupt_pin: "GPIO26" 
+      ethernet_reset_pin: "GPIO4"
+  tone_player: !include
+    file: ../include/rtttl-player.yaml
+    vars:
+      buzzer_pin: "GPIO33"
+  ha_chime: !include
+    file: ../include/home-asst-tone-player.yaml
+  illuminance: !include
+    file: ../include/photoresistor-illuminance.yaml
+    vars:
+      illuminance_pin: "GPIO39"
+  radar_0: !include
+    file: ../include/HLK-LD2410-radar-motion.yaml
+    vars:
+      uart_id: "uart_1"
+      radar_id: "ld2410_0"
+      uart_tx_pin: "GPIO17" 
+      uart_rx_pin: "GPIO16" 
+  radar_1: !include
+    file: ../include/HLK-LD2410-radar-motion.yaml
+    vars:
+      uart_id: "uart_0"
+      radar_id: "ld2410_1"
+      uart_tx_pin: "GPIO1" 
+      uart_rx_pin: "GPIO3" 
+  i2c: !include
+    file: ../include/i2c.yaml
+    vars:
+      i2c_sda_pin: "GPIO21"
+      i2c_scl_pin: "GPIO22"
+      i2c_freq: "420kHz"
+# This needs to get updated to be something that remotely reads the data points from a given set of sensors in Home Assistant
+# which are in turn updated by a separate MCU in the 6.0 iteration of this thingy.
+  temp_humidity: !include
+    file: ../include/BMP280-AHT20-temp-humidity.yaml
+    vars: 
+      temperature_offset: "0"      
+  display: !include
+    file: ../include/SDD1306-display-arkadia.yaml
+  keypad: !include
+    file: ../include/10-key-keypad.yaml
+  door_lock_0: !include 
+    file: ../include/door-lock.yaml
+    vars: 
+      door_lock_id: "door_lock_0"
+      sensor_pin: "GPIO36"
+      motor_pin_1: "GPIO32"
+      motor_pin_2: "GPIO27"
+  door_lock_1: !include 
+    file: ../include/door-lock.yaml
+    vars: 
+      door_lock_id: "door_lock_1"
+      sensor_pin: "GPIO34"
+      motor_pin_1: "GPIO15"
+      motor_pin_2: "GPIO25"
+  door_sensor_0: !include
+    file: ../include/door-sensor.yaml
+    vars:
+      door_sensor_id: "door_sensor_0"
+      sensor_pin: "GPIO35"
+  door_sensor_1: !include
+    file: ../include/door-sensor.yaml
+    vars:
+      door_sensor_id: "door_sensor_1"
+      sensor_pin: "GPIO13"
+
+<<: !include 
+  file: ../include/esp32-device-baseline.yaml
+  vars:
+    # turn off UART0 logging so that we can use it for radar1
+    logger_baud_rate: "0"
+    device_hostname: "621-esphome"
+    device_friendly_name: "Arkadia House Sensor Hub 06.xx (621)"
+    device_comment: "Wherever you go, there you are."

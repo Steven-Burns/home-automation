@@ -1,0 +1,33 @@
+# This CPU speed selector works, but seems like a bad idea to generally expose, so packaging it
+# as an include-able component.
+select:
+  - platform: template
+    id: sys_set_cpu_freq_id
+    name: CPU Speed MHz
+    entity_category: config 
+    options:
+      - "unchanged"
+      - "240"
+      - "160"
+      - "80"
+    initial_option: "unchanged"
+    set_action:
+      - lambda: |- 
+          ESP_LOGD("cpusel", x.c_str());
+          if ("240" == x) 
+          {
+            setCpuFrequencyMhz(240);
+          } 
+          else if ("160" == x)
+          {
+            setCpuFrequencyMhz(160);
+          } 
+          else if ("80" == x)
+          {
+            setCpuFrequencyMhz(80);
+          }
+          else 
+          {
+            ESP_LOGD("cpusel", "CPU feq unchanged.");
+          }
+

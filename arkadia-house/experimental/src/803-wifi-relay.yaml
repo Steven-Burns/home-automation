@@ -1,0 +1,20 @@
+esp32:
+  board: seeed_xiao_esp32c3
+
+packages:
+  wifi: !include  
+    file: include/wifi.yaml
+  relay: !include 
+    file: include/single-relay.yaml
+    vars: 
+      relay_0_pin: "GPIO4"
+
+# "All Device" baseline stuff here
+
+<<: !include 
+  file: include/esp32-device-baseline.yaml
+  vars:
+    device_hostname: "803-esphome"
+    device_comment: "Wifi and relay on board 803."
+
+

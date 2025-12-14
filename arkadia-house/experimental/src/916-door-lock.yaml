@@ -1,0 +1,56 @@
+esp32:
+  board: lolin_s2_mini
+  variant: ESP32S2
+
+packages:
+  blinky: !include
+    file: include/interval-blinky.yaml
+    vars:
+      builtin_led_pin: "GPIO15"
+  wired_ethernet: !include
+    file: include/wired-ethernet.yaml
+    vars:
+      ethernet_clk_pin: "GPIO34"      # --- In future interations, might look at the datasheet to see 
+      ethernet_mosi_pin: "GPIO36"     #     if these are optimal choices.
+      ethernet_miso_pin: "GPIO11" 
+      ethernet_cs_pin: "GPIO21" 
+      ethernet_interrupt_pin: "GPIO16" 
+      ethernet_reset_pin: "GPIO9"
+
+# sensor:
+#   - platform: adc
+#     pin: GPIO2
+#     name: "Hall Effect analog signal"
+#     update_interval: 5s
+
+binary_sensor:
+  - platform: gpio
+    name: "Hall Effect digital signal"
+    pin:
+      number: GPIO3
+      mode:
+        input: true
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+
+switch:
+  - platform: gpio
+    name: "Door Lock"
+    id: door_lock_0_id
+    pin: 
+      number: GPIO40
+      inverted: true
+      mode:
+        output: true
+        pulldown: true
+        # pullup: false
+
+# "All Device" baseline stuff here
+
+<<: !include 
+  file: include/esp32-device-baseline.yaml
+  vars:
+    device_hostname: "916-esphome"
+    device_comment: "Baseline for board 916."
+

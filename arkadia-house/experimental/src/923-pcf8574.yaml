@@ -1,0 +1,290 @@
+esp32:
+  # board: nodemcu-32s This also works.
+  board: wemos_d1_mini32
+
+packages:
+  blinky: !include
+    file: ./../include/interval-blinky.yaml
+    vars:
+      builtin_led_pin: "GPIO2"
+  wifi: !include  
+    file: ./../include/wifi.yaml
+  i2c: !include
+    file: ./../include/i2c.yaml
+    vars:
+      # datasheet says 21 and 22 are I2C0
+      i2c_sda_pin: "GPIO21"
+      i2c_scl_pin: "GPIO22"
+      i2c_freq: "420kHz"
+
+# https://esphome.io/components/pcf8574.html#pcf8574-i-o-expander
+
+pcf8574:
+  - id: pcf8574_0_id
+    address: 0x27
+    pcf8575: true
+
+binary_sensor:
+  - platform: gpio
+    name: "PCF8574 Pin #0"
+    pin:
+      pcf8574: pcf8574_0_id
+      number: 0
+      inverted: true
+      mode: 
+        input: true
+  - platform: gpio
+    name: "PCF8574 Pin #1"
+    pin:
+      pcf8574: pcf8574_0_id
+      number: 1
+      inverted: true
+      mode:
+        input: true
+  - platform: gpio
+    name: "PCF8574 Pin #2"
+    pin:
+      pcf8574: pcf8574_0_id
+      number: 2
+      inverted: true
+      mode:
+        input: true
+  - platform: gpio
+    name: "PCF8574 Pin #3"
+    pin:
+      pcf8574: pcf8574_0_id
+      number: 3
+      inverted: true
+      mode: 
+        input: true
+  - platform: gpio
+    name: "PCF8574 Pin #4"
+    pin:
+      pcf8574: pcf8574_0_id
+      number: 4
+      inverted: false
+      mode:
+        input: true
+  - platform: gpio
+    name: "PCF8574 Pin #5"
+    pin:
+      pcf8574: pcf8574_0_id
+      number: 5
+      inverted: false
+      mode:
+        input: true
+  - platform: gpio
+    name: "PCF8574 Pin #6"
+    pin:
+      pcf8574: pcf8574_0_id
+      number: 6
+      inverted: false
+      mode:
+        input: true
+  - platform: gpio
+    name: "PCF8574 Pin #7"
+    pin:
+      pcf8574: pcf8574_0_id
+      number: 7
+      inverted: false
+      mode:
+        input: true
+      
+        
+# https://esphome.io/components/mcp230xx.html#mcp230xx-i-o-expander
+
+
+
+# This works
+light:
+  - platform: esp32_rmt_led_strip
+    id: light_0_id
+    name: "Light"
+    rgb_order: RGB
+    pin: GPIO4
+    num_leds: 2
+    rmt_channel: 0
+    chipset: ws2811
+    is_rgbw: false
+    default_transition_length: 0.5s
+    on_turn_on:
+      then:
+        - light.turn_on:
+            id: light_0_id
+            brightness: 20%
+            red: 0%
+            green: 100%
+            blue: 0%
+    effects:
+      - addressable_random_twinkle:
+      - addressable_random_twinkle:
+          name: Random Twinkle Effect With Custom Values
+          twinkle_probability: 5%
+          progress_interval: 32ms      
+      - addressable_fireworks:
+      - addressable_fireworks:
+          name: Fireworks Effect With Custom Values
+          update_interval: 32ms
+          spark_probability: 10%
+          use_random_color: false
+          fade_out_rate: 120      
+      - addressable_twinkle:
+      - addressable_twinkle:
+          name: Twinkle Effect With Custom Values
+          twinkle_probability: 5%
+          progress_interval: 4ms      
+      - addressable_scan:
+      - addressable_scan:
+          name: Scan Effect With Custom Values
+          move_interval: 100ms
+          scan_width: 1
+      - addressable_color_wipe:
+      - addressable_color_wipe:
+          name: Color Wipe Effect With Custom Values
+          colors:
+            - red: 100%
+              green: 100%
+              blue: 100%
+              num_leds: 5
+              gradient: true
+            - red: 0%
+              green: 0%
+              blue: 0%
+              num_leds: 1
+          add_led_interval: 100ms
+          reverse: false      
+      - addressable_rainbow:
+      - addressable_rainbow:
+          name: Rainbow Effect With Custom Values
+          speed: 10
+          width: 50      
+      - strobe:
+      - strobe:
+          name: Strobe Effect With Custom Values
+          colors:
+            - state: true
+              brightness: 100%
+              red: 100%
+              green: 90%
+              blue: 0%
+              duration: 500ms
+              transition_length: 1.5s              
+            - state: false
+              duration: 250ms
+            - state: true
+              brightness: 100%
+              red: 0%
+              green: 100%
+              blue: 0%
+              duration: 500ms      
+      - pulse:
+      - pulse:
+          name: "Fast Pulse"
+          transition_length: 0.5s
+          update_interval: 0.5s
+          min_brightness: 0%
+          max_brightness: 100%
+      - pulse:
+          name: "Slow Pulse"
+          transition_length: 500ms
+          update_interval: 2s
+      - pulse:
+          name: "Asymmetrical Pulse"
+          transition_length:
+            on_length: 1s
+            off_length: 500ms
+          update_interval: 1.5s      
+      - random:
+      - random:
+          name: Random Effect With Custom Values
+          transition_length: 5s
+          update_interval: 7s
+      - flicker:
+      - flicker:
+          name: Flicker Effect With Custom Values
+          alpha: 95%
+          intensity: 1.5%          
+      - addressable_flicker:
+      - addressable_flicker:
+          name: addressable Flicker Effect With Custom Values
+          update_interval: 16ms
+          intensity: 5%
+      - addressable_lambda:
+          name: "My Custom Lambda 1"
+          update_interval: 16ms
+          lambda: |-
+            // it.size() - Number of LEDs
+            // it[num] - Access the LED at index num.
+            // Set the LED at num to the given r, g, b values
+            // it[num] = Color(r, g, b);
+            // Get the color at index num (Color instance)
+            // it[num].get();
+
+            // Example: Simple color wipe
+            for (int i = it.size() - 1; i > 0; i--) {
+              it[i] = it[i - 1].get();
+            }
+            it[0] = Color::random_color();
+
+            // Bonus: use .range() and .all() to set many LEDs without having to write a loop.
+            it.range(0, 50) = Color::BLACK;
+            it.all().fade_to_black(10);          
+      - addressable_lambda:
+          name: "My Custom Lamba 2"
+          update_interval: 100ms
+          lambda: |-
+            // Static variables keep their value even when
+            // stopping and starting the effect again
+            static uint16_t progress = 0;
+
+            // normal variables lose their value after each
+            // execution - basically after each update_interval
+            uint16_t changes = 0;
+
+            // To reset static when stopping and starting the effect
+            // again you can use the initial_run variables
+            if (initial_run) {
+              progress = 0;
+              it.all() = Color::BLACK;
+              // optionally do a return so nothing happens until the next update_interval
+              return;
+            }                    
+
+# This also works
+# light:
+#   - platform: neopixelbus
+#     type: GRB
+#     variant: WS2811
+#     pin: GPIO4
+#     num_leds: 2
+#     name: "NeoPixel Light"
+  
+# This works too
+# light:
+#   - platform: esp32_rmt_led_strip
+#     pin: GPIO04
+#     rgb_order: RGB
+#     is_wrgb: false
+#     num_leds: 1
+#     rmt_channel: 1
+#     chipset: SK6812
+#     name: "Short Strip"
+#     effects:
+#       - addressable_random_twinkle:
+#       - addressable_fireworks:
+#       - addressable_twinkle:
+#       - addressable_scan:
+#       - addressable_rainbow:
+#       - strobe:
+#       - pulse:
+
+
+# "All Device" baseline stuff here
+
+<<: !include 
+  file: ./../include/esp32-device-baseline.yaml
+  vars:
+    device_hostname: "923-esphome"
+    device_friendly_name: "923-esphome"
+    device_comment: "PCF 8574 experiment"
+

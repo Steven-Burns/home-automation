@@ -1,0 +1,54 @@
+esp32:
+  board: nodemcu-32s
+
+packages:
+  wifi: !include
+    file: include/wifi.yaml
+  illuminance: !include
+    file: include/TEMT6000-illuminance.yaml
+    vars:
+      illuminance_pin: "GPIO36"
+  radar_motion: !include
+    file: include/HLK-LD2410-radar-motion.yaml
+    vars:
+      # GPIO1 and 3 are labeled as UART0, but that conflicts with logging
+      # so let's try 17 and 16
+      uart_2_tx_pin: "GPIO17"
+      uart_2_rx_pin: "GPIO16"
+  i2c: !include
+    file: include/i2c.yaml
+    vars:
+      i2c_sda_pin: "GPIO33"
+      i2c_scl_pin: "GPIO25"
+      i2c_freq: "420kHz"
+  temp_humidity: !include
+    file: include/BMP280-AHT20-temp-humidity.yaml
+  relay: !include
+    file: include/single-relay.yaml
+    vars:
+      relay_0_pin: "GPIO27"
+  display: !include
+    file: include/SDD1306-OLED-display-fast-boards.yaml
+
+binary_sensor:
+  - platform: gpio
+    name: "Relay Toggle Button"
+    id: button_0_id
+    pin:
+      number: GPIO15
+      mode:
+        input: true
+        pulldown: true
+    on_click:
+      min_length: 10ms
+      max_length: 1500ms
+      then:
+        - switch.toggle: relay_0_id
+
+# "All Device" baseline stuff here
+
+<<: !include 
+  file: include/esp32-device-baseline.yaml
+  vars:
+    device_hostname: "904-esphome"
+    device_comment: "Retrofit sensor unit on board 904."

@@ -1,0 +1,14 @@
+sensor:
+  - platform: adc
+    # this needs to be an analog input pin
+    pin: ${illuminance_pin}
+    name: "Photoresistor 0"
+    id: illuminance_id
+    # why centivolts? I want a 3-digit number
+    unit_of_measurement: cV
+    attenuation: auto
+    #raw: true
+    update_interval: 10s
+    filters:
+      - multiply: 100
+      - delta: 10.0

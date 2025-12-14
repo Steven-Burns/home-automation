@@ -1,0 +1,28 @@
+sensor:
+    # https://devices.esphome.io/devices/temt6000
+  - platform: adc
+    pin: ${illuminance_pin}
+    name: "Illuminance"
+    id: illuminance_id
+    device_class: illuminance
+    update_interval: 10s
+    unit_of_measurement: lx
+    attenuation: auto
+    filters:
+      - lambda: |-
+          return (x / 10000.0) * 2000000.0;
+
+
+# I wonder if this is relevant:
+# "This component prints the voltage as seen by the chip pin. 
+# On the ESP8266, this is always 0.0V to 1.0V Some development 
+# boards like the Wemos D1 mini include external voltage divider 
+# circuitry to scale down a 3.3V input signal to the chip-internal 
+# 1.0V. If your board has this circuitry, add a multiply filter to
+# get correct values:
+#
+#sensor:
+#  - platform: adc
+#    # ...
+#    filters:
+#      - multiply: 3.3

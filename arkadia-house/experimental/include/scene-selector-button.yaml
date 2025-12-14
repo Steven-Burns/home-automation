@@ -1,0 +1,148 @@
+# a selector and a button that changes the selection.
+
+substitutions:
+  button_pin: "GPIO15"
+  scene00: 'unset'
+  scene01: 'unset'
+  scene02: 'unset'
+  scene03: 'unset'
+  scene04: 'unset'
+  scene05: 'unset'
+  scene06: 'unset'
+  scene07: 'unset'
+  scene08: 'unset'
+  scene09: 'unset'
+  scene10: 'unset'
+
+select:
+  - platform: template
+    id: lighting_selector_id
+    name: "Lighting Scene Selector"
+    optimistic: true
+    options: 
+      - ${scene00}
+      - ${scene01}
+      - ${scene02}
+      - ${scene03}
+      - ${scene04}
+      - ${scene05}
+      - ${scene06}
+      - ${scene07}
+      - ${scene08}
+      - ${scene09}
+      - ${scene10}
+    set_action:
+      - logger.log:
+          format: "Chosen option: %s"
+          args: ["x.c_str()"]    
+      - homeassistant.action:
+          action: scene.turn_on
+          data_template: 
+            # these are evaluated by the HomeAssistant API call dispatcher, and can reference variables named in the variables: section
+            # following, using HA templating syntax.
+            entity_id: "{{ entity_id }}"
+          variables:
+            # these are evaluated on the device, before invoking the HomeAssistant API call
+            entity_id: |- 
+              std::string scene = std::string("scene.") + x.c_str();
+              ESP_LOGD("main", "Activating scene %s", scene.c_str());
+              return scene.c_str();
+
+# There is an argument to be made that the below is Bad Architecture: that the division of labor should be that the device 
+# simply reports events ("stimuli") and that the server Home Assistant decides how that stimuli should be interpreted.
+# In that latter design, HA would have a list of scenes, a selector acting as a cursor into that list, and the logic to decide 
+# when to switch between them, the device only says that a click or long click has been detected. 
+# That puts the policy of environmental change only in the server.  This makes for some cool capabilities, such as a server-side 
+# global lock that prevents scene changes during a dinner party by naughty children, for instance.
+
+binary_sensor:
+  - platform: gpio
+    name: "Keyswitch Selector"
+    id: keyswitch_0_id
+    pin:
+      number: ${button_pin}
+      mode:
+        input: true
+        pulldown: true
+    filters:
+      - delayed_on: 10ms
+      - delayed_off: 100ms
+    on_multi_click:
+    # This collection of timing values implements a click and a long click 
+    - timing:
+        - ON for at least 0.75s
+        - OFF for at least 0.1s
+      then:
+        - logger.log: Very long click
+        - switch.toggle: relay_0_id
+        - lambda: |-
+            auto select = id(lighting_selector_id);
+            auto index = select->active_index();
+            if (index.has_value()) 
+            {
+              int i = index.value();
+              ESP_LOGD("main", "Option at index %d is active", i);
+              
+              auto call = select->make_call();
+              if (i != 0)
+              {
+                // scene 0 is by convention the "all lights off" scene.
+                // If any scene other than "all off" is active, activate all off.
+                // meaning, if any lights are on, turn them off.
+                call.select_first();
+              }
+              else
+              {
+                // otherwise, jump to the last scene, which by-convention is the 
+                // "all lights at maximum brightness" scene.
+                call.select_last();
+              }
+
+              //... thus, long click means "if any lights are on, turn them off, else 
+              // turn everything on full."
+
+              call.perform();
+            } 
+            else 
+            {
+              ESP_LOGD("main", "No option is active");
+            }
+    - timing:
+        - ON for at most 0.75s
+        - OFF for at least 0.1s
+      then:
+        - logger.log: Clicked.
+        - lambda: |-
+            bool started_at_zero = false;
+            int i = 0;
+            auto select = id(lighting_selector_id);
+            auto index = select->active_index();
+            if (index.has_value()) 
+            {
+              i = index.value();
+              ESP_LOGD("main", "i = %d", i);
+
+              do 
+              {
+                if (++i >= select->size())
+                {
+                  if (started_at_zero)
+                  {
+                    // We've previously searched off the end of the set of selections, so give up.
+                    // This so we don't search in an infinite loop.
+                    return;
+                  }
+                  started_at_zero = true;
+                  i = 0;
+                }
+              }
+              while (strcasecmp(select->at(i)->c_str(), "unset") == 0);
+
+              auto call = select->make_call();
+              ESP_LOGD("main", "new index = %d", i);
+              call.set_index(i);
+              call.perform();
+            }
+            
+
+

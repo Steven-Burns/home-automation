@@ -1,0 +1,29 @@
+esp32:
+  board: lolin_s2_mini
+  variant: ESP32S2
+
+packages:
+  blinky: !include
+    file: include/interval-blinky.yaml
+    vars:
+      builtin_led_pin: "GPIO15"
+  # wifi: !include  
+  #   file: include/wifi.yaml
+  wired_ethernet: !include
+    file: include/wired-ethernet.yaml
+    vars:
+      ethernet_clk_pin: "GPIO35"  
+      ethernet_mosi_pin: "GPIO33" 
+      ethernet_miso_pin: "GPIO1" 
+      ethernet_cs_pin: "GPIO37" 
+      ethernet_interrupt_pin: "GPIO39" 
+      ethernet_reset_pin: "GPIO2"
+
+# "All Device" baseline stuff here
+
+<<: !include 
+  file: include/esp32-device-baseline.yaml
+  vars:
+    device_hostname: "907-esphome"
+    device_comment: "Board 907 with wired ethernet."
+

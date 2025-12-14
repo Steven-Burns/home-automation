@@ -1,0 +1,47 @@
+ethernet:
+  id: ethernet_id
+  type: W5500
+  clk_pin: ${ethernet_clk_pin}
+  mosi_pin: ${ethernet_mosi_pin}
+  miso_pin: ${ethernet_miso_pin}
+  cs_pin: 
+      number: ${ethernet_cs_pin}
+  interrupt_pin: ${ethernet_interrupt_pin}
+  reset_pin: ${ethernet_reset_pin}
+  clock_speed: 26.67Mhz 
+  # manual_ip:
+  #   static_ip: 192.168.4.76
+  #   gateway: 192.168.1.1
+  #   subnet: 255.255.0.0
+  #   dns1: 192.168.1.1
+  #   dns2: 8.8.8.8
+
+text_sensor:
+  - platform: ethernet_info
+    ip_address:
+      name: Wired IP Address
+      # This ID is significant and also defined for WiFi ethernet, so that whether the
+      # devide is wired or wireless, there is a single sensor ID for the IP address.
+      id: ip_address_id
+      entity_category: diagnostic
+      icon: "mdi:information-box"
+      # address_0:
+      #   name: Wired IP Address 0
+      # address_1:
+      #   name: Wired IP Address 1
+      # address_2:
+      #   name: Wired IP Address 2
+      # address_3:
+      #   name: Wired IP Address 3
+      # address_4:
+      #   name: Wired IP Address 4
+    dns_address:
+      name: Wired DNS Addresses
+      entity_category: diagnostic
+      icon: "mdi:information-box"
+    mac_address:
+      name: Wired MAC Address
+      entity_category: diagnostic
+      icon: "mdi:information-box"
+
+      

@@ -1,0 +1,192 @@
+font:
+  - file: "../../fonts/spleen-5x8.bdf"
+    id: tiny_font_id
+  - file: "../../fonts/Bahnschrift/bahnschrift.condensedsemibold.ttf"
+    id: large_font_id
+    size: 48
+  - file: "../../fonts/Bahnschrift/bahnschrift.condensedsemibold.ttf"
+    id: small_font_id
+    size: 36
+  - file: "../../fonts/Bahnschrift/bahnschrift.condensedsemibold.ttf"
+    id: med_font_id
+    size: 28
+
+display:
+  - platform: ssd1306_i2c
+    id: ssd1306_id
+    model: "SSD1306_128x64"
+    update_interval: 0.1s
+    contrast: 40%
+    invert: false
+    rotation: 270
+
+# maybe a device info page 
+          # auto ip_addr = id(ip_address_id)->get_state();
+          # it.printf(width, ++line * char_height, tiny_font, TextAlign::BASELINE_RIGHT, "%s", App.get_name().c_str());
+          # it.printf(width, ++line * char_height, tiny_font, TextAlign::BASELINE_RIGHT, "%s", ip_addr.c_str());
+
+    lambda: |-
+          static auto full_width = it.get_width();
+          static const int yellow_width = 16; 
+          static auto blue_width = full_width - yellow_width;
+          static auto height = it.get_height();
+          static auto tiny_font = id(tiny_font_id);
+          static auto big_font = id(large_font_id);
+          static auto small_font = id(small_font_id);
+          static auto med_font = id(med_font_id);
+          static const int tiny_char_height = 8;
+          static const int small_char_height = 16;
+          static const int med_char_height = 21;
+          static const int big_char_height = 37;
+          int yellow_line = 0;
+          int blue_line = 0;
+
+          std::string ip_addr = id(ip_address_id)->get_state();
+          std::string last_octet = "---";
+          std::string::size_type last_dot = ip_addr.rfind('.');
+          if (last_dot != std::string::npos) 
+          {
+            last_octet = ip_addr.substr(last_dot + 1, 3);
+          }
+          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, "%s", last_octet.c_str());
+
+          float lux = 0.0;
+          lux = id(illuminance_id)->state;
+          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, "%3.0f", lux);
+
+          // the encapsulation of data is ... not, as here we start to read all sorts of global data with 
+          // 'well-known' names...
+
+          bool radar_target0 = id(ld2410_0_target_detected);
+          bool radar_target1 = id(ld2410_1_target_detected);
+
+          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, 
+            "R%s%s",
+            radar_target0 ? "0" : "-",
+            radar_target1 ? "1" : "-");
+
+          bool is_door_lock_0_sensor_opened = id(door_lock_0_sensor).state;
+          bool is_door_lock_1_sensor_opened = id(door_lock_1_sensor).state;
+          bool is_door_0_sensor_opened = id(door_sensor_0).state;
+          bool is_door_1_sensor_opened = id(door_sensor_1).state;
+          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, 
+            "D%s%s", 
+            is_door_lock_0_sensor_opened ? "a" : "C",
+            is_door_lock_1_sensor_opened ? "a" : "C");
+          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, 
+            "d%s%s", 
+            is_door_0_sensor_opened ? "a" : "C",
+            is_door_1_sensor_opened ? "a" : "C");
+
+          int door_lock_0_state = id(door_lock_0).state;
+          int door_lock_1_state = id(door_lock_1).state;
+          it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT, 
+            "L%s%s",
+            (door_lock_0_state == 1) ? "L" : "U",
+            (door_lock_1_state == 1) ? "L" : "U");
+
+          auto key_states = id(keypad_key_states); 
+          for (int i = 0; i < 10; i += 2)
+          {
+            it.printf(full_width, yellow_line += tiny_char_height, tiny_font, TextAlign::BASELINE_RIGHT,
+            "%s %s",
+            key_states[i] ? std::to_string(i).c_str() : "-",
+            key_states[i+1] ? std::to_string(i+1).c_str() : "-");
+          }
+
+          // blinky routine as an array of connected points.
+          static const int NUM_BLINKIES = 3;
+          static const int MIN_X = full_width - yellow_width;
+          static const int MAX_X = full_width - 1;
+          static const int MIN_Y = height - 20;
+          static const int MAX_Y = height;
+          static int blinky_x[] = {0, 30, 10, 75};
+          static int blinky_y[] = {0, 5, 127, 30};
+          static int blinky_dx[] = {1, 1, -2, -3};
+          static int blinky_dy[] = {1, -2, 1, 1};
+          for (int i = 0; i < NUM_BLINKIES; ++i) 
+          {
+            blinky_x[i] += blinky_dx[i];
+            blinky_y[i] += blinky_dy[i];
+            if (blinky_x[i] > MAX_X) { blinky_x[i] = MAX_X;  blinky_dx[i] = -blinky_dx[i]; }
+            if (blinky_y[i] > MAX_Y) { blinky_y[i] = MAX_Y;  blinky_dy[i] = -blinky_dy[i]; }
+            if (blinky_x[i] < MIN_X ) { blinky_x[i] = MIN_X; blinky_dx[i] = -blinky_dx[i]; }
+            if (blinky_y[i] < MIN_Y ) { blinky_y[i] = MIN_Y; blinky_dy[i] = -blinky_dy[i]; }
+          }
+          for (int i = 0; i < NUM_BLINKIES; ++i)
+          {
+            if (NUM_BLINKIES - 1 == i) 
+            {
+              it.line(blinky_x[i], blinky_y[i], blinky_x[0], blinky_y[0], COLOR_ON);
+              break;
+            }
+            it.line(blinky_x[i], blinky_y[i], blinky_x[i + 1], blinky_y[i + 1], COLOR_ON);
+          
+          //  it.draw_pixel_at(blinky_x[i], blinky_y[i], COLOR_ON);
+          }
+
+          // 
+          // blue section
+          // 
+
+          // it.printf(blue_width, blue_line, tiny_font, TextAlign::BASELINE_RIGHT, "%s", App.get_name().c_str());
+
+          float hum = 0.0;
+          hum = id(humidity_id)->state;
+          it.printf(blue_width, blue_line += med_char_height, med_font, TextAlign::BASELINE_RIGHT, "%2.1f ", hum);
+          it.print(blue_width, blue_line, tiny_font, TextAlign::BOTTOM_RIGHT, "%");
+
+          float temp = 0.0;
+          temp = id(temperature_id)->state;
+          temp = temp * 1.8 + 32;
+          it.printf(blue_width, blue_line, med_font, TextAlign::TOP_RIGHT, "%1d", (int)(temp * 10) % 10);
+          it.printf(blue_width, blue_line += big_char_height, big_font, TextAlign::BASELINE_RIGHT, "%2.0f ", truncf(temp));
+          it.print(blue_width, blue_line, tiny_font, TextAlign::BOTTOM_RIGHT, "F");
+
+
+
+
+
+
+# Cycle through pages on a timer
+# interval:
+#   - interval: 5s
+#     then:
+#       - display.page.show_next: ssd1306_id
+#       - component.update: ssd1306_id
+
+
+# // en lieu of a hardware blinky light, toggle a software light every time the display is updated
+# static bool blinky_is_lit = true;
+# static int blinky_x = 0;
+# static int blinky_y = 0;
+# static int dx = 1;
+# static int dy = 1;
+# // auto radar_target = id(ld2410_0_moving_target_binary_sensor);
+# if (radar_moving)
+# {
+#   /*
+#   // motion detected: play the current animation frame and advance the frame
+#   auto ani = id(motion_detected_animation_id);
+#   it.image(0, 44, ani, COLOR_ON, COLOR_OFF);
+#   ani->next_frame();
+#   */
+
+#   // move the blinky.
+#   blinky_is_lit = true;
+#   blinky_x += dx; blinky_y += dy;
+#   if (blinky_x < 0) { blinky_x = 0; dx = -dx; }
+#   if (blinky_x > 16) { blinky_x = 16; dx = -dx; }
+#   if (blinky_y < 0) { blinky_y = 0; dy = -dy; }
+#   if (blinky_y > 12) { blinky_y = 12; dy = -dy; }
+# }
+# else 
+# {
+#   /*
+#   // no motion detected: show the standing still icon
+#   it.image(0, 44, id(standing_still_icon_id)); 
+#   */
+#   blinky_is_lit = !blinky_is_lit;
+
+# }
+# it.filled_rectangle(blinky_x, blinky_y, 2, 2, blinky_is_lit ? COLOR_ON : COLOR_OFF);

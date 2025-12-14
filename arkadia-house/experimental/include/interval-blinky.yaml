@@ -1,0 +1,22 @@
+# this combination of output and interval will blink the on-board led
+# without creating a home assistant entity. No entity means that the 
+# state transitions will not be communicated with Home Assistant and 
+# therefore generate no traffic no data logging history. This blinky is 
+# just to tell me that the "loop is running."
+
+output:
+  - platform: gpio
+    pin:
+      number: ${builtin_led_pin}
+      mode: output
+      # ignore_strapping_warning: true
+    id: on_board_led_id
+
+interval:
+  - interval: 500ms
+    then:
+      lambda: |- 
+        static bool led_is_on = false;
+        led_is_on = !led_is_on;
+        id(on_board_led_id)->set_state(led_is_on);
+

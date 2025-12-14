@@ -1,0 +1,20 @@
+esp32:
+  board: nodemcu-32s
+
+packages:
+  blinky: !include
+    file: include/interval-blinky.yaml
+    vars:
+      builtin_led_pin: "GPIO2"
+  wifi: !include  
+    file: include/wifi.yaml
+
+# "All Device" baseline stuff here
+
+<<: !include 
+  file: include/esp32-device-baseline.yaml
+  vars:
+    device_hostname: "901-esphome"
+    device_comment: "901 connected on WiFi."
+
+

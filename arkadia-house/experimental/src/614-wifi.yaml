@@ -1,0 +1,26 @@
+esp32:
+  board: lolin_s2_mini
+  variant: ESP32S2
+  cpu_frequency: 240MHZ
+  framework:
+    type: arduino
+
+packages:
+  diagnostics: !include 
+    file: ../include/diagnostics.yaml
+  blinky: !include
+    file: ../include/interval-blinky.yaml
+    vars:
+      builtin_led_pin: "GPIO15"
+  wifi: !include  
+    file: ../include/wifi.yaml
+
+# "All Device" baseline stuff here
+
+<<: !include 
+  file: ../include/esp32-device-baseline.yaml
+  vars:
+    device_hostname: "614-esphome"
+    device_friendly_name: "614-esphome"
+    device_comment: "Board Baseline."
+

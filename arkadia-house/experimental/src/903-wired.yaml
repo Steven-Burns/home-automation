@@ -1,0 +1,53 @@
+esp32:
+  board: nodemcu-32s
+
+packages:
+  blinky: !include
+    file: include/interval-blinky.yaml
+    vars:
+      builtin_led_pin: "GPIO2"
+  wired_ethernet: !include
+    file: include/wired-ethernet.yaml
+    vars:
+      ethernet_clk_pin: "GPIO18"
+      ethernet_mosi_pin: "GPIO23"
+      ethernet_miso_pin: "GPIO19"
+      ethernet_cs_pin: "GPIO5"
+      ethernet_interrupt_pin: "GPIO21"
+      ethernet_reset_pin: "GPIO22"
+  radar_motion: !include
+    file: include/HLK-LD2410-radar-motion.yaml
+    vars:
+      # 16 and 17 are supposedly the pins for ESP32 hardware UART 2
+      uart_2_tx_pin: "GPIO17"
+      uart_2_rx_pin: "GPIO16"
+  i2c: !include 
+    file: include/i2c.yaml
+    vars:
+      i2c_sda_pin: "GPIO32"
+      i2c_scl_pin: "GPIO33"
+  buttons: !include  
+    file: include/buttons.yaml
+    vars:
+      button_0_pin: "GPIO25"
+      button_1_pin: "GPIO26"
+  relay: !include 
+    file: include/single-relay.yaml
+    vars: 
+      relay_0_pin: "GPIO4"
+  display: !include 
+    file: include/SDD1306-display-simple.yaml
+
+# "All Device" baseline stuff here
+
+<<: !include 
+  file: include/esp32-device-baseline.yaml
+  vars:
+    device_hostname: "903-esphome"
+    device_comment: "Complete sensor array running on board 903 connected on wired ethernet."
+
+
+
+
+
+
