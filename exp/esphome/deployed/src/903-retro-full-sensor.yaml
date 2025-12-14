@@ -52,6 +52,7 @@ packages:
       scene05: "dining_tv_mode"
       scene06: creepy_dining_room
       scene07: dining_nitelite_mode
+      scene08: scene.dining_christmas
       scene10: bright_dining
 
 <<: !include 
