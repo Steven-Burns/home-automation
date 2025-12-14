@@ -10,14 +10,14 @@ packages:
   blinky: !include
     file: ../include/interval-blinky.yaml
     vars:
-      builtin_led_pin: "GPIO2"
+      builtin_led_pin: "GPIO2" # yes, you can ignore the strapping pin warning
   wired_ethernet: !include
     file: ../include/wired-ethernet.yaml
     vars:
       ethernet_clk_pin: "GPIO18"  
       ethernet_mosi_pin: "GPIO23" 
       ethernet_miso_pin: "GPIO19" 
-      ethernet_cs_pin: "GPIO05" 
+      ethernet_cs_pin: "GPIO05"  # yes, you can ignore the strapping pin warning
       ethernet_interrupt_pin: "GPIO26" 
       ethernet_reset_pin: "GPIO4"
   tone_player: !include
@@ -70,7 +70,7 @@ packages:
     vars: 
       door_lock_id: "door_lock_1"
       sensor_pin: "GPIO34"
-      motor_pin_1: "GPIO15"
+      motor_pin_1: "GPIO15" # yes, you can ignore the strapping pin warning
       motor_pin_2: "GPIO25"
   door_sensor_0: !include
     file: ../include/door-sensor.yaml
@@ -89,5 +89,5 @@ packages:
     # turn off UART0 logging so that we can use it for radar1
     logger_baud_rate: "0"
     device_hostname: "620-esphome"
-    device_friendly_name: "Arkadia House Sensor Hub 04 (620)"
+    device_friendly_name: "Arkadia House Sensor Hub v4 (620)"
     device_comment: "Wherever you go, there you are."
