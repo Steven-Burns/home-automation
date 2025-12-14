@@ -19,7 +19,6 @@ uart:
 ld2410:
   - id: ${radar_id}
     uart_id: ${uart_id}
-    throttle: 2s
 
 globals:
    - id: ${radar_id}_target_detected
@@ -65,12 +64,12 @@ sensor:
       name: ${radar_id} Moving Distance
       internal: true      
       filters:
-        - delta: 30
+        - delta: 10
     still_distance:
       name: ${radar_id} Motionless Distance
       internal: true
       filters:
-        - delta: 30
+        - delta: 10
     moving_energy:
       name: ${radar_id} Movement Energy
       internal: true
@@ -85,7 +84,7 @@ sensor:
       name: ${radar_id} Motion Detection Distance
       internal: true
       filters:
-        - delta: 30
+        - delta: 10
 
 button:
   - platform: ld2410
